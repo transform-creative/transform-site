@@ -6,7 +6,8 @@
       "Bash(npm audit:*)",
       "Bash(npm install:*)",
       "Bash(xargs grep:*)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "PowerShell(scoop install ffmpeg)"
     ]
   }
 }

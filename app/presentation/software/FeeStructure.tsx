@@ -76,7 +76,7 @@ export function FeeStructure({}: FeeStructureProps) {
                   "var(--borderRadius)",
               }}
             >
-              $15-40k
+              $10-50k
             </h3>
           </div>
           <h4 className="">1. Intital Build</h4>

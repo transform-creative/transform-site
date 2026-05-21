@@ -420,7 +420,7 @@ export function Carousel({
                 height: 15,
                 borderRadius: "50%",
                 background:
-                  selectedIndex === i ? "var(--accent)" : "var(--accent-md)",
+                  selectedIndex === i ? "var(--accent-sm)" : "var(--thirdColor)",
                 border: "none",
                 padding: 0,
                 cursor: "pointer",
