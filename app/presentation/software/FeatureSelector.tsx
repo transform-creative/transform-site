@@ -108,13 +108,13 @@ export default function FeatureSelector({ features }: Props) {
               ref={(el) => {
                 buttonRefs.current[index] = el;
               }}
-              className={`gap-10 center col middle ${feature.className ?? ""}`}
+              className={`gap-10 center col boxed middle ${feature.className ?? ""}`}
               style={{
                 width: 150,
                 color:
                   index === selectedIndex
                     ? "var(--accent)"
-                    : undefined,
+                    : 'var(--txt)',
               }}
               onClick={() => { hasInteracted.current = true; setSelectedIndex(index); }}
             >
@@ -127,7 +127,7 @@ export default function FeatureSelector({ features }: Props) {
                 size={25}
                 color={
                   index === selectedIndex
-                    ? "var(--accent)"
+                    ? "var(--bkg)"
                     : undefined
                 }
               />

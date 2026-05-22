@@ -1,16 +1,11 @@
-import { Project, type SharedContextProps } from "~/data/CommonTypes";
-import {
-  useNavigate,
-  useOutletContext,
-  useSearchParams,
-} from "react-router";
+import { type SharedContextProps } from "~/data/CommonTypes";
+import { useNavigate, useOutletContext } from "react-router";
 import { Icon } from "../elements/Icon";
 import { DesignTab } from "./DesignTab";
 import { MediaTab } from "./MediaTab";
 import { SoftwareTab } from "./SoftwareTab";
 import { ContactTab } from "./ContactTab";
-import { ProjectInfoPopup } from "./ProjectInfoPopup";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { PROJECTS } from "~/data/Objects";
 import { useGSAP } from "@gsap/react";
 import { SplitText, ScrollTrigger } from "gsap/all";
@@ -18,7 +13,7 @@ import gsap from "gsap";
 import HeaderText from "./HeaderText";
 import WorkedWith from "./WorkedWith";
 import { Carousel } from "../elements/Carousel";
-import { projectToIcon } from "~/business/commonBL";
+import { ProjectCarousel } from "../elements/ProjectCarousel";
 import { AnimatedDots } from "../elements/AnimatedDots";
 import { EndorsementCard } from "../elements/EndorsementCard";
 
@@ -30,10 +25,6 @@ export interface LandingPageProps {}
  */
 export function LandingPage({}: LandingPageProps) {
   const context: SharedContextProps = useOutletContext();
-  const [selectedProject, setSelectedProject] = useState<Project>();
-  const [viewProjectActive, setViewProjectActive] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [hoveredImage, setHoveredImage] = useState<number>();
 
   const navigate = useNavigate();
 
@@ -41,17 +32,6 @@ export function LandingPage({}: LandingPageProps) {
   const heroRef = useRef<HTMLDivElement>(null);
 
   gsap.registerPlugin(SplitText, ScrollTrigger);
-
-  useEffect(() => {
-    if (searchParams.get("project")) {
-      setSelectedProject(
-        PROJECTS.find(
-          (p) => p.id == parseInt(searchParams.get("project") || ""),
-        ),
-      );
-      setViewProjectActive(true);
-    }
-  }, []);
 
   /*******************************************************
    * GSAP
@@ -260,74 +240,7 @@ export function LandingPage({}: LandingPageProps) {
           className="mt3 w100 col middle center lateFade"
           style={{ opacity: 0 }}
         >
-          <Carousel
-            interval={3}
-            showArrows
-            autoplay
-            snapOffset={20}
-            width={100}
-            centerFocused
-            onClick={() => {}}
-            resistance={PROJECTS.length * 1000}
-          >
-            {PROJECTS.map((img, idx) => (
-              <div
-                key={`${img.id} - ${idx}`}
-                className="gap-20"
-                style={{ position: "relative" }}
-                onMouseOver={() => {
-                  setHoveredImage(img.id);
-                }}
-                onMouseOut={() => setHoveredImage(undefined)}
-                onClick={() => {
-                  setViewProjectActive(true);
-                  setSelectedProject(
-                    PROJECTS.find((p) => p.id == img.id),
-                  );
-                  setSearchParams(
-                    { project: img.id?.toString() },
-                    { preventScrollReset: true },
-                  );
-                }}
-              >
-                {hoveredImage == img.id && (
-                  <div className="">
-                    <h3
-                      style={{ zIndex: 20, color: "#eeeeee" }}
-                      className="overlayDiv mediumFade"
-                    >
-                      <Icon
-                        name={projectToIcon(img.type)}
-                        color="#eeeeee"
-                        className="mr2"
-                      />
-                      {img.name}
-                    </h3>
-                    <div
-                      className="overlayDiv"
-                      style={{
-                        opacity: 0.6,
-                        zIndex: 10,
-                        background: "var(--accent)",
-                      }}
-                    />
-                  </div>
-                )}
-                <img
-                  className="gallery-image"
-                  style={{
-                    filter: `${
-                      hoveredImage == img.id
-                        ? "contrast(0.8)"
-                        : "none"
-                    }`,
-                  }}
-                  src={`${img.images[0]}`}
-                  alt={`image of ${img.name} - a piece of digital content created by transform creative australia`}
-                />
-              </div>
-            ))}
-          </Carousel>
+          <ProjectCarousel projects={PROJECTS} />
         </div>
       </div>
           <h2
@@ -406,16 +319,6 @@ export function LandingPage({}: LandingPageProps) {
         />
       </div>
 
-      <ProjectInfoPopup
-        active={viewProjectActive}
-        project={selectedProject}
-        onClose={() => {
-          setViewProjectActive(false);
-          setTimeout(() => setSelectedProject(undefined), 300);
-          searchParams.delete("project");
-          setSearchParams(searchParams, { preventScrollReset: true });
-        }}
-      />
     </div>
   );
 }

@@ -11,7 +11,7 @@ export const PROJECTS: Project[] = [
     id: 102,
     organisation: "BaptistCare",
     name: "Breaking Free Program",
-    video: "https://youtu.be/BEAUVPc4ufU",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/Breaking_Free.mp4",
     images: [
       `https://api.freeflex.com.au/storage/v1/object/public/transform/BreakingFree-1.png`,
       `https://api.freeflex.com.au/storage/v1/object/public/transform/BreakingFree-2.png`,
@@ -28,7 +28,7 @@ export const PROJECTS: Project[] = [
     id: 105,
     organisation: "Crossover",
     name: "The Middle Sister Project",
-    video: "https://youtu.be/kuazOnc255k",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/MSP%20Trailer%20Update.mp4",
     images: [
       "https://api.freeflex.com.au/storage/v1/object/public/transform/MSP%20Basic%20horizontal.png",
       `https://api.freeflex.com.au/storage/v1/object/public/transform/MSP-1.png`,
@@ -83,7 +83,7 @@ export const PROJECTS: Project[] = [
       "https://api.freeflex.com.au/storage/v1/object/public/transform/CROSSOVER_SITE_5.png",
       "https://api.freeflex.com.au/storage/v1/object/public/transform/CROSSOVER_SITE_6.png",
     ],
-    video: "https://youtu.be/Mtk4BmTBYGQ",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/crossover_compress.mp4",
     endorsement: {
       name: "Andrew",
       text: "We couldn't be happier with the website Transform Creative set up for us. Isaac quickly grasped all our complex requirements and created a solution perfect for our needs. It all came in on budget and weeks ahead of time. Highly recommend!",
@@ -92,8 +92,8 @@ export const PROJECTS: Project[] = [
    {
     id: 106,
     organisation: "Red Frogs",
-    name: "A Day at The Cricket",
-    video: "https://youtu.be/WVEFzkTxw2g",
+    name: "Cricket volunteer experience",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/Red_frogs_volunteers-V1.mp4",
     images: [
       "https://api.freeflex.com.au/storage/v1/object/public/transform/RedFrogs-4.png",
       "https://api.freeflex.com.au/storage/v1/object/public/transform/RedFrogs-1.png",
@@ -111,7 +111,7 @@ export const PROJECTS: Project[] = [
     id: 103,
     organisation: "Crossover",
     name: "Help Where It's Needed Most",
-    video: "https://youtu.be/uuSdZ9qB1pM",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/Help%20where%20it's%20needed%20most%20-%20SUBS_1.mp4",
     images: [
       `https://api.freeflex.com.au/storage/v1/object/public/transform/HelpNeededMost-4.png`,
       `https://api.freeflex.com.au/storage/v1/object/public/transform/HelpNeededMost-1.png`,
@@ -148,7 +148,7 @@ export const PROJECTS: Project[] = [
     id: 107,
     organisation: "Sonder",
     name: "EOY Celebration",
-    video: "https://youtu.be/Elgg6WyI5WM",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/Sonder_EOY.mp4",
     images: [
       "https://api.freeflex.com.au/storage/v1/object/public/transform/Sonder-3.png",
       "https://api.freeflex.com.au/storage/v1/object/public/transform/Sonder-1.png",
@@ -165,7 +165,7 @@ export const PROJECTS: Project[] = [
     id: 108,
     organisation: "BaptistCare",
     name: "Wright Street Program",
-    video: "https://youtu.be/Hqe1naF86QM",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/Wright%20Street%20-%20subs.mp4",
     images: [
       "https://api.freeflex.com.au/storage/v1/object/public/transform/WrightStreet-4.png",
       "https://api.freeflex.com.au/storage/v1/object/public/transform/WrightStreet-1.png",
@@ -183,7 +183,7 @@ export const PROJECTS: Project[] = [
     id: 101,
     organisation: "Crossover",
     name: "Baptism Week 2025",
-    video: "https://youtu.be/V-3_UYeukKc?si=xX8LlopwfJczmWAy",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/Baptism%20Week%202025_3.mp4",
     images: [
       `https://api.freeflex.com.au/storage/v1/object/public/transform/BaptismWeek25-3.png`,
       `https://api.freeflex.com.au/storage/v1/object/public/transform/BaptismWeek25-2.png`,
@@ -202,7 +202,7 @@ export const PROJECTS: Project[] = [
     id: 104,
     organisation: "Crossover",
     name: "Life is now an offering",
-    video: "https://youtu.be/tlK0KfNtmJ0",
+    video: "https://api.freeflex.com.au/storage/v1/object/public/transform/Life%20is%20an%20offering%20-%20SUBS.mp4",
     images: [
       `https://api.freeflex.com.au/storage/v1/object/public/transform/LifeOffering-4.png`,
       `https://api.freeflex.com.au/storage/v1/object/public/transform/LifeOffering-1.png`,

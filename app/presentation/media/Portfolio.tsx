@@ -1,42 +1,29 @@
-import { Project, type SharedContextProps } from "~/data/CommonTypes";
-import {
-  useNavigate,
-  useOutletContext,
-  useSearchParams,
-} from "react-router";
+import { useSearchParams } from "react-router";
 import { PROJECTS } from "~/data/Objects";
-import ReactPlayer from "react-player";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Icon } from "../elements/Icon";
-import { ProjectInfoPopup } from "../landing/ProjectInfoPopup";
 import HeaderText from "../landing/HeaderText";
 import { ContactTab } from "../landing/ContactTab";
 import { AnimatedDots } from "../elements/AnimatedDots";
 import { ScrollMoreButton } from "../elements/ScrollMoreButton";
 import { AnimatedPageIcon } from "../elements/AnimatedPageIcon";
+import { ProjectCarousel } from "../elements/ProjectCarousel";
 
 export interface PortfolioProps {}
 
 /******************************
  * Portfolio component
- * @todo Create description
+ * Listing page — a home-style carousel of projects with type filters.
  */
 export function Portfolio({}: PortfolioProps) {
-  const context: SharedContextProps = useOutletContext();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [playing, setPlaying] = useState<number>();
-  const [project, setProject] = useState<Project>();
-  const [projectPopupActive, setProjectPopupActive] = useState(false);
   const filter = searchParams.get("type");
-  const reactPlayer = useRef(null);
   const filterSectionRef = useRef<HTMLDivElement>(null);
 
-  function videoMouseOver(id: number) {
-    setPlaying(id);
-  }
-
-  function videoMouseOff() {}
+  const filteredProjects = PROJECTS.filter((p) =>
+    filter ? p.type == filter : true,
+  );
 
   return (
     <div className="w100 col middle" style={{ minHeight: "100vh" }}>
@@ -107,94 +94,11 @@ export function Portfolio({}: PortfolioProps) {
           Software
         </button>
       </div>
-      <div className="m3 col middle center">
-        <div className="grid-auto w75">
-          {PROJECTS.filter((p) =>
-            filter ? p.type == filter : true,
-          ).map((p) => (
-            <div
-              key={`${p.name}-${p.id}`}
-              style={{
-                minWidth: 300,
-                aspectRatio: "16/9",
-                borderRadius: 5,
-              }}
-            >
-              <div
-                style={{
-                  zIndex: 20,
-                  position: "relative",
-                }}
-              >
-                <button
-                  onClick={() => {
-                    setProject(p);
-                    setProjectPopupActive(true);
-                    setPlaying(undefined);
-                  }}
-                  className="row gap-5 middle"
-                  style={{
-                    background: "var(--bkg)",
-                    padding: "2px 5px",
-                    position: "absolute",
-                    top: 10,
-                    right: 10,
-                    zIndex: 10,
-                  }}
-                >
-                  <Icon name={"information-circle"} />
-                  <p>More info</p>
-                </button>
-              </div>
-              {p.video ? (
-                <ReactPlayer
-                  key={p.id}
-                  src={p.video}
-                  ref={reactPlayer}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    aspectRatio: "16/9",
-                    objectFit: "cover",
-                    borderRadius: 5,
-                  }}
-                  muted={true}
-                  onMouseOver={() => videoMouseOver(p.id)}
-                  onMouseOut={() => videoMouseOff()}
-                  controls={true}
-                  playing={p.id == playing}
-                  light={
-                    playing == p.id ? undefined : (
-                      <img
-                        onMouseOver={() => videoMouseOver(p.id)}
-                        src={p.images[0]}
-                        style={{
-                          height: "100%",
-                          width: "100%",
-                          objectFit: "cover",
-                          borderRadius: 5,
-                        }}
-                        alt={`Cover image for ${p.name} created by Transform Creative in Adelaide, South Australia`}
-                      />
-                    )
-                  }
-                />
-              ) : (
-                <img
-                  onClick={() => setProject(p)}
-                  src={p.images[0]}
-                  style={{
-                    cursor: "pointer",
-                    height: "100%",
-                    width: "100%",
-                    borderRadius: 5,
-                  }}
-                  alt={`Image for ${p.name} - ${p.type} created by Transform Creative in Adelaide, South Australia`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+      <div className="m3 col middle center w-100">
+        <ProjectCarousel
+          key={filter || "all"}
+          projects={filteredProjects}
+        />
       </div>
       <div className="horizontal-line mediumFade mt-20" />
       <div
@@ -204,12 +108,6 @@ export function Portfolio({}: PortfolioProps) {
         <ContactTab />
       </div>
       <div className="horizontal-line mediumFade mb-20" />
-
-      <ProjectInfoPopup
-        project={project}
-        onClose={() => setProjectPopupActive(false)}
-        active={projectPopupActive}
-      />
     </div>
   );
 }

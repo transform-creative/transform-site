@@ -2,7 +2,7 @@ import type { SharedContextProps } from "~/data/CommonTypes";
 import { useNavigate, useOutletContext } from "react-router";
 import { Icon } from "../elements/Icon";
 import "./landing.css";
-import { useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { CONTACT } from "~/data/Objects";
 
 export interface ContactTabProps {
@@ -10,6 +10,7 @@ export interface ContactTabProps {
   headerText?: string;
   showHeader?: boolean;
   buttonText?: string;
+  style?: CSSProperties;
 }
 
 /******************************
@@ -21,6 +22,7 @@ export function ContactTab({
   headerText = "Got questions? Let's talk.",
   showHeader = true,
   buttonText = "Email us!",
+  style
 }: ContactTabProps) {
   const context: SharedContextProps = useOutletContext();
   const [playerPlay, setPlayerPlay] = useState(false);
@@ -49,10 +51,10 @@ export function ContactTab({
 
   return (
     <section id="contact" className="w-100 col middle center">
-      <div className="p3 col middle w100">
+      <div className="p3 col middle w100" >
         {showHeader && (
-          <div>
-            <div className="col middle center mb2">
+          <div >
+            <div className="col middle center mb2" >
               <Icon
                 name="chatbubble-ellipses-outline"
                 size={iconSize}
@@ -63,29 +65,32 @@ export function ContactTab({
             </div>
           </div>
         )}
-        <div className="w-50">
-          <div className="m2 row middle" style={{ gap: 8 }}>
+        <div className="w-50 col middle">
+          <button className="m2 row middle accent" style={{ gap: 8 }}>
             <a
-              style={{ textDecoration: "none", flex: 1 }}
-              className="p-10 w-100 accentButton row center middle"
+              style={{ textDecoration: "none", flex: 1, ...style }}
+              role="button"
+              className="p-10 w-100  row center middle"
               target="_blank"
               rel="noreferrer"
               href={`mailto:${CONTACT.email}`}
             >
-              <Icon name="mail-open" className="mr2" />
+              <Icon name="mail-open" className="mr2"  color={style?.color || undefined}/>
               {buttonText}
             </a>
-          </div>
+          </button>
         </div>
         <div className="row middle center clickable">
           <p onClick={copyEmail}>{CONTACT.email}</p>
           <button
+          style={{color: style?.color}}
             onClick={copyEmail}
             title="Copy email address"
             className="pt2 pb2"
           >
             <Icon
               name={copied ? "checkmark-outline" : "copy-outline"}
+              color={style?.background }
               size={15}
             />
           </button>

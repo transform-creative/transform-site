@@ -125,7 +125,11 @@ export default function DevelopmentRoute() {
       component: (
         <div className="col middle ">
           <button
-            className="row middle center gap-5 accentButton"
+            className="row middle center gap-5 boxed"
+            style={{
+              color: "var(--accent)",
+              background: "var(--bkg)",
+            }}
             onClick={() => {
               const top =
                 (feeStructureRef.current?.getBoundingClientRect()
@@ -158,6 +162,7 @@ export default function DevelopmentRoute() {
           headerText="Let's chat."
           buttonText="Book a 'no obligations' chat."
           showHeader={false}
+          style={{ color: "var(--accent)", background: "var(--bkg)" }}
         />
       ),
     },
@@ -177,6 +182,7 @@ export default function DevelopmentRoute() {
           headerText="Let's chat."
           buttonText="Book a 'no obligations' chat."
           showHeader={false}
+          style={{ color: "var(--accent)", background: "var(--bkg)" }}
         />
       ),
     },
@@ -193,6 +199,7 @@ export default function DevelopmentRoute() {
           headerText="Let's chat."
           buttonText="Book a 'no obligations' chat."
           showHeader={false}
+          style={{ color: "var(--accent)", background: "var(--bkg)" }}
         />
       ),
     },
@@ -207,7 +214,11 @@ export default function DevelopmentRoute() {
       component: (
         <div className="col middle ">
           <button
-            className="row middle center gap-5 accentButton"
+            className="row middle center gap-5"
+            style={{
+              color: "var(--accent)",
+              background: "var(--bkg)",
+            }}
             onClick={() => {
               const top =
                 (examplesRef.current?.getBoundingClientRect().top ??
@@ -218,7 +229,7 @@ export default function DevelopmentRoute() {
             }}
           >
             <Icon name="arrow-down" />
-            See examples of how we've helped other organisations
+            See examples of our work
           </button>
         </div>
       ),
@@ -289,7 +300,9 @@ export default function DevelopmentRoute() {
             offset={context.inShrink ? 150 : 100}
           />
         </div>
-       {context.inShrink || <div className="" style={{ height: 100 }} />}
+        {context.inShrink || (
+          <div className="" style={{ height: 100 }} />
+        )}
 
         <div className="w-50">
           <h2
@@ -310,7 +323,10 @@ export default function DevelopmentRoute() {
         className="horizontal-line mediumFade"
         style={{ top: -30 }}
       />
-      <div className="w-75 center" ref={featureSectionRef}>
+      <div
+        className="w-75 center accent boxed"
+        ref={featureSectionRef}
+      >
         <div className="p-20 w-100">
           <FeatureSelector features={buttons} />
         </div>
@@ -321,7 +337,11 @@ export default function DevelopmentRoute() {
         style={{ top: 0 }}
       />
 
-      <div className="col middle" ref={examplesRef}>
+      <div
+        className="col middle w-100"
+        ref={examplesRef}
+        style={{ overflow: "clip" }}
+      >
         <SoftwareProjects />
       </div>
 
