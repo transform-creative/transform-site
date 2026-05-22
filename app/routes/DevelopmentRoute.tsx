@@ -234,7 +234,7 @@ export default function DevelopmentRoute() {
         <AnimatedDots autoPlayDelay={0} />
         <div
           className="col middle center"
-          style={{ height: "100vh" }}
+          style={{ minHeight: "100vh" }}
         >
           <AnimatedPageIcon size={100} />
           <HeaderText
@@ -248,37 +248,34 @@ export default function DevelopmentRoute() {
             as="h2"
             className="center"
           />
-          <div className="row shrinkCol between">
+          <div
+            className="row shrinkCol between m-20"
+            style={{ width: context.inShrink ? "100vw" : "50vw" }}
+          >
             <div
-              className="w-100  row middle center m-20 "
+              className="w-100 row middle center"
               style={{
                 aspectRatio: "16 / 9",
-                width: context.inShrink ? "100vw" : "50vw",
+                borderRadius: "var(--borderRadius)",
+                overflow: "hidden",
               }}
             >
-              <div
-                className="m-20 w-100"
-                style={{ aspectRatio: "16 / 9" }}
-              >
-                <ReactPlayer
-                  src="https://api.freeflex.com.au/storage/v1/object/public/transform/Software-video.mp4"
-                  ref={reactPlayer}
-                  onClick={() => {
-                    setPlayerMuted(!playerMuted);
-                    !playerPlay && setPlayerPlay(true);
-                  }}
-                  className=""
-                  style={{
-                    minWidth: "100%",
-                    minHeight: "100%",
-                    objectFit: "cover",
-                    borderRadius: "var(--borderRadius)",
-                  }}
-                  muted={playerMuted}
-                  loop
-                  playing={playerPlay}
-                />
-              </div>
+              <ReactPlayer
+                src="https://api.freeflex.com.au/storage/v1/object/public/transform/Software-video.mp4"
+                ref={reactPlayer}
+                onClick={() => {
+                  setPlayerMuted(!playerMuted);
+                  !playerPlay && setPlayerPlay(true);
+                }}
+                style={{
+                  minWidth: "100%",
+                  minHeight: "100%",
+                  objectFit: "cover",
+                }}
+                muted={playerMuted}
+                loop
+                playing={playerPlay}
+              />
             </div>
           </div>
           <p className="center fade-md m-10 p-20">
