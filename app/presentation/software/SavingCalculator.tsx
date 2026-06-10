@@ -36,8 +36,8 @@ const THIRD_PARTY_CAUSE_SHARE = 0;
 // small orgs (so the engagement is still worthwhile) tapering to a thin slice
 // for large ones. Anchored so a ~$100k org yields the floor and a ~$10M org
 // hits the cap, with the dollar take clamped to [floor, cap] beyond that.
-const TRANSFORM_MIN_TAKE = 3_000; // floor — at least this much from a ~$100k org
-const TRANSFORM_MAX_TAKE = 80_000; // cap — no more than this from a ~$10M org
+const TRANSFORM_MIN_TAKE = 4000; // floor — at least this much from a ~$100k org
+const TRANSFORM_MAX_TAKE = 100_000; // cap — no more than this from a ~$10M org
 const SCALE_LOW_TOTAL = 100_000; // small-org anchor
 const SCALE_HIGH_TOTAL = 10_000_000; // large-org anchor
 const SCALE_LOW_CUT = 0.75; // our share of add-ons at the small-org anchor
@@ -204,70 +204,76 @@ export function SavingCalculator({}: SavingCalculatorProps) {
   }, []);
 
   return (
-    <div className="col middle w-100" ref={containerRef}>
+    <div className="col w-100" ref={containerRef}>
       {/* --- Controls --- */}
-      <div            style={{ background: "var(--accent-sm)" }}
-         className="col shrink-wrap middle center gap-20 mb-20 boxed pt-20 pb-20 w-100"
->
-        <div className="row"
-        >
-          <label className="row middle gap-10">
-            <p style={{ fontWeight: 600 }}>Annual fundraising total</p>
-            <div
-              className="row middle"
-              style={{
-                background: "var(--bkg)",
-                borderRadius: "var(--borderRadius)",
-              }}
-            >
-              $
-              <input
-                type="number"
-                min={0}
-                step={0.1}
-                value={annualTotal / 1_000_000}
-                onChange={(e) =>
-                  setAnnualTotal(Math.max(0, +e.target.value) * 1_000_000)
-                }
+      <div
+        style={{ background: "var(--accent-sm)" }}
+        className="row shrink-wrap between gap-20 mb-20 boxed p-20"
+      >
+        <div className="row w-100 between middle shrink-wrap">
+          <div className="col">
+            <label className="row middle gap-10">
+              <p style={{ fontWeight: 600 }}>
+                Annual fundraising total
+              </p>
+              <div
+                className="row middle"
                 style={{
-                  border: "none",
-                  background: "transparent",
-                  fontWeight: 700,
-                  width: 70,
-                  color: "var(--txt)",
-                  outline: "none",
+                  background: "var(--bkg)",
+                  borderRadius: "var(--borderRadius)",
                 }}
+              >
+                $
+                <input
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={annualTotal / 1_000_000}
+                  onChange={(e) =>
+                    setAnnualTotal(
+                      Math.max(0, +e.target.value) * 1_000_000,
+                    )
+                  }
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    maxWidth: 70,
+                    fontWeight: 800,
+                    fontSize: '1.2rem',
+                    color: "var(--txt)",
+                    outline: "none",
+                  }}
+                />
+                <p>
+                  Million
+                </p>
+              </div>
+            </label>
+            <div className="row middle gap-10">
+              <p>
+                <strong>'Cover admin costs'</strong> toggle default state
+              </p>
+               <ToggleSwitch
+                on={coverCostsDefaultOn}
+                onChange={setCoverCostsDefaultOn}
               />
-              <span style={{ paddingRight: 10, fontWeight: 700 }}>
-                Million
-              </span>
             </div>
-          </label>
-          <div className="row middle gap-10">
-            <ToggleSwitch
-              on={coverCostsDefaultOn}
-              onChange={setCoverCostsDefaultOn}
-            />
-            <span>
-              <strong>'Cover costs'</strong> toggle default state
-            </span>
+          </div>
+          <div className="col end center mb-20">
+            <h2>+ {fmt(extraToCause)}</h2>
+            <p>To your cause</p>
           </div>
         </div>
-         <div className="col middle center mb-20">
-          <h2>+ {fmt(extraToCause)}</h2>
-          <p>To your cause</p>
-        </div>
       </div>
-     
-      {/* --- Comparison cards --- */}
-        <div
-          className={
-            (context.inShrink ? "col" : "row") +
-            " middle center gap-20 w-100"
-          }
-        >
-                <div className="w-100">
 
+      {/* --- Comparison cards --- */}
+      <div
+        className={
+          (context.inShrink ? "col" : "row") +
+          " middle center gap-20 w-100"
+        }
+      >
+        <div className="w-100">
           {/* Transform Creative */}
           <div
             data-card
@@ -291,7 +297,7 @@ export function SavingCalculator({}: SavingCalculatorProps) {
               split={[
                 {
                   name: "Transform Creative",
-                  value: pct(transform.providerShare),
+                  value: pct(Math.round(transform.providerShare*100)/100),
                 },
                 {
                   name: "Your cause",
@@ -300,19 +306,19 @@ export function SavingCalculator({}: SavingCalculatorProps) {
               ]}
             />
           </div>
-      </div>
+        </div>
 
         {/* Third party */}
-                  <div className="w-100">
-        <div
-          data-card
-          className="col middle boxed p-20"
-          style={{
-            alignSelf: "stretch",
-            background: "var(--bkg)",
-            border: "1px solid var(--accent-md)",
-          }}
-        >
+        <div className="w-100">
+          <div
+            data-card
+            className="col middle boxed p-20"
+            style={{
+              alignSelf: "stretch",
+              background: "var(--bkg)",
+              border: "1px solid var(--accent-md)",
+            }}
+          >
             <CardHeading
               name={thirdParty.name}
               emphasis={thirdParty.emphasis}
@@ -396,7 +402,7 @@ function CardHeading({
         <strong>{emphasis}</strong>
         {after}
       </span>
-      <h1 style={{ color, margin: 0 }}>{fmt(amount)}</h1>
+      <h2 style={{ color, margin: 0 }}>{fmt(amount)}</h2>
     </div>
   );
 }
