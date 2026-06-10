@@ -29,9 +29,7 @@ export default function SoftwareProjects() {
 
   return (
     <div className="col middle center gap-20 w-100 m-20">
-      <h2 id="software-projects-title" style={{ textAlign: "center" }}>
-        Projects we're proud of
-      </h2>
+
       <ProjectCarousel projects={softwareProjects} />
     </div>
   );

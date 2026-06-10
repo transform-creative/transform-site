@@ -18,6 +18,7 @@ import { useOutletContext } from "react-router";
 import { ContactTab } from "~/presentation/landing/ContactTab";
 import { AnimatedPageIcon } from "~/presentation/elements/AnimatedPageIcon";
 import ReactPlayer from "react-player";
+import { SavingCalculator } from "~/presentation/software/SavingCalculator";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -243,32 +244,16 @@ export default function DevelopmentRoute() {
     >
       <div className="w-100 center col middle gap-20">
         <AnimatedDots autoPlayDelay={0} />
-        <div
-          className="col middle center"
-          style={{ minHeight: "100vh" }}
-        >
-          <AnimatedPageIcon size={100} />
-          <HeaderText
-            text={["Software development"]}
-            typingSpeed={50}
-            pauseDuration={500}
-            showCursor={true}
-            cursorCharacter="|"
-            color="var(--accent)"
-            textColors={["var(--accent)"]}
-            as="h2"
-            className="center"
-          />
+        <div className="col middle center">
           <div
-            className="row shrinkCol between m-20"
-            style={{ width: context.inShrink ? "100vw" : "50vw" }}
+            style={{ minHeight: "50vh" }}
+            className="row middle between w-75 gap-20 shrink-wrap"
           >
             <div
-              className="w-100 row middle center"
+              className="w-100"
               style={{
                 aspectRatio: "16 / 9",
                 borderRadius: "var(--borderRadius)",
-                overflow: "hidden",
               }}
             >
               <ReactPlayer
@@ -281,43 +266,43 @@ export default function DevelopmentRoute() {
                 style={{
                   minWidth: "100%",
                   minHeight: "100%",
-                  objectFit: "cover",
+                  borderRadius: "var(--borderRadius)",
                 }}
                 muted={playerMuted}
                 loop
                 playing={playerPlay}
               />
             </div>
+            <div className="col gap-10 start">
+              <h2>
+                We develop custom sites that reduce fundraising
+                overheads and turn donors into believers.
+              </h2>
+              <div className="row gap-10">
+                <button className="accent">
+                  What could my org save?
+                </button>
+                <button className="outline">Contact us</button>
+              </div>
+            </div>
           </div>
-          <p className="center fade-md m-10 p-20">
-            We build custom websites for non-profit organisations with
-            a focus on increasing user trust and engagement.
-          </p>
-          <ScrollMoreButton
-            id="dev-more-btn"
-            targetRef={headerTextRef}
-            label="More info"
-            offset={context.inShrink ? 150 : 100}
-          />
         </div>
-        {context.inShrink || (
-          <div className="" style={{ height: 100 }} />
-        )}
+        <div
+          className="col middle w-100"
+          ref={examplesRef}
+          style={{ overflow: "clip" }}
+        >
+          <SoftwareProjects />
+        </div>
 
-        <div className="w-50">
-          <h2
-            id="dev-header"
-            ref={headerTextRef}
-            className=""
-            style={{ textAlign: "center" }}
-          >
-            Not just a software vendor. We're here to help you track,
-            analyse and understand your data and leverage it for
-            maximum impact.
+        <div className="w-75 mb-20 pb-20 col gap-20 middle">
+          {" "}
+          <h2 className="center accent mb-10 w-75" style={{color: "var(--txt)"}}>
+            Our sites redirect third party donation fees back to you,
+            allowing you to keep more of every dollar raised.
           </h2>
+          <SavingCalculator />
         </div>
-
-        <div className="" style={{ height: 100 }} />
       </div>
       <div
         className="horizontal-line mediumFade"
@@ -336,14 +321,6 @@ export default function DevelopmentRoute() {
         className="horizontal-line mediumFade mt-20"
         style={{ top: 0 }}
       />
-
-      <div
-        className="col middle w-100"
-        ref={examplesRef}
-        style={{ overflow: "clip" }}
-      >
-        <SoftwareProjects />
-      </div>
 
       <div
         className="horizontal-line mediumFade mb-20"

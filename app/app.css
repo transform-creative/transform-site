@@ -109,7 +109,7 @@ h2 {
   font-weight: 200;
   margin: 0;
   text-align: start;
-  font-size: 60pt;
+  font-size: 40pt;
   line-height: 1.2;
   color: var(--accent);
 }
@@ -188,6 +188,7 @@ a {
 input {
   font-family: "Onest", sans-serif;
   color: var(--txt);
+  font-size:  1rem;
   background: var(--bkg);
   height: 50px;
   height: 3em;
