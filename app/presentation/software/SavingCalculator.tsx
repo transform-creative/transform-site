@@ -301,7 +301,7 @@ export function SavingCalculator({}: SavingCalculatorProps) {
                 },
                 {
                   name: "Your cause",
-                  value: pct(1 - transform.providerShare),
+                  value: pct(1 - (Math.round(transform.providerShare*100)/100)),
                 },
               ]}
             />
