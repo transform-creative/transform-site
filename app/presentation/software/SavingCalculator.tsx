@@ -45,11 +45,11 @@ const THIRD_PARTY_CAUSE_SHARE = 0;
 // for large ones. Anchored so a ~$100k org yields the floor and a ~$10M org
 // hits the cap, with the dollar take clamped to [floor, cap] beyond that.
 const TRANSFORM_MIN_TAKE = 5000; // floor — at least this much from a ~$100k org
-const TRANSFORM_MAX_TAKE = 100_000; // cap — no more than this from a ~$10M org
+const TRANSFORM_MAX_TAKE = 130_000; // cap — no more than this from a ~$10M org
 const SCALE_LOW_TOTAL = 100_000; // small-org anchor
 const SCALE_HIGH_TOTAL = 10_000_000; // large-org anchor
 const SCALE_LOW_CUT = 0.85; // our share of add-ons at the small-org anchor
-const SCALE_HIGH_CUT = 0.15; // our share of add-ons at the large-org anchor
+const SCALE_HIGH_CUT = 0.25; // our share of add-ons at the large-org anchor
 
 const DEFAULT_ANNUAL_TOTAL = 1_000_000;
 
