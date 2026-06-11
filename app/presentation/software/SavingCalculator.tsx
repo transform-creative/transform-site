@@ -455,7 +455,7 @@ export function SavingCalculator({}: SavingCalculatorProps) {
         </div>
       </div>
 
-      <p className="center mt-20" style={{ fontStyle: "italic", opacity: 0.6 }}>
+      <p className="textCenter mt-20" style={{ fontStyle: "italic", opacity: 0.6 }}>
           *Estimate only. Assumes an average donation of ${" "}
           <InlineNumber
             value={avgDonation}
