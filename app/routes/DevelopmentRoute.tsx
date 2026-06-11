@@ -132,7 +132,7 @@ export default function DevelopmentRoute() {
       text: "No exorbitant 'platform fee'",
       description: [
         "'Percentage based' giving platforms make it easy to get started, but that ~4% fee adds up as you scale.",
-        "We charge a modest fee, not a percentage of your donations, so you keep more of the money you raise.",
+        "We charge a modest fee, not a percentage of yFdonations, so you keep more of the money you raise.",
       ],
       component: (
         <div className="col middle ">
@@ -314,8 +314,9 @@ export default function DevelopmentRoute() {
         </div>
 
         <div
-          className="w-75 mb-20 pb-20 col gap-20 middle"
+          className="w-75 mb-20 pb-20 col gap-20 middle center"
           ref={savingsRef}
+          style={{minHeight: '90vh'}}
         >
           {" "}
           <h2 className="textCenter accent mb-10 w-75" style={{color: "var(--txt)"}}>
@@ -338,19 +339,6 @@ export default function DevelopmentRoute() {
         </div>
       </div>
 
-      <div
-        className="horizontal-line mediumFade mt-20"
-        style={{ top: 0 }}
-      />
-
-      <div
-        className="horizontal-line mediumFade mb-20"
-        style={{ top: 0 }}
-      />
-
-      <div className="w-75" ref={feeStructureRef}>
-        <FeeStructure />
-      </div>
 
       <div
         className="horizontal-line mediumFade"
