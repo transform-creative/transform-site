@@ -9,7 +9,12 @@
       "Bash(npx tsc *)",
       "PowerShell(scoop install ffmpeg)",
       "Bash(npm run *)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"root: %{http_code}\\\\n\" https://www.transformcreative.com.au/)",
+      "Bash(curl -s -o /dev/null -w \"portfolio: %{http_code}\\\\n\" https://www.transformcreative.com.au/portfolio)",
+      "Bash(curl -s -o /dev/null -w \"development: %{http_code}\\\\n\" https://www.transformcreative.com.au/development)",
+      "Bash(curl -s -o /dev/null -w \"random: %{http_code}\\\\n\" https://www.transformcreative.com.au/asdfqwer)",
+      "Bash(curl -s https://www.transformcreative.com.au/)"
     ]
   }
 }
