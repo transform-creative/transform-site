@@ -186,27 +186,27 @@ export function LandingPage({}: LandingPageProps) {
             <div className="row center w50 m3" style={{ zIndex: 10 }}>
               <button
                 id="landing-software-button"
-                className="boxed accent row middle ml3 mr3 lateFade"
-                style={{ opacity: 0, color: "var(--bkg)" }}
-                onClick={() => navigate("#software")}
+                className="boxed  row middle ml3 mr3 lateFade"
+                style={{ opacity: 0, color: "var(--accent)" }}
+                onClick={() => navigate("/development")}
               >
                 <Icon
                   name="code-outline"
                   className="mr1"
-                  color="var(--bkg)"
+                  color="var(--accent)"
                 />
                 Software
               </button>
               <button
                 id="landing-media-button"
-                className="boxed accent row middle ml2 mr3 lateFade"
-                style={{ opacity: 0, color: "var(--bkg)" }}
+                className="boxed  row middle ml2 mr3 lateFade"
+                style={{ opacity: 0, color: "var(--accent)" }}
                 onClick={() => navigate("#media")}
               >
                 <Icon
                   name="film-outline"
                   className="mr1"
-                  color="var(--bkg)"
+                  color="var(--accent)"
                 />
                 Video
               </button>

@@ -544,6 +544,14 @@ h5.center {
 @media (max-width: 1200px) {
   .shrink-wrap {
     flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+    .shrink-col {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
   .shrink-hide {
     opacity: 0;
@@ -615,4 +623,44 @@ h5.center {
 
 .shaded > * {
   background: #D0D0D0;
+}
+
+/************************************
+************ Range slider ***********
+*************************************/
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Remove the focus box that browsers draw around the control */
+.slider:focus,
+.slider:focus-visible {
+  outline: none;
+}
+.slider::-moz-focus-outer {
+  border: 0;
+}
+
+/* The draggable knob — coloured var(--bkg) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: var(--bkg);
+  border: 2px solid var(--accent);
+}
+.slider::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: var(--bkg);
+  border: 2px solid var(--accent);
 }

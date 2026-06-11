@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "~/presentation/elements/Icon";
 import { Route } from "../+types/root";
 import "../app-v2.css";
@@ -14,7 +14,7 @@ import gsap from "gsap";
 import HeaderText from "~/presentation/landing/HeaderText";
 import { ScrollMoreButton } from "~/presentation/elements/ScrollMoreButton";
 import { SharedContextProps } from "~/data/CommonTypes";
-import { useOutletContext } from "react-router";
+import { useOutletContext, useSearchParams } from "react-router";
 import { ContactTab } from "~/presentation/landing/ContactTab";
 import { AnimatedPageIcon } from "~/presentation/elements/AnimatedPageIcon";
 import ReactPlayer from "react-player";
@@ -75,8 +75,19 @@ export default function DevelopmentRoute() {
   const featureSectionRef = useRef<HTMLDivElement>(null);
   const feeStructureRef = useRef<HTMLDivElement>(null);
   const examplesRef = useRef<HTMLDivElement>(null);
+  const savingsRef = useRef<HTMLDivElement>(null);
   const headerTextRef = useRef<HTMLHeadingElement>(null);
   const context: SharedContextProps = useOutletContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("section") !== "savings") return;
+    const top =
+      (savingsRef.current?.getBoundingClientRect().top ?? 0) +
+      window.scrollY -
+      100;
+    window.scrollTo({ top, behavior: "smooth" });
+  }, [searchParams]);
 
   // React player vars
   const reactPlayer = useRef(null);
@@ -247,7 +258,7 @@ export default function DevelopmentRoute() {
         <div className="col middle center">
           <div
             style={{ minHeight: "50vh" }}
-            className="row middle between w-75 gap-20 shrink-wrap"
+            className="row middle between w-75 gap-20 shrink-col"
           >
             <div
               className="w-100"
@@ -273,13 +284,20 @@ export default function DevelopmentRoute() {
                 playing={playerPlay}
               />
             </div>
-            <div className="col gap-10 start">
-              <h2>
-                We develop custom sites that reduce fundraising
-                overheads and turn donors into believers.
+            <div className="col gap-20 start shrink-col">
+              <h2 className="shrink-col">
+                We develop custom sites that <strong>
+                  reduce fundraising
+                  overheads
+                </strong> and turn donors into believers.
               </h2>
-              <div className="row gap-10">
-                <button className="accent">
+              <div className="row gap-10 shrink-col">
+                <button
+                  className="accent"
+                  onClick={() =>
+                    setSearchParams({ section: "savings" })
+                  }
+                >
                   What could my org save?
                 </button>
                 <button className="outline">Contact us</button>
@@ -295,10 +313,13 @@ export default function DevelopmentRoute() {
           <SoftwareProjects />
         </div>
 
-        <div className="w-75 mb-20 pb-20 col gap-20 middle">
+        <div
+          className="w-75 mb-20 pb-20 col gap-20 middle"
+          ref={savingsRef}
+        >
           {" "}
-          <h2 className="center accent mb-10 w-75" style={{color: "var(--txt)"}}>
-            Our sites redirect third party donation fees back to you,
+          <h2 className="textCenter accent mb-10 w-75" style={{color: "var(--txt)"}}>
+            Our sites redirect third party donation fees <strong>back to you</strong>,
             allowing you to keep more of every dollar raised.
           </h2>
           <SavingCalculator />
