@@ -228,7 +228,7 @@ export function MediaTab({}: MediaTabProps) {
           >
             <ReactPlayer
               ref={reactPlayer}
-              src="https://api.freeflex.com.au/storage/v1/object/public/transform/2026%20reel-LQ.mp4"
+              src="https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/2026%20reel-LQ.mp4"
               onClick={() => {
                 setPlayerMuted(!playerMuted);
                 !playerPlay &&

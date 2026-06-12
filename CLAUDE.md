@@ -68,7 +68,7 @@ app/
 
 Portfolio projects, contact details, and client logos are **all static** — defined in `app/data/Objects.tsx` as a `PROJECTS` array and related constants. Project media is hosted at:
 ```
-https://api.freeflex.com.au/storage/v1/object/public/transform/
+https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/
 ```
 
 No dynamic database queries exist yet. Supabase is initialised (env vars configured) but only used for authentication.

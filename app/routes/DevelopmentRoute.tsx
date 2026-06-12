@@ -268,7 +268,7 @@ export default function DevelopmentRoute() {
               }}
             >
               <ReactPlayer
-                src="https://api.freeflex.com.au/storage/v1/object/public/transform/Software-video.mp4"
+                src="https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Software-video.mp4"
                 ref={reactPlayer}
                 onClick={() => {
                   setPlayerMuted(!playerMuted);

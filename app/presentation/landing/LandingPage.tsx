@@ -138,7 +138,7 @@ export function LandingPage({}: LandingPageProps) {
         >
           <video
             ref={videoRef}
-            src="https://api.freeflex.com.au/storage/v1/object/public/transform/GREEN_DAPPLED_WALL_SCRUB.mp4"
+            src="https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/GREEN_DAPPLED_WALL_SCRUB.mp4"
             muted
             playsInline
             preload="auto"
