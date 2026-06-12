@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import type { IoniconName } from "~/data/Ionicons";
 import type { ActivatableElement } from "~/data/CommonTypes";
 import { Icon } from "./Icon";
+import '../../app-v2.css'
 
 interface BasicMenuProps extends ActivatableElement {
   children: any;
@@ -69,7 +70,7 @@ const BasicMenu = ({
         <div
           ref={transitionRef}
           style={{ zIndex: zIndex }}
-          className="fillScreen col end"
+          className="fillScreen col middle bottom"
           onClick={() => {
             if (!disableClickOff) onClose();
           }}

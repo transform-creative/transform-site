@@ -14,7 +14,20 @@
       "Bash(curl -s -o /dev/null -w \"portfolio: %{http_code}\\\\n\" https://www.transformcreative.com.au/portfolio)",
       "Bash(curl -s -o /dev/null -w \"development: %{http_code}\\\\n\" https://www.transformcreative.com.au/development)",
       "Bash(curl -s -o /dev/null -w \"random: %{http_code}\\\\n\" https://www.transformcreative.com.au/asdfqwer)",
-      "Bash(curl -s https://www.transformcreative.com.au/)"
+      "Bash(curl -s https://www.transformcreative.com.au/)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Read(//c/Users/isaac/AppData/Local/Temp/claude/bundled-skills/**)",
+      "Read(//c/Users/isaac/AppData/Local/Temp/claude/bundled-skills/2.1.173/4a024723081a2f72465a60c0191b38d0/**)",
+      "Bash(timeout 40 bash -c 'until curl -sf http://localhost:5173 >/dev/null 2>&1 || curl -sf http://localhost:3000 >/dev/null 2>&1; do sleep 1; done')",
+      "Read(//tmp/**)",
+      "Bash(chromium-cli --session app)",
+      "Bash(node -e \"try{require.resolve\\('playwright'\\);console.log\\('playwright OK'\\)}catch{try{require.resolve\\('puppeteer'\\);console.log\\('puppeteer OK'\\)}catch{console.log\\('none'\\)}}\")",
+      "Bash(npm ls *)",
+      "Bash(curl -s http://localhost:5174/auth)",
+      "mcp__claude_ai_Supabase__generate_typescript_types",
+      "PowerShell(npm run typecheck)",
+      "mcp__claude_ai_Supabase__apply_migration"
     ]
   }
 }

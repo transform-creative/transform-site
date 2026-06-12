@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Z_BINARY } from "zlib";
 import { SharedContextProps } from "~/data/CommonTypes";
+import { supabaseSignOut } from "~/database/Auth";
 
 export interface HeaderBarProps {
   inShrink: boolean;
@@ -86,6 +87,7 @@ export function HeaderBar({ inShrink, context }: HeaderBarProps) {
               <MenuOptions
                 inShrink={inShrink}
                 onClose={() => setMenuActive(false)}
+                context={context}
               />
             </div>
           )}
@@ -114,13 +116,29 @@ export function HeaderBar({ inShrink, context }: HeaderBarProps) {
 interface MenuOptionsProps {
   inShrink: boolean;
   onClose: () => void;
+  context: SharedContextProps;
 }
 
-function MenuOptions({ inShrink,  onClose }: MenuOptionsProps) {
+function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
   const navigate = useNavigate();
 
-
   const textSize = inShrink ? "30px" : undefined;
+
+  const user = context.session?.user;
+  const isSignedIn = !!user;
+  // Clients carry their business id in app_metadata.client_of
+  const isClient = !!user?.app_metadata?.client_of;
+
+  async function handleSignOut() {
+    const result = await supabaseSignOut();
+    if (result !== true) {
+      context.popAlert("Could not sign out", "Please try again", true);
+      return;
+    }
+    context.popAlert("Signed out");
+    navigate("/");
+    onClose();
+  }
 
   return (
     <div className={`${inShrink ? "col" : 'row'}`} style={{zIndex: 30, width: inShrink ? "300px" : "100%"}}>
@@ -190,6 +208,41 @@ function MenuOptions({ inShrink,  onClose }: MenuOptionsProps) {
       >
         Contact
       </button>
+      <div className="div10" />
+      {isSignedIn && isClient ? (
+        <button
+          onClick={() => {
+            navigate(`/client/${user!.id}`);
+            onClose();
+          }}
+          style={{ textDecoration: "none", fontSize: textSize }}
+          className="p2 row center middle"
+        >
+          <Icon name="person-circle-outline" color="var(--accent)" />
+          Client portal
+        </button>
+      ) : isSignedIn ? (
+        <button
+          onClick={handleSignOut}
+          style={{ textDecoration: "none", fontSize: textSize }}
+          className="p2 row center middle"
+        >
+          <Icon name="log-out-outline" color="var(--accent)" />
+          Sign out
+        </button>
+      ) : (
+        <button
+          onClick={() => {
+            navigate("/auth");
+            onClose();
+          }}
+          style={{ textDecoration: "none", fontSize: textSize }}
+          className="p2 row center middle"
+        >
+          <Icon name="person-circle-outline" color="var(--accent)" />
+          Client portal
+        </button>
+      )}
       {inShrink && (
         <div className="col w100 middle center mt2">
           <Icon

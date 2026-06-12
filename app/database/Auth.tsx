@@ -28,6 +28,22 @@ export async function supabaseSignOut() {
   return true;
 }
 
+/*************************
+ * Verify the OTP code emailed to the user.
+ */
+export async function SignInWithOtp(email: string, otp: string) {
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: email,
+    token: otp,
+    type: "email",
+  });
+
+  if (error) throw error;
+
+  return data;
+}
+
+
 /***********************
  * Handle error logging
  * @param error The error object

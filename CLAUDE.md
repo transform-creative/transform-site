@@ -18,7 +18,7 @@ The site is a portfolio/marketing website showcasing past projects and allowing 
 | Language | TypeScript (strict mode) |
 | Styling | Tailwind CSS v4 + custom CSS |
 | Animations | GSAP v3 (via `@gsap/react`, SplitText plugin) |
-| Backend | Supabase (auth only — database not yet connected) |
+| Backend | Supabase (auth + database — see Client Portal) |
 | Hosting | Vercel |
 | Icons | Ionicons (`@reacticons/ionicons`) |
 | Fonts | "SIFONN_PRO" (custom, /public/*.otf) + "Onest" (Google Fonts) |
@@ -33,8 +33,13 @@ app/
 │   ├── Objects.tsx       # ALL static data: projects, contact info, client logos
 │   └── Ionicons.tsx      # Ionicon type definitions
 ├── database/
-│   ├── SupabaseClient.tsx  # Supabase client init (env vars)
-│   └── Auth.tsx            # OTP sign-in / sign-out functions
+│   ├── SupabaseClient.tsx  # Supabase client init (typed createClient<Database>)
+│   ├── supabase.ts         # Generated DB schema types (source of truth)
+│   ├── Auth.tsx            # OTP sign-in / sign-out functions
+│   ├── Read.tsx            # SELECT queries (getClientIssues, getAuthClient)
+│   ├── Create.tsx          # INSERT operations (scaffold)
+│   ├── Update.tsx          # UPDATE operations (scaffold)
+│   └── Delete.tsx          # DELETE operations (scaffold)
 ├── presentation/
 │   ├── HeaderBar.tsx       # Sticky nav, mobile hamburger
 │   ├── FooterBar.tsx       # Footer
@@ -42,13 +47,15 @@ app/
 │   ├── landing/            # Home page + all tab sections (Media, Design, Software, Contact, WorkedWith)
 │   ├── media/              # Portfolio listing page
 │   ├── software/           # Software showcase
-│   └── authentication/     # OTP sign-in form
+│   ├── authentication/     # OTP sign-in form
+│   └── client/             # Client portal (ClientPortal, IssueCard)
 ├── routes/                 # Route-level page components
 │   ├── LandingRoute.tsx    # /
 │   ├── HomeRoute.tsx       # /home (same content as /)
 │   ├── MediaRoute.tsx      # /portfolio
 │   ├── ContactRoute.tsx    # /contact
-│   └── AuthenticationRoute.tsx
+│   ├── AuthenticationRoute.tsx
+│   └── ClientRoute.tsx     # /client/:id (clients only, auth-guarded)
 ├── root.tsx                # Root layout, session state, alert system, responsive tracking
 ├── routes.ts               # Route config
 └── app.css                 # Global CSS vars, utility classes, animations
@@ -63,6 +70,18 @@ app/
 | `/portfolio` | Portfolio | Project listing with type filters |
 | `/contact` | ContactTab | Email CTA |
 | `/authentication` | Authentication | Supabase OTP sign-in |
+| `/client/:id` | ClientPortal | Logged-in **clients only**. `:id` = the client's auth `user_id`. |
+
+## Client Portal
+
+The `/client/:id` route is a private dashboard for clients (see `app/presentation/client/`).
+
+- **`:id`** is the client's auth user id (`auth_clients.user_id`). A client may only view their own portal.
+- **Client vs admin detection**: a client is any signed-in user whose `session.user.app_metadata` carries a `client_of` (their `business_id`). The route guard in `ClientRoute.tsx` redirects non-clients to `/` and signed-out users to `/auth`.
+- **Tables** (all in Supabase, RLS enabled): `auth_clients`, `businesses`, `clients_to_businesses`, `issues`, `issue_comments`. Generated types live in `app/database/supabase.ts`; app-facing aliases (`Issue`, `IssueComment`, `AuthClient`, `Business`, `ClientIssue`, `IssueStatus`, …) in `app/data/CustomTypes.tsx`.
+- **Issue severity** (drives the card colour swatch): `low | moderate | severe | critical | future` → see `severityColor()` in `commonBL`.
+- **Issue status is derived, not stored** — there is no status column. `deriveIssueStatus()` in `commonBL` infers it from timestamps: `approved` (`approved_at` set) → `awaiting_approval` (`updated_at` set) → `in_progress` (`started_at` set) → `not_started`.
+- **DB access is split by CRUD operation** in `app/database/`: `Read.tsx`, `Create.tsx`, `Update.tsx`, `Delete.tsx`. Currently only reads are wired (`getClientIssues`, `getAuthClient`); the "Log issue", approve/reject, and per-card "comments" buttons are **stubs**.
 
 ## Data
 
@@ -126,8 +145,8 @@ Both are set in `.env.local` and exposed via `import.meta.env.*`.
 ## Supabase Status
 
 - **Auth**: Configured and working (OTP email magic link)
-- **Database**: Not yet connected — no tables or queries exist
-- When adding database features, create tables and queries via Supabase dashboard first, then add typed queries in `app/database/`
+- **Database**: Connected. The client portal reads from `issues` / `issue_comments` / `auth_clients` (see `app/database/Read.tsx`). Generated schema types in `app/database/supabase.ts`; the client is typed `createClient<Database>`.
+- When adding database features, create tables via Supabase dashboard, regenerate `app/database/supabase.ts`, then add typed queries to the matching CRUD file in `app/database/` (`Read`/`Create`/`Update`/`Delete`).
 
 ## TypeScript Conventions
 
@@ -144,3 +163,8 @@ Both are set in `.env.local` and exposed via `import.meta.env.*`.
 4. **GSAP SplitText** is a paid plugin — it's already installed; use it freely
 5. **Responsive layout** uses the `inShrink` flag passed via context, not just Tailwind breakpoints
 6. The `/home` route exists as a duplicate of `/` — likely for navigation convenience
+
+## Key rules
+- Never use spans - use appropriate relevant tags instead
+- rely on app-v2.css for styling and only use inline style props unless absolutely neccessary. Even the prefer adding new entries to app-v2.css instead where a pattern is likely to be used again. Keep entries in the css file small (2-5 lines ideally) so they can generally be reused more than once
+- always import 'app-v2.css' and useOutletContext() in all new files
