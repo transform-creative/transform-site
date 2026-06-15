@@ -10,12 +10,20 @@ import {
   timeAgo,
 } from "~/business/commonBL";
 import { createIssue, createIssueComment } from "~/database/Create";
-import { approveIssue, rejectIssue, updateIssue } from "~/database/Update";
+import {
+  approveIssue,
+  markIssueUpdated,
+  rejectIssue,
+  startIssue,
+  updateIssue,
+} from "~/database/Update";
 import { Icon } from "../elements/Icon";
 import { LabelInput } from "../elements/LabelInput/LabelInput";
 import BasicMenu from "../elements/BasicMenu";
 import "../../app-v2.css";
 import "../elements/LabelInput/LabelInput.css";
+import MoveableMenu from "../elements/MoveableMenu";
+import { ContextModal } from "../elements/ContextModal";
 
 interface IssueModalProps {
   active: boolean;
@@ -25,6 +33,9 @@ interface IssueModalProps {
   // When present (admin/business board) the create form shows a client picker
   // so the issue is attributed to a real client rather than the admin.
   clients?: Pick<AuthClient, "user_id" | "name">[];
+  // Business board: drives the start → mark-updated workflow rather than the
+  // client's approve / reject decision.
+  businessMode?: boolean;
   focusComments?: boolean; // edit opened via the comments button
   onClose: () => void;
   onChanged: () => void; // tell the portal to refetch
@@ -44,6 +55,7 @@ export function IssueModal({
   clientId,
   businessId,
   clients,
+  businessMode = false,
   focusComments = false,
   onClose,
   onChanged,
@@ -138,6 +150,30 @@ export function IssueModal({
     }
   }
 
+  // The business pushes an issue forward; mirrors the card's workflow actions.
+  const businessAction: "start" | "update" | null = !businessMode
+    ? null
+    : status === "not_started"
+      ? "start"
+      : status === "in_progress" || status === "rejected"
+        ? "update"
+        : null;
+
+  /** Business workflow (edit mode header): start the work or mark it updated. */
+  async function handleBusinessAction(action: "start" | "update") {
+    if (!issue) return;
+    try {
+      action === "start"
+        ? await startIssue(issue.id)
+        : await markIssueUpdated(issue.id);
+      context.popAlert(action === "start" ? "Marked as started" : "Marked as updated");
+      onChanged();
+      onClose();
+    } catch {
+      context.popAlert("Something went wrong", "Please try again", true);
+    }
+  }
+
   /** Approve / reject the pending update (edit mode header). */
   async function handleDecision(decision: "approve" | "reject") {
     if (!issue) return;
@@ -179,13 +215,31 @@ export function IssueModal({
       width={context.inShrink ? "95%" : isEdit ? 820 : 420}
       disableClickOff
     >
-      <div className="row gap20 wrap issue-modal">
+      <div className="row gap-20 wrap issue-modal">
         {/* Left panel — the form */}
-        <div className="col gap10 issue-modal-form">
+        <div className="col gap-10 issue-modal-form">
           <div className="between middle">
             <h3 className="accent">New feature or issue request</h3>
-            {isEdit && status === "awaiting_approval" && (
-              <div className="row middle gap5">
+            {isEdit && businessAction === "start" && (
+              <button
+                className="row middle gap-5 outline-accent"
+                onClick={() => handleBusinessAction("start")}
+              >
+                <Icon name="play-circle-outline" size={20} color="var(--accent)" />
+                Start
+              </button>
+            )}
+            {isEdit && businessAction === "update" && (
+              <button
+                className="row middle gap-5 accentButton"
+                onClick={() => handleBusinessAction("update")}
+              >
+                <Icon name="checkmark-circle" size={20} color="var(--bkg)" />
+                Mark updated
+              </button>
+            )}
+            {isEdit && !businessMode && status === "awaiting_approval" && (
+              <div className="row middle gap-5">
                 <Icon
                   name="checkmark-circle"
                   size={26}
@@ -204,15 +258,15 @@ export function IssueModal({
 
           {/* Edit-only metadata */}
           {isEdit && issue && (
-            <div className="col gap5">
-              <div className="row middle gap5">
+            <div className="col gap-5">
+              <div className="row middle gap-5">
                 <Icon name="add-circle-outline" size={14} color="var(--accent)" />
                 <p>
                   <b>Created</b> {timeAgo(issue.created_at)}
                 </p>
               </div>
               {status === "awaiting_approval" && (
-                <div className="row middle gap5">
+                <div className="row middle gap-5">
                   <Icon name="checkmark-circle" size={14} color="var(--accent)" />
                   <p>
                     <b>Updated</b> {timeAgo(issue.updated_at)}
@@ -220,13 +274,13 @@ export function IssueModal({
                 </div>
               )}
               {status === "rejected" && (
-                <div className="row middle gap5">
+                <div className="row middle gap-5">
                   <Icon name="close-circle" size={14} color="var(--dangerColor)" />
                   <p>Sent back</p>
                 </div>
               )}
               {!issue.approved_at && (
-                <div className="row middle gap5">
+                <div className="row middle gap-5">
                   <Icon
                     name="alert-circle-outline"
                     size={14}
@@ -240,10 +294,10 @@ export function IssueModal({
 
           {/* Client picker — admin "log issue for" (create mode only) */}
           {showClientPicker && (
-            <div className="col gap5 relative">
+            <div className="col gap-5 relative">
               <button
                 type="button"
-                className="row middle gap10 severity-picker"
+                className="row middle gap-10 severity-picker"
                 onClick={() => setClientPickerOpen((o) => !o)}
               >
                 <Icon
@@ -265,7 +319,7 @@ export function IssueModal({
                     <button
                       key={c.user_id}
                       type="button"
-                      className="row middle gap10 severity-option"
+                      className="row middle gap-10 severity-option"
                       onClick={() => {
                         setSelectedClientId(c.user_id);
                         setClientPickerOpen(false);
@@ -302,10 +356,10 @@ export function IssueModal({
           />
 
           {/* Severity picker */}
-          <div className="col gap5 relative">
+          <div className="col gap-5 relative">
             <button
               type="button"
-              className="row middle gap10 severity-picker"
+              className="row middle gap-10 severity-picker"
               onClick={() => setPickerOpen((o) => !o)}
             >
               <div
@@ -318,31 +372,36 @@ export function IssueModal({
             </button>
             {pickerOpen && (
               <div className="col boxed severity-list">
-                {SEVERITY_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className="row middle gap10 severity-option"
-                    onClick={() => {
-                      setSeverity(opt.value);
-                      setPickerOpen(false);
-                    }}
-                  >
-                    <div
-                      className="severity-swatch"
-                      style={{ background: severityColor(opt.value) }}
-                    />
-                    <p>
-                      <b>{opt.label}</b> . {opt.description}
-                    </p>
-                  </button>
-                ))}
+                <ContextModal x={100} y={100} onClose={() => setPickerOpen(false)}>
+                  <div>
+                    {SEVERITY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className="row middle gap-10 severity-option"
+                      onClick={() => {
+                        setSeverity(opt.value);
+                        setPickerOpen(false);
+                      }}
+                    >
+                      <div
+                        className="severity-swatch"
+                        style={{ background: severityColor(opt.value) }}
+                      />
+                      <p>
+                        <b>{opt.label}</b> . {opt.description}
+                      </p>
+                    </button>
+                                    ))}
+                  </div>
+                </ContextModal>
+                
               </div>
             )}
           </div>
 
           <button
-            className="accentButton w-100 center middle gap5"
+            className="accentButton w-100 center middle gap-5"
             onClick={handleSubmit}
             disabled={submitting}
           >
@@ -353,7 +412,7 @@ export function IssueModal({
 
         {/* Right panel — comments (edit only) */}
         {isEdit && issue && (
-          <div className="col gap10 issue-comments">
+          <div className="col gap-10 issue-comments">
             {issue.issue_comments.length === 0 ? (
               <p className="accent-text">No comments yet</p>
             ) : (
@@ -383,7 +442,7 @@ export function IssueModal({
               onChange={(e) => setCommentBody(e.target.value)}
             />
             <button
-              className="outline-secondary w-100 center middle gap5"
+              className="outline-secondary w-100 center middle gap-5"
               onClick={handleAddComment}
               disabled={commentSubmitting || !commentBody.trim()}
             >

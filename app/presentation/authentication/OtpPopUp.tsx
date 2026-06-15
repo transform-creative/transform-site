@@ -133,7 +133,7 @@ export function OtpPopUp({
             e.preventDefault();
             handleSignIn(otp);
           }}
-          className="col gap10 middle between"
+          className="col gap-10 middle between"
         >
           <div className="col middle">
             <Icon
@@ -142,7 +142,7 @@ export function OtpPopUp({
               color="var(--accent)"
             />
           </div>
-          <div className="m0 w-100 col middle gap10">
+          <div className="m0 w-100 col middle gap-10">
             <div className="col middle mb-10">
               <h2 className="mb-10 center">
                 We've sent a code to your email
@@ -168,7 +168,7 @@ export function OtpPopUp({
             <button
               className={`w-100 ${
                 otp ? "accent" : "lightButton"
-              } row middle center gap10`}
+              } row middle center gap-10`}
               type="submit"
               disabled={
                 !otp ||
@@ -186,9 +186,9 @@ export function OtpPopUp({
               text={signInError.text || ""}
             />
           </div>
-          <div className="row gap5">
+          <div className="row gap-5">
             <a
-              className="row middle center gap10 lightButton buttonLink"
+              className="row middle center gap-10 lightButton buttonLink"
               href="https://mail.google.com/mail/u/0/#inbox"
               target="_blank"
               rel="noopener noreferrer"
@@ -197,7 +197,7 @@ export function OtpPopUp({
               <h3>Open gmail</h3>
             </a>
             <a
-              className="row middle center gap10 lightButton buttonLink"
+              className="row middle center gap-10 lightButton buttonLink"
               href="https://outlook.live.com/mail/0/inbox"
               target="_blank"
               rel="noopener noreferrer"

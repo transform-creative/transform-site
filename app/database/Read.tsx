@@ -105,7 +105,7 @@ export async function getBusinessIssues(
 ): Promise<BusinessIssue[]> {
   const { data, error } = await supabase
     .from("issues")
-    .select("*, issue_comments(*), auth_clients!issues_client_id_fkey(user_id, name)")
+    .select("*, issue_comments(*), auth_clients(user_id, name)")
     .eq("business_id", businessId)
     .order("created_at", { ascending: false });
 
@@ -114,5 +114,6 @@ export async function getBusinessIssues(
     throw error;
   }
 
+  console.log(data)
   return (data ?? []) as BusinessIssue[];
 }

@@ -1,30 +1,73 @@
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import type { ClientIssue } from "~/data/CustomTypes";
-import { deriveIssueStatus, severityColor, timeAgo } from "~/business/commonBL";
-import { approveIssue, rejectIssue } from "~/database/Update";
+import {
+  deriveIssueStatus,
+  severityColor,
+  timeAgo,
+} from "~/business/commonBL";
+import {
+  approveIssue,
+  markIssueUpdated,
+  rejectIssue,
+  startIssue,
+} from "~/database/Update";
 import { Icon } from "../elements/Icon";
 
 interface IssueCardProps {
   issue: ClientIssue;
   // When set (admin/business board) the card shows who uploaded the issue.
   clientName?: string | null;
+  // Business board: shows the "Start" / "Mark updated" workflow actions rather
+  // than the client's approve / reject decision.
+  businessMode?: boolean;
   onOpen: (focusComments?: boolean) => void;
   onChanged: () => void;
 }
 
 /******************************
- * A single issue card on the client portal. Shows the severity swatch,
- * approve / reject actions, the issue text, status metadata and a
- * comments button. Clicking the body opens the issue, the comments button
- * opens it focused on the comments panel.
+ * A single issue card on the portal. Shows the severity swatch, the workflow
+ * action(s), the issue text, status metadata and a comments button. The
+ * business drives an issue forward (start → mark updated); the client decides
+ * on a pending update (approve / reject).
  */
-export function IssueCard({ issue, clientName, onOpen, onChanged }: IssueCardProps) {
+export function IssueCard({
+  issue,
+  clientName,
+  businessMode = false,
+  onOpen,
+  onChanged,
+}: IssueCardProps) {
   const context: SharedContextProps = useOutletContext();
   const status = deriveIssueStatus(issue);
   const commentCount = issue.issue_comments?.length ?? 0;
 
-  /** Approve / reject the pending update straight from the card. */
+  // The business pushes an issue forward: start it, then mark it updated (also
+  // used to re-submit something the client sent back).
+  const businessAction: "start" | "update" | null = !businessMode
+    ? null
+    : status === "not_started"
+      ? "start"
+      : status === "in_progress" || status === "rejected"
+        ? "update"
+        : null;
+  // The client only acts on a pending update.
+  const showClientDecision = !businessMode && status === "awaiting_approval";
+
+  /** Business workflow: start the work or mark it updated for approval. */
+  async function handleBusinessAction(action: "start" | "update") {
+    try {
+      action === "start"
+        ? await startIssue(issue.id)
+        : await markIssueUpdated(issue.id);
+      context.popAlert(action === "start" ? "Marked as started" : "Marked as updated");
+      onChanged();
+    } catch {
+      context.popAlert("Something went wrong", "Please try again", true);
+    }
+  }
+
+  /** Client decision: approve the update, or send it back to Transform. */
   async function handleDecision(decision: "approve" | "reject") {
     try {
       decision === "approve"
@@ -38,25 +81,33 @@ export function IssueCard({ issue, clientName, onOpen, onChanged }: IssueCardPro
   }
 
   return (
-    <div className="boxed p-10 col gap10 issue-card">
-      {/* Uploader (admin/business board only) */}
-      {clientName && (
-        <div className="row middle gap5">
-          <Icon name="person-circle-outline" size={14} color="var(--accent)" />
-          <p>
-            <b>{clientName}</b>
-          </p>
-        </div>
-      )}
-
-      {/* Severity swatch + approve/reject actions */}
+    <div className="boxed p-10 col gap-10 issue-card outline-accent">
+      {/* Severity swatch + workflow / decision actions */}
       <div className="between middle">
         <div
           className="severity-swatch"
           style={{ background: severityColor(issue.severity) }}
         />
-        {status === "awaiting_approval" && (
-          <div className="row middle gap5">
+        {businessAction === "start" && (
+          <button
+            className="row middle gap-5 outline-accent"
+            onClick={() => handleBusinessAction("start")}
+          >
+            <Icon name="play-circle-outline" size={18} color="var(--accent)" />
+            Start
+          </button>
+        )}
+        {businessAction === "update" && (
+          <button
+            className="row middle gap-5 accentButton"
+            onClick={() => handleBusinessAction("update")}
+          >
+            <Icon name="checkmark-circle" size={18} color="var(--bkg)" />
+            Mark updated
+          </button>
+        )}
+        {showClientDecision && (
+          <div className="row middle gap-5">
             <Icon
               name="checkmark-circle"
               size={20}
@@ -73,69 +124,79 @@ export function IssueCard({ issue, clientName, onOpen, onChanged }: IssueCardPro
         )}
       </div>
 
+      {clientName && (
+        <h3 className="outline-secondary pl-5">{clientName || "NO CLIENT"}</h3>
+      )}
+
       {/* Issue text — opens the issue */}
       <p className="clickable" onClick={() => onOpen(false)}>
         {issue.description || issue.title || "Untitled issue"}
       </p>
 
       {/* Status metadata */}
-      <div className="col gap5">
-        <div className="row middle gap5">
+      <div className="col gap-5">
+        <div className="row middle gap-5">
           <Icon name="add-circle-outline" size={14} color="var(--accent)" />
           <p>
             <b>Created</b> {timeAgo(issue.created_at)}
           </p>
         </div>
 
-        {status === "awaiting_approval" && (
-          <div className="row middle gap5">
-            <Icon name="checkmark-circle" size={14} color="var(--accent)" />
-            <p>
-              <b>Updated</b> {timeAgo(issue.updated_at)}
-            </p>
-          </div>
-        )}
-
-        {status === "in_progress" && (
-          <div className="row middle gap5">
-            <Icon
-              name="information-circle-outline"
-              size={14}
-              color="var(--accent-lg)"
-            />
-            <p>Working on it</p>
-          </div>
-        )}
-
-        {status === "not_started" && (
-          <div className="row middle gap5">
-            <Icon name="ellipse-outline" size={14} color="var(--accent-lg)" />
-            <p>Not started</p>
-          </div>
-        )}
-
         {status === "rejected" && (
-          <div className="row middle gap5">
+          <div className="row middle gap-5">
             <Icon name="close-circle" size={14} color="var(--dangerColor)" />
             <p>Sent back</p>
           </div>
         )}
 
-        {!issue.approved_at && (
-          <div className="row middle gap5">
+        {status === "in_progress" && (
+          <div className="row middle gap-5">
             <Icon
-              name="alert-circle-outline"
+              name="information-circle-outline"
               size={14}
-              color="var(--warningColor)"
+              color="var(--accent-lg)"
             />
-            <p>Pending approval</p>
+            <p>In progress</p>
+          </div>
+        )}
+
+        {status === "not_started" && (
+          <div className="row middle gap-5">
+            <Icon name="ellipse-outline" size={14} color="var(--accent-lg)" />
+            <p>{businessMode ? "Awaiting action" : "Not started"}</p>
+          </div>
+        )}
+
+        {status === "awaiting_approval" && (
+          <>
+            <div className="row middle gap-5">
+              <Icon name="checkmark-circle" size={14} color="var(--accent)" />
+              <p>
+                <b>Updated</b> {timeAgo(issue.updated_at)}
+              </p>
+            </div>
+            <div className="row middle gap-5">
+              <Icon
+                name="alert-circle-outline"
+                size={14}
+                color="var(--warningColor)"
+              />
+              <p>{businessMode ? "Awaiting client approval" : "Pending your approval"}</p>
+            </div>
+          </>
+        )}
+
+        {status === "approved" && (
+          <div className="row middle gap-5">
+            <Icon name="checkmark-circle" size={14} color="var(--accent)" />
+            <p>Completed</p>
           </div>
         )}
       </div>
 
       {/* Comments — opens the issue focused on the comments panel */}
       <button
-        className="outline-secondary w-100 center"
+        className={`outline-secondary w-100 center ${commentCount > 0 && "accent"}`}
         onClick={() => onOpen(true)}
       >
         {commentCount} comments

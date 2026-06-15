@@ -221,20 +221,20 @@ input:disabled {
 
 textarea {
   font-family: "Onest", sans-serif;
-  background-color: var(--bkg);
+  color: var(--txt);
+  font-size:  1rem;
+  background: var(--bkg);
+  height: 50px;
+  height: 3em;
 
-  resize: vertical;
   border: 1px solid var(--accent-lg);
-
   border-radius: var(--borderRadius);
-
-  padding: 10px;
+  padding: 0;
   margin: 0;
 
-  height: 5em;
   width: 100%;
 
-  transition: 0.2s;
+  transition: 0.25s;
 }
 
 textarea:focus {

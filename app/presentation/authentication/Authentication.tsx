@@ -90,7 +90,7 @@ export function Authentication({}: AuthenticationProps) {
         </div>
         <div className="w-100">
           <form
-            className="col gap5"
+            className="col gap-5"
             action="submit"
             onSubmit={(f) => {
               f.preventDefault();

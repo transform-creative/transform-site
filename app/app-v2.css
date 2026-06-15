@@ -544,6 +544,10 @@ h5.center {
   color: var(--accent);
 }
 
+.danger-text {
+  color: var(--dangerColor);
+}
+
 .severity-swatch {
   height: 22px;
   width: 22px;
