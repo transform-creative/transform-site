@@ -69,6 +69,8 @@ export function IssueModal({
   const [description, setDescription] = useState("");
   const [severity, setSeverity] = useState<IssueSeverity>("low");
   const [pickerOpen, setPickerOpen] = useState(false);
+  // Viewport coords the severity pop-over anchors to (set from the trigger).
+  const [pickerCoords, setPickerCoords] = useState({ x: 0, y: 0 });
   const [submitting, setSubmitting] = useState(false);
 
   // The client a new issue is logged for (admin only), defaulting to the last
@@ -102,6 +104,13 @@ export function IssueModal({
     }
   }, [issue?.id, active]);
 
+  // In edit mode, only allow saving once a field actually differs.
+  const isDirty =
+    !isEdit ||
+    title !== (issue?.title ?? "") ||
+    description !== (issue?.description ?? "") ||
+    severity !== ((issue?.severity as IssueSeverity) ?? "low");
+
   const status = issue ? deriveIssueStatus(issue) : "not_started";
   const meta = severityMeta(severity);
   const selectedClientName = clients?.find(
@@ -128,6 +137,7 @@ export function IssueModal({
         await updateIssue(issue.id, { title, description, severity });
         context.popAlert("Issue updated");
         onChanged();
+        onClose();
       } else {
         await createIssue({
           client_id: createClientId,
@@ -235,7 +245,7 @@ export function IssueModal({
                 onClick={() => handleBusinessAction("update")}
               >
                 <Icon name="checkmark-circle" size={20} color="var(--bkg)" />
-                Mark updated
+                Complete
               </button>
             )}
             {isEdit && !businessMode && status === "awaiting_approval" && (
@@ -356,11 +366,15 @@ export function IssueModal({
           />
 
           {/* Severity picker */}
-          <div className="col gap-5 relative">
+          <div className="col gap-5">
             <button
               type="button"
               className="row middle gap-10 severity-picker"
-              onClick={() => setPickerOpen((o) => !o)}
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setPickerCoords({ x: rect.left, y: rect.bottom });
+                setPickerOpen((o) => !o);
+              }}
             >
               <div
                 className="severity-swatch"
@@ -370,43 +384,44 @@ export function IssueModal({
                 <b>{meta.label}</b> . {meta.description}
               </p>
             </button>
-            {pickerOpen && (
-              <div className="col boxed severity-list">
-                <ContextModal x={100} y={100} onClose={() => setPickerOpen(false)}>
-                  <div>
-                    {SEVERITY_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      className="row middle gap-10 severity-option"
-                      onClick={() => {
-                        setSeverity(opt.value);
-                        setPickerOpen(false);
-                      }}
-                    >
-                      <div
-                        className="severity-swatch"
-                        style={{ background: severityColor(opt.value) }}
-                      />
-                      <p>
-                        <b>{opt.label}</b> . {opt.description}
-                      </p>
-                    </button>
-                                    ))}
-                  </div>
-                </ContextModal>
-                
+            <ContextModal
+              active={pickerOpen}
+              x={pickerCoords.x}
+              y={pickerCoords.y}
+              width={320}
+              onClose={() => setPickerOpen(false)}
+            >
+              <div className="col">
+                {SEVERITY_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className="row middle gap-10 severity-option"
+                    onClick={() => {
+                      setSeverity(opt.value);
+                      setPickerOpen(false);
+                    }}
+                  >
+                    <div
+                      className="severity-swatch"
+                      style={{ background: severityColor(opt.value) }}
+                    />
+                    <p>
+                      <b>{opt.label}</b> . {opt.description}
+                    </p>
+                  </button>
+                ))}
               </div>
-            )}
+            </ContextModal>
           </div>
 
           <button
             className="accentButton w-100 center middle gap-5"
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={submitting || !isDirty}
           >
             <Icon name="checkmark-circle" color="var(--bkg)" />
-            {submitting ? "Saving…" : "Submit"}
+            {submitting ? "Saving…" : isEdit ? "Update" : "Submit"}
           </button>
         </div>
 
@@ -419,7 +434,13 @@ export function IssueModal({
               issue.issue_comments.map((comment) => (
                 <div key={comment.id} className="col comment-card">
                   <p>
-                    <b>
+                    <b
+                      style={
+                        comment.author_user_id === clientId
+                          ? { color: "var(--accent)" }
+                          : undefined
+                      }
+                    >
                       {comment.author_user_id === clientId
                         ? "You"
                         : "Transform"}

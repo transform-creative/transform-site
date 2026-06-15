@@ -224,7 +224,6 @@ textarea {
   color: var(--txt);
   font-size:  1rem;
   background: var(--bkg);
-  height: 50px;
   height: 3em;
 
   border: 1px solid var(--accent-lg);
@@ -255,7 +254,6 @@ input {
   color: var(--txt);
   background: var(--bkg);
   height: 50px;
-  height: 3em;
 
   border: 1px solid var(--accent-lg);
   border-radius: var(--borderRadius);

@@ -1,9 +1,9 @@
 import IonIcon from "@reacticons/ionicons";
 import React, { useRef } from "react";
 import { useEffect, useState } from "react";
-import type { ActivatableElement, ContextModalElement } from "~/data/CommonTypes";
+import type { ActivatableElement } from "~/data/CommonTypes";
 
-export interface ContextModalProps extends ContextModalElement {
+export interface ContextModalProps extends ActivatableElement {
   x: number;
   y: number;
   z?: number;
@@ -88,15 +88,14 @@ export function ContextModal({
       onClose();
   }
 
-  if (active) {
-    return (
-      <div
-        id="close"
-        className={`${
-          !noBlur && "modal-bkg"
-        } fade-sm`}
-        onClick={(e) => updateIsActive(e, true)}
-      >
+  if (!active) return null;
+
+  return (
+    <div
+      id="close"
+      className={`${!noBlur ? "modal-bkg" : ""} fade-sm`}
+      onClick={(e) => updateIsActive(e, true)}
+    >
         <div
           ref={menuRef}
           className="boxed outline p0"
@@ -121,5 +120,4 @@ export function ContextModal({
         </div>
       </div>
     );
-  }
 };

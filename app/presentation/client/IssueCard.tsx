@@ -103,7 +103,7 @@ export function IssueCard({
             onClick={() => handleBusinessAction("update")}
           >
             <Icon name="checkmark-circle" size={18} color="var(--bkg)" />
-            Mark updated
+            Complete
           </button>
         )}
         {showClientDecision && (

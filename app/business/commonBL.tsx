@@ -78,6 +78,35 @@ export function deriveIssueStatus(issue: Issue): IssueStatus {
 }
 
 /*******************************************
+ * The severity levels in display order for the "not started" board columns,
+ * most-severe first. Mirrors the swatch colours in `severityColor`.
+ */
+export const SEVERITY_COLUMN_ORDER: IssueSeverity[] = [
+  "critical",
+  "severe",
+  "moderate",
+  "low",
+  "future",
+];
+
+/*******************************************
+ * The timestamp of an issue's most recent activity, as a millisecond epoch.
+ * Used to sort boards newest-first. Falls back through the workflow timestamps
+ * (update → sent back → started → created) to whatever is most recent.
+ */
+export function lastActivityAt(issue: Issue): number {
+  const times = [
+    issue.updated_at,
+    issue.rejected_at,
+    issue.started_at,
+    issue.created_at,
+  ]
+    .map((t) => (t ? new Date(t).getTime() : 0))
+    .filter((t) => !isNaN(t));
+  return times.length ? Math.max(...times) : 0;
+}
+
+/*******************************************
  * Format a date as a relative "x ago" string (e.g. "5 days ago").
  * Kept dependency-free as the project has no date library.
  */

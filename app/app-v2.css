@@ -558,6 +558,10 @@ h5.center {
   width: 220px;
 }
 
+.severity-column {
+  min-width: 220px;
+}
+
 .log-issue {
   position: absolute;
   top: 0;
@@ -595,6 +599,12 @@ h5.center {
 
 .severity-option:hover {
   background: var(--accent-md);
+}
+
+.modal-bkg {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
 }
 
 .severity-list {

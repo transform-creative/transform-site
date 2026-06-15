@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import type {
@@ -7,7 +7,13 @@ import type {
   BusinessIssue,
   ClientIssue,
 } from "~/data/CustomTypes";
-import { deriveIssueStatus } from "~/business/commonBL";
+import {
+  deriveIssueStatus,
+  lastActivityAt,
+  severityColor,
+  severityMeta,
+  SEVERITY_COLUMN_ORDER,
+} from "~/business/commonBL";
 import {
   getAuthClient,
   getBusinessClients,
@@ -25,6 +31,38 @@ interface ClientPortalProps {
   // When present the viewer is a business owner/admin: the board loads every
   // issue for the business (across all clients) and cards show the uploader.
   business?: Business | null;
+}
+
+/** The board's three tabs. "being_updated" combines in-progress + sent-back. */
+type TabKey = "needs_approval" | "being_updated" | "not_started";
+
+// Tab metadata in display order. The bucket membership lives in `groupIssues`.
+const TAB_META: { key: TabKey; label: string }[] = [
+  { key: "needs_approval", label: "Needs approval" },
+  { key: "being_updated", label: "Being updated" },
+  { key: "not_started", label: "Not started" },
+];
+
+/** Split the open issues into the three tab buckets by derived status. */
+function groupIssues(issues: ClientIssue[]): Record<TabKey, ClientIssue[]> {
+  const buckets: Record<TabKey, ClientIssue[]> = {
+    needs_approval: [],
+    being_updated: [],
+    not_started: [],
+  };
+  for (const issue of issues) {
+    const status = deriveIssueStatus(issue);
+    if (status === "awaiting_approval") buckets.needs_approval.push(issue);
+    else if (status === "in_progress" || status === "rejected")
+      buckets.being_updated.push(issue);
+    else if (status === "not_started") buckets.not_started.push(issue);
+  }
+  return buckets;
+}
+
+/** Sort a copy of the list by most recent activity, newest first. */
+function byActivity(list: ClientIssue[]): ClientIssue[] {
+  return [...list].sort((a, b) => lastActivityAt(b) - lastActivityAt(a));
 }
 
 /******************************
@@ -46,8 +84,11 @@ export function ClientPortal({
     Pick<AuthClient, "user_id" | "name">[]
   >([]);
   const [loading, setLoading] = useState(true);
-  // The completed board is collapsed by default for both views.
-  const [showCompleted, setShowCompleted] = useState(false);
+  // The active board tab. Clients lead with what needs their approval; the
+  // business leads with the work it's actively pushing forward.
+  const [selectedTab, setSelectedTab] = useState<TabKey>(
+    isAdmin ? "being_updated" : "needs_approval",
+  );
   // The open modal, keyed by issue id (null id = create mode). Keying by id
   // means a reload re-supplies fresh data (e.g. a just-posted comment).
   const [modal, setModal] = useState<{
@@ -122,45 +163,19 @@ export function ClientPortal({
     };
   }, [clientId, isAdmin, business?.id]);
 
-  const awaiting = issues.filter(
-    (i) => deriveIssueStatus(i) === "awaiting_approval",
+  // The open issues split into the three tab buckets, and the tabs that
+  // actually have something to show (empty tabs are hidden).
+  const buckets = useMemo(() => groupIssues(issues), [issues]);
+  const tabs = useMemo(
+    () =>
+      TAB_META.map((t) => ({ ...t, count: buckets[t.key].length })).filter(
+        (t) => t.count > 0,
+      ),
+    [buckets],
   );
-  const inProgress = issues.filter(
-    (i) => deriveIssueStatus(i) === "in_progress",
-  );
-  const notStarted = issues.filter(
-    (i) => deriveIssueStatus(i) === "not_started",
-  );
-  const rejected = issues.filter(
-    (i) => deriveIssueStatus(i) === "rejected",
-  );
-  const completed = issues.filter(
-    (i) => deriveIssueStatus(i) === "approved",
-  );
-
-  // The board's rows. Same groups for both views; only the order differs by
-  // role — the business works top-down (fix sent-back, then start, update,
-  // wait), while the client leads with what needs their approval.
-  const sectionMap = {
-    rejected: { key: "rejected", issues: rejected, label: "sent back" },
-    awaiting: { key: "awaiting", issues: awaiting, label: "awaiting approval" },
-    in_progress: { key: "in_progress", issues: inProgress, label: "being updated" },
-    not_started: { key: "not_started", issues: notStarted, label: "awaiting action" },
-  };
-  const sections: { key: string; issues: ClientIssue[]; label: string }[] =
-    isAdmin
-      ? [
-          sectionMap.rejected,
-          sectionMap.not_started,
-          sectionMap.in_progress,
-          sectionMap.awaiting,
-        ]
-      : [
-          sectionMap.awaiting,
-          sectionMap.in_progress,
-          sectionMap.rejected,
-          sectionMap.not_started,
-        ];
+  // The active tab falls back to the first visible one when the role default
+  // (or a previously-selected tab) has emptied out.
+  const activeTab = tabs.find((t) => t.key === selectedTab) ?? tabs[0] ?? null;
 
   // The live issue backing the modal, looked up fresh from state by id.
   const modalIssue =
@@ -176,21 +191,53 @@ export function ClientPortal({
     setModal({ issueId: null, focusComments: false });
   }
 
-  /** A row of issue cards, shared across the board's sections. */
-  const renderCards = (list: ClientIssue[]) => (
-    <div className="row wrap gap-20 w-100">
-      {list.map((issue) => (
-        <IssueCard
-          key={issue.id}
-          issue={issue}
-          clientName={
-            isAdmin ? (issue as BusinessIssue).auth_clients?.name : undefined
-          }
-          businessMode={isAdmin}
-          onOpen={(focusComments) => openIssue(issue.id, !!focusComments)}
-          onChanged={reload}
-        />
-      ))}
+  /** A single issue card, with the role-aware wiring shared by every tab. */
+  const renderCard = (issue: ClientIssue) => (
+    <IssueCard
+      key={issue.id}
+      issue={issue}
+      clientName={
+        isAdmin ? (issue as BusinessIssue).auth_clients?.name : undefined
+      }
+      businessMode={isAdmin}
+      onOpen={(focusComments) => openIssue(issue.id, !!focusComments)}
+      onChanged={reload}
+    />
+  );
+
+  /** Tab body: cards laid out left-to-right with even spacing, newest first. */
+  const renderGrid = (list: ClientIssue[]) => (
+    <div className="row wrap gap-20 w-100 start">
+      {byActivity(list).map(renderCard)}
+    </div>
+  );
+
+  /**
+   * Tab body for "not started": one column per severity present (most-severe
+   * first), each column's cards sorted newest-activity first.
+   */
+  const renderSeverityColumns = (list: ClientIssue[]) => (
+    <div className="row wrap gap-20 w-100 start">
+      {SEVERITY_COLUMN_ORDER.map((severity) => {
+        const column = byActivity(
+          list.filter((i) => i.severity === severity),
+        );
+        if (column.length === 0) return null;
+        return (
+          <div key={severity} className="col gap-10 severity-column">
+            <div className="row middle gap-5">
+              <div
+                className="severity-swatch"
+                style={{ background: severityColor(severity) }}
+              />
+              <h4>
+                {severityMeta(severity).label} ({column.length})
+              </h4>
+            </div>
+            {column.map(renderCard)}
+          </div>
+        );
+      })}
     </div>
   );
 
@@ -209,7 +256,7 @@ export function ClientPortal({
   }
 
   return (
-    <div className="col middle gap-20 ml-20 mr-20">
+    <div className="col middle gap-20 ml-20 mr-20" style={{minHeight: "90vh"}}>
       <div className="col w-75 gap-20">
         {/* Header */}
         <div className="row relative ">
@@ -242,9 +289,7 @@ export function ClientPortal({
             </div>
             <h1 className="accent">Welcome back.</h1>
             <p className="">
-              <b>{awaiting.length}</b> issues awaiting approval{" · "}
-              <b>{inProgress.length}</b> in progress{" · "}
-              <b>{notStarted.length}</b> not started
+             <strong>{issues.length}</strong> issues available
             </p>
           </div>
         </div>
@@ -261,44 +306,27 @@ export function ClientPortal({
             <p>There are no issues to show right now.</p>
           </div>
         ) : (
-          <>
-            {sections.map(
-              (s) =>
-                s.issues.length > 0 && (
-                  <div key={s.key} className="col gap-10 w-100">
-                    <h3>
-                      {s.issues.length} issue
-                      {s.issues.length === 1 ? "" : "s"}{" "}
-                      <b
-                        className={
-                          s.key === "rejected" ? "danger-text" : "accent-text"
-                        }
-                      >
-                        {s.label}
-                      </b>
-                    </h3>
-                    {renderCards(s.issues)}
-                  </div>
-                ),
-            )}
-
-            {/* Completed board — collapsed by default for both views */}
-            {completed.length > 0 && (
-              <div className="col gap-10 w-100">
+          <div className="col gap-20 w-100">
+            {/* Tab bar — left-aligned buttons, one per non-empty bucket */}
+            <div className="row wrap gap-10">
+              {tabs.map((t) => (
                 <button
-                  className="outline-secondary row middle gap-5"
-                  onClick={() => setShowCompleted((c) => !c)}
+                  key={t.key}
+                  className={
+                    activeTab?.key === t.key ? "accentButton" : "outline-secondary"
+                  }
+                  onClick={() => setSelectedTab(t.key)}
                 >
-                  <Icon
-                    name={showCompleted ? "chevron-down-outline" : "chevron-forward-outline"}
-                    color="var(--accent)"
-                  />
-                  {showCompleted ? "Hide" : "Show"} {completed.length} completed
+                  {t.label} ({t.count})
                 </button>
-                {showCompleted && renderCards(completed)}
-              </div>
-            )}
-          </>
+              ))}
+            </div>
+
+            {/* Tab body */}
+            {activeTab?.key === "not_started"
+              ? renderSeverityColumns(buckets.not_started)
+              : activeTab && renderGrid(buckets[activeTab.key])}
+          </div>
         )}
       </div>
 

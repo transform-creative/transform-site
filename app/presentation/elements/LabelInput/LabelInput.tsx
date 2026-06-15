@@ -101,7 +101,7 @@ export function LabelInput ({
         )}
         <div className="row " >
           <div className="w-100 row middle" >
-            {inlineLabel && <h3 className="mr-5 ml-5">{name}</h3>}
+            {inlineLabel && name && <h3 className="mr-5 ml-5">{name}</h3>}
             {isTextArea ? (
               <textarea
                 ref={inputRef as Ref<HTMLTextAreaElement>}
@@ -120,7 +120,6 @@ export function LabelInput ({
                 style={{
                   ...style,
                   color: `${error ? "var(--danger)" : "var(--txt)"}`,
-                  border: "none",
                   background: "var(--bkg-gradient)",
                 }}
               />

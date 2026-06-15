@@ -18,6 +18,7 @@ export async function getClientIssues(
     .from("issues")
     .select("*, issue_comments(*)")
     .eq("client_id", clientId)
+    .is("approved_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -107,6 +108,7 @@ export async function getBusinessIssues(
     .from("issues")
     .select("*, issue_comments(*), auth_clients(user_id, name)")
     .eq("business_id", businessId)
+    .is("approved_at", null)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -114,6 +116,5 @@ export async function getBusinessIssues(
     throw error;
   }
 
-  console.log(data)
   return (data ?? []) as BusinessIssue[];
 }
