@@ -35,3 +35,12 @@ export type IssueStatus =
 
 /** An issue joined with its full comments list, as rendered on the portal */
 export type ClientIssue = Issue & { issue_comments: IssueComment[] };
+
+/**
+ * A `ClientIssue` plus the uploading client, as loaded for the business/admin
+ * board so each card can show who reported the issue. Extends `ClientIssue`
+ * so it stays assignable wherever a `ClientIssue` is expected.
+ */
+export type BusinessIssue = ClientIssue & {
+  auth_clients: Pick<AuthClient, "user_id" | "name"> | null;
+};

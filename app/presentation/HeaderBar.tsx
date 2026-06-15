@@ -9,6 +9,7 @@ import gsap from "gsap";
 import { Z_BINARY } from "zlib";
 import { SharedContextProps } from "~/data/CommonTypes";
 import { supabaseSignOut } from "~/database/Auth";
+import "../app-v2.css"
 
 export interface HeaderBarProps {
   inShrink: boolean;
@@ -216,20 +217,35 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
             onClose();
           }}
           style={{ textDecoration: "none", fontSize: textSize }}
-          className="p2 row center middle"
+          className="gap-10 row center middle"
         >
-          <Icon name="person-circle-outline" color="var(--accent)" />
+          <Icon name="person-circle-outline" color="var(--accent)" size={35} />
           Client portal
         </button>
       ) : isSignedIn ? (
-        <button
-          onClick={handleSignOut}
-          style={{ textDecoration: "none", fontSize: textSize }}
-          className="p2 row center middle"
-        >
-          <Icon name="log-out-outline" color="var(--accent)" />
-          Sign out
-        </button>
+        <>
+          {/* Business owners reach their board on their own id; the route guard
+              verifies ownership and redirects anyone who isn't an owner. */}
+          <button
+            onClick={() => {
+              navigate(`/client/${user!.id}`);
+              onClose();
+            }}
+            style={{ textDecoration: "none", fontSize: textSize }}
+            className="gap-10 row center middle"
+          >
+            <Icon name="person-circle-outline" color="var(--accent)" size={35} />
+            Client portal
+          </button>
+          <button
+            onClick={handleSignOut}
+            style={{ textDecoration: "none", fontSize: textSize }}
+            className="p2 row center middle"
+          >
+            <Icon name="log-out-outline" color="var(--accent)" />
+            Sign out
+          </button>
+        </>
       ) : (
         <button
           onClick={() => {
@@ -237,9 +253,9 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
             onClose();
           }}
           style={{ textDecoration: "none", fontSize: textSize }}
-          className="p2 row center middle"
+          className="gap-5 row center middle"
         >
-          <Icon name="person-circle-outline" color="var(--accent)" />
+          <Icon name="person-circle-outline" color="var(--accent)"  size={20}/>
           Client portal
         </button>
       )}

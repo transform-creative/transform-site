@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { ClientIssue, IssueSeverity } from "~/data/CustomTypes";
+import type { AuthClient, ClientIssue, IssueSeverity } from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
   severityColor,
@@ -22,10 +22,16 @@ interface IssueModalProps {
   issue: ClientIssue | null; // null = create mode, present = edit mode
   clientId: string;
   businessId: number | null;
+  // When present (admin/business board) the create form shows a client picker
+  // so the issue is attributed to a real client rather than the admin.
+  clients?: Pick<AuthClient, "user_id" | "name">[];
   focusComments?: boolean; // edit opened via the comments button
   onClose: () => void;
   onChanged: () => void; // tell the portal to refetch
 }
+
+// Remembers the admin's last "log issue for" client across sessions.
+const LAST_CLIENT_KEY = "transform.lastIssueClientId";
 
 /******************************
  * Create / edit an issue. The same component renders both modes: when `issue`
@@ -37,18 +43,26 @@ export function IssueModal({
   issue,
   clientId,
   businessId,
+  clients,
   focusComments = false,
   onClose,
   onChanged,
 }: IssueModalProps) {
   const context: SharedContextProps = useOutletContext();
   const isEdit = !!issue;
+  // Admins logging a new issue choose which client it's for.
+  const showClientPicker = !isEdit && !!clients;
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [severity, setSeverity] = useState<IssueSeverity>("low");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // The client a new issue is logged for (admin only), defaulting to the last
+  // selection cached in localStorage.
+  const [selectedClientId, setSelectedClientId] = useState("");
+  const [clientPickerOpen, setClientPickerOpen] = useState(false);
 
   const [commentBody, setCommentBody] = useState("");
   const [commentSubmitting, setCommentSubmitting] = useState(false);
@@ -59,16 +73,40 @@ export function IssueModal({
     setDescription(issue?.description ?? "");
     setSeverity((issue?.severity as IssueSeverity) ?? "low");
     setPickerOpen(false);
+    setClientPickerOpen(false);
     setCommentBody("");
+
+    // Default the create-mode client picker to the last-used client (if it's
+    // still one of this business's clients), otherwise the first client.
+    if (showClientPicker && clients) {
+      const remembered =
+        typeof window !== "undefined"
+          ? window.localStorage.getItem(LAST_CLIENT_KEY)
+          : null;
+      const fallback = clients[0]?.user_id ?? "";
+      setSelectedClientId(
+        clients.some((c) => c.user_id === remembered) ? remembered! : fallback
+      );
+    }
   }, [issue?.id, active]);
 
   const status = issue ? deriveIssueStatus(issue) : "not_started";
   const meta = severityMeta(severity);
+  const selectedClientName = clients?.find(
+    (c) => c.user_id === selectedClientId
+  )?.name;
 
   /** Create or save the issue from the form. */
   async function handleSubmit() {
     if (!description.trim()) {
       context.popAlert("Add a description", "Tell us what the problem is", true);
+      return;
+    }
+
+    // Admins attribute the issue to the chosen client; clients log it as themselves.
+    const createClientId = showClientPicker ? selectedClientId : clientId;
+    if (showClientPicker && !createClientId) {
+      context.popAlert("Pick a client", "Choose who this issue is for", true);
       return;
     }
 
@@ -80,12 +118,15 @@ export function IssueModal({
         onChanged();
       } else {
         await createIssue({
-          client_id: clientId,
+          client_id: createClientId,
           business_id: businessId,
           title,
           description,
           severity,
         });
+        if (showClientPicker && typeof window !== "undefined") {
+          window.localStorage.setItem(LAST_CLIENT_KEY, createClientId);
+        }
         context.popAlert("Issue logged", "We'll take a look shortly");
         onChanged();
         onClose();
@@ -192,6 +233,54 @@ export function IssueModal({
                     color="var(--warningColor)"
                   />
                   <p>Pending approval</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Client picker — admin "log issue for" (create mode only) */}
+          {showClientPicker && (
+            <div className="col gap5 relative">
+              <button
+                type="button"
+                className="row middle gap10 severity-picker"
+                onClick={() => setClientPickerOpen((o) => !o)}
+              >
+                <Icon
+                  name="person-circle-outline"
+                  size={18}
+                  color="var(--accent)"
+                />
+                <p>
+                  <b>
+                    {selectedClientId
+                      ? selectedClientName || "Unnamed client"
+                      : "Select a client"}
+                  </b>
+                </p>
+              </button>
+              {clientPickerOpen && (
+                <div className="col boxed severity-list">
+                  {clients!.map((c) => (
+                    <button
+                      key={c.user_id}
+                      type="button"
+                      className="row middle gap10 severity-option"
+                      onClick={() => {
+                        setSelectedClientId(c.user_id);
+                        setClientPickerOpen(false);
+                      }}
+                    >
+                      <Icon
+                        name="person-circle-outline"
+                        size={18}
+                        color="var(--accent)"
+                      />
+                      <p>
+                        <b>{c.name || "Unnamed client"}</b>
+                      </p>
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

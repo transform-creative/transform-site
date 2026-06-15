@@ -1,6 +1,11 @@
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
-import type { AuthClient, ClientIssue } from "~/data/CustomTypes";
+import type {
+  AuthClient,
+  Business,
+  BusinessIssue,
+  ClientIssue,
+} from "~/data/CustomTypes";
 
 /*************************
  * Read all issues for a client, each with its full comments list.
@@ -42,4 +47,72 @@ export async function getAuthClient(
   }
 
   return data;
+}
+
+/*************************
+ * Read the business owned by a given auth user, if any. Used to detect an
+ * admin/business owner (they own a `businesses` row) and get its id.
+ * @param userId The auth user id (businesses.user_id)
+ */
+export async function getBusinessForUser(
+  userId: string
+): Promise<Business | null> {
+  const { data, error } = await supabase
+    .from("businesses")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    await logError(error, ["getBusinessForUser", "Read"]);
+    throw error;
+  }
+
+  return data;
+}
+
+/*************************
+ * Read every client linked to a business, for the admin "log issue" picker.
+ * @param businessId The businesses.id of the owned business
+ */
+export async function getBusinessClients(
+  businessId: number
+): Promise<Pick<AuthClient, "user_id" | "name">[]> {
+  const { data, error } = await supabase
+    .from("clients_to_businesses")
+    .select(
+      "auth_clients!clients_to_businesses_auth_client_id_fkey(user_id, name)"
+    )
+    .eq("business_id", businessId);
+
+  if (error) {
+    await logError(error, ["getBusinessClients", "Read"]);
+    throw error;
+  }
+
+  return (data ?? [])
+    .map((row) => row.auth_clients)
+    .filter((c): c is Pick<AuthClient, "user_id" | "name"> => !!c);
+}
+
+/*************************
+ * Read every issue for a business (across all its clients), each with its full
+ * comments list and the uploading client, for the admin/business board.
+ * @param businessId The businesses.id of the owned business
+ */
+export async function getBusinessIssues(
+  businessId: number
+): Promise<BusinessIssue[]> {
+  const { data, error } = await supabase
+    .from("issues")
+    .select("*, issue_comments(*), auth_clients!issues_client_id_fkey(user_id, name)")
+    .eq("business_id", businessId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    await logError(error, ["getBusinessIssues", "Read"]);
+    throw error;
+  }
+
+  return (data ?? []) as BusinessIssue[];
 }

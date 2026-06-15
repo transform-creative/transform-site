@@ -7,6 +7,8 @@ import { Icon } from "../elements/Icon";
 
 interface IssueCardProps {
   issue: ClientIssue;
+  // When set (admin/business board) the card shows who uploaded the issue.
+  clientName?: string | null;
   onOpen: (focusComments?: boolean) => void;
   onChanged: () => void;
 }
@@ -17,7 +19,7 @@ interface IssueCardProps {
  * comments button. Clicking the body opens the issue, the comments button
  * opens it focused on the comments panel.
  */
-export function IssueCard({ issue, onOpen, onChanged }: IssueCardProps) {
+export function IssueCard({ issue, clientName, onOpen, onChanged }: IssueCardProps) {
   const context: SharedContextProps = useOutletContext();
   const status = deriveIssueStatus(issue);
   const commentCount = issue.issue_comments?.length ?? 0;
@@ -37,6 +39,16 @@ export function IssueCard({ issue, onOpen, onChanged }: IssueCardProps) {
 
   return (
     <div className="boxed p-10 col gap10 issue-card">
+      {/* Uploader (admin/business board only) */}
+      {clientName && (
+        <div className="row middle gap5">
+          <Icon name="person-circle-outline" size={14} color="var(--accent)" />
+          <p>
+            <b>{clientName}</b>
+          </p>
+        </div>
+      )}
+
       {/* Severity swatch + approve/reject actions */}
       <div className="between middle">
         <div

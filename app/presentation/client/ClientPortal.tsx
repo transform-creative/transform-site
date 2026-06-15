@@ -1,9 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { AuthClient, ClientIssue } from "~/data/CustomTypes";
+import type {
+  AuthClient,
+  Business,
+  BusinessIssue,
+  ClientIssue,
+} from "~/data/CustomTypes";
 import { deriveIssueStatus } from "~/business/commonBL";
-import { getAuthClient, getClientIssues } from "~/database/Read";
+import {
+  getAuthClient,
+  getBusinessClients,
+  getBusinessIssues,
+  getClientIssues,
+} from "~/database/Read";
 import { supabaseSignOut } from "~/database/Auth";
 import { Icon } from "../elements/Icon";
 import { IssueCard } from "./IssueCard";
@@ -12,6 +22,9 @@ import '../../app-v2.css'
 
 interface ClientPortalProps {
   clientId: string;
+  // When present the viewer is a business owner/admin: the board loads every
+  // issue for the business (across all clients) and cards show the uploader.
+  business?: Business | null;
 }
 
 /******************************
@@ -20,10 +33,15 @@ interface ClientPortalProps {
  * and "not yet completed". The "Log issue" button and each card open the
  * shared IssueModal for creating / editing / commenting.
  */
-export function ClientPortal({ clientId }: ClientPortalProps) {
+export function ClientPortal({ clientId, business }: ClientPortalProps) {
   const context: SharedContextProps = useOutletContext();
+  const isAdmin = !!business;
   const [client, setClient] = useState<AuthClient | null>(null);
   const [issues, setIssues] = useState<ClientIssue[]>([]);
+  // The business's clients, loaded in admin mode for the "log issue" picker.
+  const [clients, setClients] = useState<Pick<AuthClient, "user_id" | "name">[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   // The open modal, keyed by issue id (null id = create mode). Keying by id
   // means a reload re-supplies fresh data (e.g. a just-posted comment).
@@ -33,22 +51,26 @@ export function ClientPortal({ clientId }: ClientPortalProps) {
   } | null>(null);
   const mounted = useRef(true);
 
-  // The business this client belongs to, used when logging a new issue.
+  // The business id backing the board. For an admin it's the business they own;
+  // for a client it's the `client_of` they belong to (used when logging issues).
   const clientOf = context.session?.user?.app_metadata?.client_of;
-  const businessId =
-    clientOf != null && Number.isFinite(Number(clientOf))
-      ? Number(clientOf)
-      : null;
+  const businessId = isAdmin
+    ? business!.id
+    : clientOf != null && Number.isFinite(Number(clientOf))
+    ? Number(clientOf)
+    : null;
 
   const reload = useCallback(async () => {
     try {
-      const issueData = await getClientIssues(clientId);
+      const issueData = isAdmin
+        ? await getBusinessIssues(business!.id)
+        : await getClientIssues(clientId);
       if (mounted.current) setIssues(issueData);
     } catch {
       if (mounted.current)
-        context.popAlert("Could not refresh your issues", "Please try again", true);
+        context.popAlert("Could not refresh the issues", "Please try again", true);
     }
-  }, [clientId]);
+  }, [clientId, isAdmin, business?.id]);
 
   useEffect(() => {
     mounted.current = true;
@@ -56,16 +78,26 @@ export function ClientPortal({ clientId }: ClientPortalProps) {
     async function load() {
       try {
         setLoading(true);
-        const [clientData, issueData] = await Promise.all([
-          getAuthClient(clientId),
-          getClientIssues(clientId),
-        ]);
-        if (!mounted.current) return;
-        setClient(clientData);
-        setIssues(issueData);
+        if (isAdmin) {
+          const [issueData, clientList] = await Promise.all([
+            getBusinessIssues(business!.id),
+            getBusinessClients(business!.id),
+          ]);
+          if (!mounted.current) return;
+          setIssues(issueData);
+          setClients(clientList);
+        } else {
+          const [clientData, issueData] = await Promise.all([
+            getAuthClient(clientId),
+            getClientIssues(clientId),
+          ]);
+          if (!mounted.current) return;
+          setClient(clientData);
+          setIssues(issueData);
+        }
       } catch (error) {
         if (mounted.current)
-          context.popAlert("Could not load your issues", "Please try again", true);
+          context.popAlert("Could not load the issues", "Please try again", true);
       } finally {
         if (mounted.current) setLoading(false);
       }
@@ -75,7 +107,7 @@ export function ClientPortal({ clientId }: ClientPortalProps) {
     return () => {
       mounted.current = false;
     };
-  }, [clientId]);
+  }, [clientId, isAdmin, business?.id]);
 
   const awaiting = issues.filter(
     (i) => deriveIssueStatus(i) === "awaiting_approval"
@@ -125,7 +157,7 @@ export function ClientPortal({ clientId }: ClientPortalProps) {
           Sign out
         </button>
         <div className="w-100 col middle center">
-          <p>{client?.name || "Client name"}</p>
+          <p>{isAdmin ? business?.name || "Your business" : client?.name || "Client name"}</p>
           <h1 className="accent">Welcome back.</h1>
           <p>
             <b>{awaiting.length}</b> issues awaiting approval{" · "}
@@ -164,6 +196,9 @@ export function ClientPortal({ clientId }: ClientPortalProps) {
                   <IssueCard
                     key={issue.id}
                     issue={issue}
+                    clientName={
+                      isAdmin ? (issue as BusinessIssue).auth_clients?.name : undefined
+                    }
                     onOpen={(focusComments) => openIssue(issue.id, !!focusComments)}
                     onChanged={reload}
                   />
@@ -184,6 +219,9 @@ export function ClientPortal({ clientId }: ClientPortalProps) {
                   <IssueCard
                     key={issue.id}
                     issue={issue}
+                    clientName={
+                      isAdmin ? (issue as BusinessIssue).auth_clients?.name : undefined
+                    }
                     onOpen={(focusComments) => openIssue(issue.id, !!focusComments)}
                     onChanged={reload}
                   />
@@ -199,6 +237,7 @@ export function ClientPortal({ clientId }: ClientPortalProps) {
         issue={modalIssue}
         clientId={clientId}
         businessId={businessId}
+        clients={isAdmin ? clients : undefined}
         focusComments={modal?.focusComments}
         onClose={() => setModal(null)}
         onChanged={reload}

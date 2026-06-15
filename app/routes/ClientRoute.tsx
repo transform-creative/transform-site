@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router";
 import type { Session } from "@supabase/supabase-js";
 import type { SharedContextProps } from "~/data/CommonTypes";
+import type { Business } from "~/data/CustomTypes";
+import { getBusinessForUser } from "~/database/Read";
 import { ClientPortal } from "~/presentation/client/ClientPortal";
 import { Route } from "../+types/root";
 
@@ -27,6 +29,11 @@ export default function ClientRoute() {
   // (their business id). They may only view their own portal.
   const isClient = !!user?.app_metadata?.client_of;
   const isOwnPortal = !!user && user.id === id;
+  // An admin is a signed-in user who owns a `businesses` row. `undefined` while
+  // we're still checking; `null` once we know they own no business.
+  const [business, setBusiness] = useState<Business | null | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     // Wait until the session has resolved before deciding.
@@ -37,15 +44,48 @@ export default function ClientRoute() {
       return;
     }
 
-    if (!isClient || !isOwnPortal) {
+    if (!isOwnPortal) {
       context.navigate("/");
+      return;
     }
-  }, [session, user, isClient, isOwnPortal]);
+
+    // Clients are admitted directly; no business lookup needed.
+    if (isClient) {
+      setBusiness(null);
+      return;
+    }
+
+    // Otherwise the only way in is owning a business — look it up.
+    let active = true;
+    getBusinessForUser(user.id)
+      .then((b) => {
+        if (!active) return;
+        setBusiness(b);
+        if (!b) context.navigate("/");
+      })
+      .catch(() => {
+        if (!active) return;
+        setBusiness(null);
+        context.navigate("/");
+      });
+    return () => {
+      active = false;
+    };
+  }, [session, user, isClient, isOwnPortal, id]);
 
   // Don't render the portal to unauthorised viewers while we redirect.
-  if (!user || !isClient || !isOwnPortal || !id) {
+  if (!user || !isOwnPortal || !id) {
     return null;
   }
 
-  return <ClientPortal clientId={id} />;
+  if (isClient) {
+    return <ClientPortal clientId={id} />;
+  }
+
+  // Admin path: wait until the business ownership check resolves.
+  if (business === undefined || !business) {
+    return null;
+  }
+
+  return <ClientPortal clientId={id} business={business} />;
 }

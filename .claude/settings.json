@@ -27,7 +27,8 @@
       "Bash(curl -s http://localhost:5174/auth)",
       "mcp__claude_ai_Supabase__generate_typescript_types",
       "PowerShell(npm run typecheck)",
-      "mcp__claude_ai_Supabase__apply_migration"
+      "mcp__claude_ai_Supabase__apply_migration",
+      "PowerShell(npx tsc --noEmit)"
     ]
   }
 }
