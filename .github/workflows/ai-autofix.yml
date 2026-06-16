@@ -47,7 +47,7 @@ permissions:
 jobs:
   autofix:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -103,7 +103,12 @@ jobs:
           # or every tool call is auto-denied (that's what burned 40 turns at 0
           # progress). The runner is ephemeral + sandboxed; the real controls are
           # the prompt guardrails, branch protection, and human PR review.
-          claude_args: "--model claude-opus-4-8 --max-turns 40 --permission-mode bypassPermissions"
+          #
+          # Cost: right-size the model to the issue. Sonnet 4.6 ($3/$15) handles the
+          # common case; escalate to Opus 4.8 ($5/$25) only for severe/critical.
+          claude_args: >-
+            --model ${{ (github.event.inputs.severity == 'severe' || github.event.inputs.severity == 'critical') && 'claude-opus-4-8' || 'claude-sonnet-4-6' }}
+            --max-turns 40 --permission-mode bypassPermissions
           prompt: |
             You are an autonomous fix agent running in CI for issue #${{ github.event.inputs.issue_id }}.
             Read the full issue first: ${{ runner.temp }}/issue.md
