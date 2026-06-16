@@ -111,8 +111,7 @@ jobs:
           # Cost: right-size the model to the issue. Sonnet 4.6 ($3/$15) handles the
           # common case; escalate to Opus 4.8 ($5/$25) only for severe/critical.
           claude_args: >-
-            --model ${{ (github.event.inputs.severity == 'severe' || github.event.inputs.severity == 'critical') && 'claude-opus-4-8' || 'claude-sonnet-4-6' }}
-            --max-turns 40 --permission-mode bypassPermissions
+          claude_args: "--model claude-opus-4-8 --max-turns 60 --permission-mode bypassPermissions"
           prompt: |
             You are an autonomous fix agent running in CI for issue #${{ github.event.inputs.issue_id }}.
             Read the full issue first: ${{ runner.temp }}/issue.md
@@ -162,7 +161,8 @@ jobs:
             ${{ runner.temp }}/ai-result.json with exactly these keys:
               {"status":"pr_open"|"needs_info"|"failed","pr_url":"<url or empty>",
                "pr_number":<number or null>,"branch":"<branch or empty>",
-               "questions":"<your questions if needs_info, else empty>"}
+               "questions":"<your questions if needs_info, else empty>",
+               "error":"<one-line reason if status is failed, else empty>"}
 
       # Read Claude's result and write status (+ any questions) back to Supabase.
       - name: Report result to Supabase
@@ -183,8 +183,11 @@ jobs:
             pr_number=$(jq -r '.pr_number // null' "$RESULT")
             branch=$(jq -r '.branch // ""' "$RESULT")
             questions=$(jq -r '.questions // ""' "$RESULT")
+            error=$(jq -r '.error // ""' "$RESULT")
           else
+            # No result file = the agent crashed or hit max turns before writing one.
             status="failed"; pr_url=""; pr_number=null; branch=""; questions=""
+            error="No result file (agent crashed or hit max turns) — see Actions run ${{ github.run_id }}"
           fi
 
           curl -fsS -X PATCH \
@@ -194,11 +197,12 @@ jobs:
             -H "Prefer: return=minimal" \
             "$SUPABASE_URL/rest/v1/issues?id=eq.$ISSUE_ID" \
             -d "$(jq -n --arg s "$status" --arg u "$pr_url" --argjson n "$pr_number" \
-                  --arg b "$branch" --arg r "${{ github.run_id }}" --arg t "$(date -u +%FT%TZ)" \
+                  --arg b "$branch" --arg e "$error" --arg r "${{ github.run_id }}" --arg t "$(date -u +%FT%TZ)" \
                   '{ai_status:$s,
                     ai_pr_url:(if $u=="" then null else $u end),
                     ai_pr_number:$n,
                     ai_branch:(if $b=="" then null else $b end),
+                    ai_error:(if $e=="" then null else $e end),
                     ai_run_id:$r, ai_updated_at:$t}')"
 
           # Post the questions as a comment so they show in the portal's comments panel.
