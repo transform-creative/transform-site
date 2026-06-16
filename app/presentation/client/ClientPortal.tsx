@@ -227,9 +227,9 @@ export function ClientPortal({
                 className="severity-swatch"
                 style={{ background: severityColor(severity) }}
               />
-              <h4>
+              <h3>
                 {severityMeta(severity).label} ({column.length})
-              </h4>
+              </h3>
             </div>
             {column.map(renderCard)}
           </div>
