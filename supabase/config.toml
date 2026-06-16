@@ -1,0 +1,9 @@
+# Supabase project config. Only the bits the AI auto-fix pipeline needs are set
+# here; everything else uses Supabase defaults. Link with `supabase link
+# --project-ref hzfjmmakqwsmucxorhlb` then `supabase functions deploy`.
+project_id = "hzfjmmakqwsmucxorhlb"
+
+[functions.dispatch-issue]
+# The Database Webhook posts to this function. We verify a shared secret header
+# ourselves (see index.ts), so Supabase JWT verification is turned off.
+verify_jwt = false

@@ -41,7 +41,15 @@
       "Skill(update-config)",
       "Skill(update-config:*)",
       "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('.claude/settings.json','utf8'\\)\\); console.log\\('valid JSON'\\)\")",
-      "mcp__claude_ai_Supabase__execute_sql"
+      "mcp__claude_ai_Supabase__execute_sql",
+      "mcp__claude_ai_Supabase__list_projects",
+      "mcp__claude_ai_Supabase__list_tables",
+      "Bash(command -v deno)",
+      "Bash(deno check *)",
+      "Bash(command -v openssl)",
+      "Bash(openssl version *)",
+      "Read(//c/Program Files/Git/usr/bin/**)",
+      "Bash(git check-ignore *)"
     ],
     "deny": [
       "Read(**/.env*)",

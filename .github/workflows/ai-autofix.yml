@@ -1,0 +1,173 @@
+# AI auto-fix — opens a PR for a logged issue.
+#
+# Triggered by the `dispatch-issue` Supabase edge function via workflow_dispatch.
+# This is the CANONICAL TEMPLATE: copy it into each client repo. The agent runs
+# here (long compute, native git); the Supabase edge function only dispatches.
+#
+# Security: this workflow can only ever OPEN a PR. `main` must be protected
+# (require PR + review), and the GitHub App must NOT have Administration
+# permission or branch-protection bypass. See permissions block below.
+#
+# Required repo/org secrets:
+#   ANTHROPIC_API_KEY  *or*  CLAUDE_CODE_OAUTH_TOKEN   (whichever you use)
+#   SUPABASE_URL                Supabase project URL
+#   SUPABASE_SERVICE_ROLE_KEY   service role key (writes ai_* status back)
+#   AI_BOT_USER_ID              auth.users id used as the author of needs-info comments
+
+name: AI auto-fix
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_id:
+        description: "issues.id to work on"
+        required: true
+      title:
+        description: "Issue title"
+        required: false
+      issue_type:
+        description: "bug | issue"
+        required: false
+      severity:
+        description: "low | moderate | severe | critical"
+        required: false
+
+# One run at a time per repo: runs queue (do not cancel), so each starts from
+# the newest main and can see all open PRs.
+concurrency:
+  group: ai-autofix-${{ github.repository }}
+  cancel-in-progress: false
+
+# Minimal scope — enough to branch + open a PR + write a comment, nothing more.
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so Claude can read recent PR diffs
+
+      # Pull the full issue from Supabase and write it to a file Claude reads.
+      - name: Fetch issue + mark processing
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ISSUE_ID: ${{ github.event.inputs.issue_id }}
+        run: |
+          set -euo pipefail
+          row=$(curl -fsS \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            "$SUPABASE_URL/rest/v1/issues?id=eq.$ISSUE_ID&select=title,description,more_info,issue_type,severity")
+          echo "$row" | jq -r --arg id "$ISSUE_ID" '.[0]
+            | "# Issue #\($id)\n\nType: \(.issue_type // "issue")  |  Severity: \(.severity // "n/a")\n\n"
+            + "## Title\n\(.title // "(none)")\n\n"
+            + "## Description\n\(.description // "(none)")\n\n"
+            + "## More info\n\(.more_info // "(none)")\n"' \
+            > "${{ runner.temp }}/issue.md"
+          # best-effort: flag the card as actively being worked on
+          curl -fsS -X PATCH \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            "$SUPABASE_URL/rest/v1/issues?id=eq.$ISSUE_ID" \
+            -d "{\"ai_status\":\"processing\",\"ai_run_id\":\"${{ github.run_id }}\",\"ai_updated_at\":\"$(date -u +%FT%TZ)\"}" || true
+
+      - name: Run Claude
+        uses: anthropics/claude-code-action@v1 # TODO: pin to a commit SHA in production
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: "--model claude-opus-4-8 --max-turns 40"
+          prompt: |
+            You are an autonomous fix agent running in CI for issue #${{ github.event.inputs.issue_id }}.
+            Read the full issue first: ${{ runner.temp }}/issue.md
+
+            GOAL: implement the smallest correct change that resolves the issue, on a
+            NEW branch, and open a pull request for a human to review and merge.
+
+            HARD RULES (security & scope):
+            - Implement ONLY what the issue describes. Do not refactor, reformat, or
+              touch unrelated files.
+            - NEVER modify .github/, workflows, CI config, secrets, or branch
+              protection. NEVER push to or force-push `main`.
+            - Work on a new branch named `ai/issue-${{ github.event.inputs.issue_id }}-<short-slug>`.
+
+            BUILD ON THE LATEST CODE:
+            - `git fetch origin` and branch from the latest default branch.
+            - Run `gh pr list --state open` and read the diffs of any related open PRs
+              so your change builds on the newest work and does not duplicate/conflict.
+
+            STOP-AND-ASK (do this instead of guessing):
+            - If you cannot make a confident, correct change with the information given
+              — ambiguous requirements, missing reproduction, or a design decision only
+              the user can make — DO NOT open a PR. Instead write the result file with
+              status "needs_info" and your specific questions, then stop. Prefer asking
+              over a low-confidence change. Don't spin: if the repo clearly lacks the
+              context to implement, ask.
+
+            TESTS: write or update the relevant unit tests and run the suite. The change
+            is not complete unless tests pass.
+
+            PULL REQUEST: title `[AI] ${{ github.event.inputs.title }}`. In the body
+            include: a short summary, "Closes issue #${{ github.event.inputs.issue_id }}",
+            STEP-BY-STEP instructions to view the change in the running app (which
+            route/page, what to click), and POTENTIAL EDGE CASES to check.
+
+            ALWAYS, as your final action, write a JSON result to
+            ${{ runner.temp }}/ai-result.json with exactly these keys:
+              {"status":"pr_open"|"needs_info"|"failed","pr_url":"<url or empty>",
+               "pr_number":<number or null>,"branch":"<branch or empty>",
+               "questions":"<your questions if needs_info, else empty>"}
+
+      # Read Claude's result and write status (+ any questions) back to Supabase.
+      - name: Report result to Supabase
+        if: always()
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AI_BOT_USER_ID: ${{ secrets.AI_BOT_USER_ID }}
+          ISSUE_ID: ${{ github.event.inputs.issue_id }}
+        run: |
+          set -uo pipefail
+          RESULT="${{ runner.temp }}/ai-result.json"
+          if [ -f "$RESULT" ]; then
+            status=$(jq -r '.status // "failed"' "$RESULT")
+            pr_url=$(jq -r '.pr_url // ""' "$RESULT")
+            pr_number=$(jq -r '.pr_number // null' "$RESULT")
+            branch=$(jq -r '.branch // ""' "$RESULT")
+            questions=$(jq -r '.questions // ""' "$RESULT")
+          else
+            status="failed"; pr_url=""; pr_number=null; branch=""; questions=""
+          fi
+
+          curl -fsS -X PATCH \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            "$SUPABASE_URL/rest/v1/issues?id=eq.$ISSUE_ID" \
+            -d "$(jq -n --arg s "$status" --arg u "$pr_url" --argjson n "$pr_number" \
+                  --arg b "$branch" --arg r "${{ github.run_id }}" --arg t "$(date -u +%FT%TZ)" \
+                  '{ai_status:$s, ai_pr_url:($u|select(.!="")), ai_pr_number:$n,
+                    ai_branch:($b|select(.!="")), ai_run_id:$r, ai_updated_at:$t}')"
+
+          # Post the questions as a comment so they show in the portal's comments panel.
+          if [ "$status" = "needs_info" ] && [ -n "$questions" ] && [ -n "${AI_BOT_USER_ID:-}" ]; then
+            curl -fsS -X POST \
+              -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+              -H "Content-Type: application/json" \
+              -H "Prefer: return=minimal" \
+              "$SUPABASE_URL/rest/v1/issue_comments" \
+              -d "$(jq -n --argjson i "$ISSUE_ID" --arg a "$AI_BOT_USER_ID" --arg b "$questions" \
+                    '{issue_id:$i, author_user_id:$a, body:$b}')" || true
+          fi

@@ -1,8 +1,10 @@
 import { IoniconName } from "~/data/Ionicons";
 import type {
+  AiStatus,
   Issue,
   IssueSeverity,
   IssueStatus,
+  IssueType,
   IssueUpdate,
 } from "~/data/CustomTypes";
 
@@ -63,6 +65,47 @@ export function severityMeta(severity: string | null) {
   return (
     SEVERITY_OPTIONS.find((o) => o.value === severity) ?? SEVERITY_OPTIONS[0]
   );
+}
+
+/*******************************************
+ * The kinds of request an issue can be. Shown as the row of buttons at the top
+ * of the issue modal. `question` is triage-only and skips the AI auto-fix
+ * pipeline (mirrored by the gate in the dispatch-issue edge function).
+ */
+export const ISSUE_TYPE_OPTIONS: {
+  value: IssueType;
+  label: string;
+  icon: IoniconName;
+}[] = [
+  { value: "bug", label: "Bug", icon: "bug-outline" },
+  { value: "issue", label: "Issue", icon: "construct-outline" },
+  { value: "question", label: "Question", icon: "help-circle-outline" },
+];
+
+/*******************************************
+ * Map an AI auto-fix status to a short label, swatch colour and icon for the
+ * chip shown on the issue card. `null` (never dispatched) returns null so the
+ * card simply shows nothing.
+ */
+export function aiStatusMeta(
+  status: string | null
+): { label: string; color: string; icon: IoniconName } | null {
+  switch (status) {
+    case "queued":
+      return { label: "AI queued", color: "var(--accent-lg)", icon: "time-outline" };
+    case "processing":
+      return { label: "AI working", color: "var(--accent)", icon: "sync-outline" };
+    case "pr_open":
+      return { label: "PR ready", color: "var(--accent)", icon: "git-pull-request-outline" };
+    case "needs_info":
+      return { label: "Needs info", color: "var(--warningColor)", icon: "help-circle-outline" };
+    case "failed":
+      return { label: "AI failed", color: "var(--dangerColor)", icon: "alert-circle-outline" };
+    case "skipped":
+      return { label: "AI skipped", color: "var(--accent-lg)", icon: "remove-circle-outline" };
+    default:
+      return null;
+  }
 }
 
 /*******************************************

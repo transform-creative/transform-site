@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { ClientIssue, IssueSeverity, Profile } from "~/data/CustomTypes";
+import type {
+  ClientIssue,
+  IssueSeverity,
+  IssueType,
+  Profile,
+} from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
   issueActionPatch,
+  ISSUE_TYPE_OPTIONS,
   severityColor,
   severityMeta,
   SEVERITY_OPTIONS,
@@ -60,8 +66,10 @@ export function IssueModal({
   // Admins logging a new issue choose which client it's for.
   const showClientPicker = !isEdit && !!clients;
 
+  const [issueType, setIssueType] = useState<IssueType>("bug");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [moreInfo, setMoreInfo] = useState("");
   const [severity, setSeverity] = useState<IssueSeverity>("low");
   const [pickerOpen, setPickerOpen] = useState(false);
   // Viewport coords the severity pop-over anchors to (set from the trigger).
@@ -78,8 +86,10 @@ export function IssueModal({
 
   // Seed the form whenever a different issue is opened (or reset for create).
   useEffect(() => {
+    setIssueType((issue?.issue_type as IssueType) ?? "bug");
     setTitle(issue?.title ?? "");
     setDescription(issue?.description ?? "");
+    setMoreInfo(issue?.more_info ?? "");
     setSeverity((issue?.severity as IssueSeverity) ?? "low");
     setPickerOpen(false);
     setClientPickerOpen(false);
@@ -102,8 +112,10 @@ export function IssueModal({
   // In edit mode, only allow saving once a field actually differs.
   const isDirty =
     !isEdit ||
+    issueType !== ((issue?.issue_type as IssueType) ?? "bug") ||
     title !== (issue?.title ?? "") ||
     description !== (issue?.description ?? "") ||
+    moreInfo !== (issue?.more_info ?? "") ||
     severity !== ((issue?.severity as IssueSeverity) ?? "low");
 
   const status = issue ? deriveIssueStatus(issue) : "not_started";
@@ -129,7 +141,13 @@ export function IssueModal({
     try {
       setSubmitting(true);
       if (isEdit && issue) {
-        await updateIssue(issue.id, { title, description, severity });
+        await updateIssue(issue.id, {
+          issue_type: issueType,
+          title,
+          description,
+          more_info: moreInfo,
+          severity,
+        });
         context.popAlert("Issue updated");
         onChanged();
         onClose();
@@ -137,8 +155,10 @@ export function IssueModal({
         await createIssue({
           client_id: createClientId,
           business_id: businessId,
+          issue_type: issueType,
           title,
           description,
+          more_info: moreInfo,
           severity,
         });
         if (showClientPicker && typeof window !== "undefined") {
@@ -257,6 +277,28 @@ export function IssueModal({
             )}
           </div>
 
+          {/* Issue type — bug / issue / question. `question` is triage-only
+              and never reaches the AI auto-fix pipeline. */}
+          <div className="row gap-5">
+            {ISSUE_TYPE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`row middle center gap-5 w-100 ${
+                  issueType === opt.value ? "accentButton" : "outline-accent"
+                }`}
+                onClick={() => setIssueType(opt.value)}
+              >
+                <Icon
+                  name={opt.icon}
+                  size={16}
+                  color={issueType === opt.value ? "var(--bkg)" : "var(--accent)"}
+                />
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
           {/* Edit-only metadata */}
           {isEdit && issue && (
             <div className="col gap-5">
@@ -354,6 +396,14 @@ export function IssueModal({
             isTextArea
             style={{ minHeight: 110 }}
             onChange={(e) => setDescription(e.target.value)}
+          />
+          <LabelInput
+            name="More info"
+            placeholder="Error messages, links, or anything else that helps"
+            value={moreInfo}
+            isTextArea
+            style={{ minHeight: 70 }}
+            onChange={(e) => setMoreInfo(e.target.value)}
           />
 
           {/* Severity picker */}

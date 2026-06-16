@@ -2,6 +2,7 @@ import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import type { ClientIssue } from "~/data/CustomTypes";
 import {
+  aiStatusMeta,
   deriveIssueStatus,
   issueActionPatch,
   severityColor,
@@ -37,6 +38,7 @@ export function IssueCard({
   const context: SharedContextProps = useOutletContext();
   const status = deriveIssueStatus(issue);
   const commentCount = issue.issue_comments?.length ?? 0;
+  const ai = aiStatusMeta(issue.ai_status);
 
   // The business pushes an issue forward: start it, then mark it updated (also
   // used to re-submit something the client sent back).
@@ -198,7 +200,28 @@ export function IssueCard({
             <p>Approved</p>
           </div>
         )}
+
+        {/* AI auto-fix status (only once dispatched) */}
+        {ai && (
+          <div className="row middle gap-5">
+            <Icon name={ai.icon} size={14} color={ai.color} />
+            <p style={{ color: ai.color }}>{ai.label}</p>
+          </div>
+        )}
       </div>
+
+      {/* Link to the AI's pull request once it has opened one */}
+      {issue.ai_pr_url && (
+        <a
+          className="row center middle gap-5 outline-accent"
+          href={issue.ai_pr_url}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <Icon name="git-pull-request-outline" size={18} color="var(--accent)" />
+          View pull request
+        </a>
+      )}
 
       {/* Comments — opens the issue focused on the comments panel */}
       <button

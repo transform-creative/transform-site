@@ -78,11 +78,14 @@ export type Database = {
           abn: string | null
           account_name: string | null
           account_num: string | null
+          ai_autofix_enabled: boolean
           bsb_num: string | null
           created_at: string
           default_invoice: number | null
           details_complete: boolean
           email: string | null
+          github_default_branch: string
+          github_repo: string | null
           id: number
           integrations: Json
           invoice_color: string
@@ -115,11 +118,14 @@ export type Database = {
           abn?: string | null
           account_name?: string | null
           account_num?: string | null
+          ai_autofix_enabled?: boolean
           bsb_num?: string | null
           created_at?: string
           default_invoice?: number | null
           details_complete?: boolean
           email?: string | null
+          github_default_branch?: string
+          github_repo?: string | null
           id?: number
           integrations?: Json
           invoice_color?: string
@@ -152,11 +158,14 @@ export type Database = {
           abn?: string | null
           account_name?: string | null
           account_num?: string | null
+          ai_autofix_enabled?: boolean
           bsb_num?: string | null
           created_at?: string
           default_invoice?: number | null
           details_complete?: boolean
           email?: string | null
+          github_default_branch?: string
+          github_repo?: string | null
           id?: number
           integrations?: Json
           invoice_color?: string
@@ -524,12 +533,22 @@ export type Database = {
       }
       issues: {
         Row: {
+          ai_attempts: number
+          ai_branch: string | null
+          ai_error: string | null
+          ai_pr_number: number | null
+          ai_pr_url: string | null
+          ai_run_id: string | null
+          ai_status: string | null
+          ai_updated_at: string | null
           approved_at: string | null
           business_id: number | null
           client_id: string
           created_at: string
           description: string | null
           id: number
+          issue_type: string | null
+          more_info: string | null
           rejected_at: string | null
           severity: string | null
           started_at: string | null
@@ -537,12 +556,22 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          ai_attempts?: number
+          ai_branch?: string | null
+          ai_error?: string | null
+          ai_pr_number?: number | null
+          ai_pr_url?: string | null
+          ai_run_id?: string | null
+          ai_status?: string | null
+          ai_updated_at?: string | null
           approved_at?: string | null
           business_id?: number | null
           client_id: string
           created_at?: string
           description?: string | null
           id?: number
+          issue_type?: string | null
+          more_info?: string | null
           rejected_at?: string | null
           severity?: string | null
           started_at?: string | null
@@ -550,12 +579,22 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          ai_attempts?: number
+          ai_branch?: string | null
+          ai_error?: string | null
+          ai_pr_number?: number | null
+          ai_pr_url?: string | null
+          ai_run_id?: string | null
+          ai_status?: string | null
+          ai_updated_at?: string | null
           approved_at?: string | null
           business_id?: number | null
           client_id?: string
           created_at?: string
           description?: string | null
           id?: number
+          issue_type?: string | null
+          more_info?: string | null
           rejected_at?: string | null
           severity?: string | null
           started_at?: string | null

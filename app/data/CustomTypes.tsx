@@ -28,6 +28,26 @@ export type IssueSeverity =
   | "future";
 
 /**
+ * What kind of request an issue is. Picked at the top of the issue modal.
+ * `question` is triage-only and is never sent to the AI auto-fix pipeline.
+ */
+export type IssueType = "bug" | "issue" | "question";
+
+/**
+ * State of the AI auto-fix pipeline for an issue (the `ai_status` column).
+ * `null` means it was never dispatched (e.g. severity `future`, type
+ * `question`, or the business has auto-fix disabled). See `aiStatusMeta` in
+ * `~/business/commonBL`. Written only by the edge function / GitHub workflow.
+ */
+export type AiStatus =
+  | "queued"
+  | "processing"
+  | "pr_open"
+  | "needs_info"
+  | "failed"
+  | "skipped";
+
+/**
  * Derived issue status. There is no `status` column on the issues table —
  * this is computed from the `started_at` / `updated_at` / `approved_at` /
  * `rejected_at` timestamps (see `deriveIssueStatus` in `~/business/commonBL`).
