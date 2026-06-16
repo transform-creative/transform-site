@@ -99,7 +99,11 @@ jobs:
           # authorized actor, so this adds no extra exposure. Tighten to the exact
           # bot login instead of "*" if you prefer.
           allowed_bots: "*"
-          claude_args: "--model claude-opus-4-8 --max-turns 40"
+          # Headless CI: no human to approve tool prompts, so pre-grant permissions
+          # or every tool call is auto-denied (that's what burned 40 turns at 0
+          # progress). The runner is ephemeral + sandboxed; the real controls are
+          # the prompt guardrails, branch protection, and human PR review.
+          claude_args: "--model claude-opus-4-8 --max-turns 40 --permission-mode bypassPermissions"
           prompt: |
             You are an autonomous fix agent running in CI for issue #${{ github.event.inputs.issue_id }}.
             Read the full issue first: ${{ runner.temp }}/issue.md
