@@ -201,8 +201,8 @@ export function IssueCard({
           </div>
         )}
 
-        {/* AI auto-fix status (only once dispatched) */}
-        {ai && (
+        {/* AI auto-fix status (only once dispatched) — business admins only */}
+        {businessMode && ai && (
           <div className="row middle gap-5">
             <Icon name={ai.icon} size={14} color={ai.color} />
             <p style={{ color: ai.color }}>{ai.label}</p>
@@ -210,8 +210,8 @@ export function IssueCard({
         )}
       </div>
 
-      {/* Link to the AI's pull request once it has opened one */}
-      {issue.ai_pr_url && (
+      {/* Link to the AI's pull request once it has opened one — business admins only */}
+      {businessMode && issue.ai_pr_url && (
         <a
           className="row center middle gap-5 outline-accent"
           href={issue.ai_pr_url}
