@@ -314,6 +314,10 @@ button:disabled {
   transform: translateY(2px);
 }
 
+.accentButton:hover * {
+  color: var(--bkg);
+}
+
 button:hover * {
   color: var(--accent);
   transition: 0.2s;
