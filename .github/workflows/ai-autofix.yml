@@ -93,6 +93,10 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # TEMP (debugging): stream the agent's full output into the run log so we
+          # can see the real PR-creation error. Revert to false once diagnosed —
+          # full output can surface repo contents / command output in CI logs.
+          show_full_output: true
           # This workflow is intentionally triggered by our GitHub App (a bot) via
           # workflow_dispatch, which the action blocks by default. Allow it. The
           # trigger surface is already locked down to workflow_dispatch by an
