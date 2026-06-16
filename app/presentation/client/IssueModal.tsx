@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import type {
@@ -65,7 +65,19 @@ export function IssueModal({
   onChanged,
 }: IssueModalProps) {
   const context: SharedContextProps = useOutletContext();
-  const isEdit = !!issue;
+
+  // Freeze the last non-null issue so the right panel (comments) stays visible
+  // during the exit animation. The parent clears `issue` at the same time as
+  // `active` → false, which would otherwise instantly collapse the panel.
+  const frozenIssueRef = useRef<ClientIssue | null>(null);
+  if (active && issue !== null) {
+    frozenIssueRef.current = issue;
+  } else if (active && issue === null) {
+    // Entering create mode — reset so a prior edit session doesn't leak through.
+    frozenIssueRef.current = null;
+  }
+  const displayIssue = issue ?? (!active ? frozenIssueRef.current : null);
+  const isEdit = !!displayIssue;
   // Admins logging a new issue choose which client it's for.
   const showClientPicker = !isEdit && !!clients;
 
@@ -121,7 +133,7 @@ export function IssueModal({
     moreInfo !== (issue?.more_info ?? "") ||
     severity !== ((issue?.severity as IssueSeverity) ?? "low");
 
-  const status = issue ? deriveIssueStatus(issue) : "not_started";
+  const status = displayIssue ? deriveIssueStatus(displayIssue) : "not_started";
   const meta = severityMeta(severity);
   const selectedClientName = clients?.find(
     (c) => c.id === selectedClientId
@@ -303,19 +315,19 @@ export function IssueModal({
           </div>
 
           {/* Edit-only metadata */}
-          {isEdit && issue && (
+          {isEdit && displayIssue && (
             <div className="col gap-5">
               <div className="row middle gap-5">
                 <Icon name="add-circle-outline" size={14} color="var(--accent)" />
                 <p>
-                  <b>Created</b> {timeAgo(issue.created_at)}
+                  <b>Created</b> {timeAgo(displayIssue.created_at)}
                 </p>
               </div>
               {status === "awaiting_approval" && (
                 <div className="row middle gap-5">
                   <Icon name="checkmark-circle" size={14} color="var(--accent)" />
                   <p>
-                    <b>Updated</b> {timeAgo(issue.updated_at)}
+                    <b>Updated</b> {timeAgo(displayIssue.updated_at)}
                   </p>
                 </div>
               )}
@@ -325,7 +337,7 @@ export function IssueModal({
                   <p>Sent back</p>
                 </div>
               )}
-              {!issue.approved_at && (
+              {!displayIssue.approved_at && (
                 <div className="row middle gap-5">
                   <Icon
                     name="alert-circle-outline"
@@ -470,12 +482,12 @@ export function IssueModal({
         </div>
 
         {/* Right panel — comments (edit only) */}
-        {isEdit && issue && (
+        {isEdit && displayIssue && (
           <div className="col gap-10 issue-comments">
-            {issue.issue_comments.length === 0 ? (
+            {displayIssue.issue_comments.length === 0 ? (
               <p className="accent-text">No comments yet</p>
             ) : (
-              issue.issue_comments.map((comment) => (
+              displayIssue.issue_comments.map((comment) => (
                 <div key={comment.id} className="col comment-card">
                   <p style={{color: "var(--accent-lg)"}}>
                     <b
