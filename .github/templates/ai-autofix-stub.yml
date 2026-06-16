@@ -1,0 +1,43 @@
+# AI auto-fix — STUB. Copy this into each client repo as
+# `.github/workflows/ai-autofix.yml`.
+#
+# This is the `workflow_dispatch` entrypoint the Supabase `dispatch-issue` edge
+# function fires. It holds NO logic — it just forwards to the central reusable
+# workflow, so all the real behaviour is maintained in ONE place and changes
+# propagate to every client automatically. You should rarely (if ever) need to
+# edit this file again per repo.
+#
+# `secrets: inherit` forwards the org-level secrets (already granted to this
+# repo) straight to the reusable workflow — no per-repo secret wiring here.
+#
+# Bump the `@v1` ref only if you intentionally move clients to a new major
+# version of the reusable workflow.
+
+name: AI auto-fix
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_id:
+        description: "issues.id to work on"
+        required: true
+      title:
+        description: "Issue title"
+        required: false
+      issue_type:
+        description: "bug | issue"
+        required: false
+      severity:
+        description: "low | moderate | severe | critical"
+        required: false
+
+jobs:
+  autofix:
+    # CHANGE THIS to your central repo if it isn't `transformcreative/ci`.
+    uses: transformcreative/ci/.github/workflows/ai-autofix.yml@v1
+    secrets: inherit
+    with:
+      issue_id: ${{ github.event.inputs.issue_id }}
+      title: ${{ github.event.inputs.title }}
+      issue_type: ${{ github.event.inputs.issue_type }}
+      severity: ${{ github.event.inputs.severity }}

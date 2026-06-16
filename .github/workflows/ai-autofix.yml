@@ -1,14 +1,20 @@
-# AI auto-fix — opens a PR for a logged issue.
+# AI auto-fix — REUSABLE workflow. Opens a PR for a logged issue.
 #
-# Triggered by the `dispatch-issue` Supabase edge function via workflow_dispatch.
-# This is the CANONICAL TEMPLATE: copy it into each client repo. The agent runs
-# here (long compute, native git); the Supabase edge function only dispatches.
+# This is the CANONICAL, CENTRAL workflow. It lives in ONE repo (the org's
+# central CI repo, e.g. transformcreative/ci) and every client repo calls it via
+# a tiny stub (.github/templates/ai-autofix-stub.yml → copied into each client
+# repo as .github/workflows/ai-autofix.yml). Editing this one file updates the
+# behaviour for ALL clients — no per-repo copy to maintain.
+#
+# It is `workflow_call`-only, so it never runs on its own; it only runs when a
+# client repo's stub calls it. The stub is the `workflow_dispatch` entrypoint the
+# Supabase `dispatch-issue` edge function fires.
 #
 # Security: this workflow can only ever OPEN a PR. `main` must be protected
 # (require PR + review), and the GitHub App must NOT have Administration
 # permission or branch-protection bypass. See permissions block below.
 #
-# Required repo/org secrets:
+# Secrets are passed through from the caller via `secrets: inherit`:
 #   ANTHROPIC_API_KEY  *or*  CLAUDE_CODE_OAUTH_TOKEN   (whichever you use)
 #   SUPABASE_URL                Supabase project URL
 #   SUPABASE_SERVICE_ROLE_KEY   service role key (writes ai_* status back)
@@ -16,26 +22,46 @@
 #   GH_APP_ID                   GitHub App id — used to mint the PR-creation token
 #   GH_APP_PRIVATE_KEY          GitHub App private key (PEM, as downloaded)
 
-name: AI auto-fix
+name: AI auto-fix (reusable)
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       issue_id:
         description: "issues.id to work on"
         required: true
+        type: string
       title:
         description: "Issue title"
         required: false
+        type: string
       issue_type:
         description: "bug | issue"
         required: false
+        type: string
       severity:
         description: "low | moderate | severe | critical"
         required: false
+        type: string
+    secrets:
+      ANTHROPIC_API_KEY:
+        required: false
+      CLAUDE_CODE_OAUTH_TOKEN:
+        required: false
+      SUPABASE_URL:
+        required: true
+      SUPABASE_SERVICE_ROLE_KEY:
+        required: true
+      AI_BOT_USER_ID:
+        required: true
+      GH_APP_ID:
+        required: true
+      GH_APP_PRIVATE_KEY:
+        required: true
 
 # One run at a time per repo: runs queue (do not cancel), so each starts from
-# the newest main and can see all open PRs.
+# the newest main and can see all open PRs. `github.repository` is the CALLER
+# repo, so each client gets its own concurrency group.
 concurrency:
   group: ai-autofix-${{ github.repository }}
   cancel-in-progress: false
@@ -60,7 +86,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          ISSUE_ID: ${{ github.event.inputs.issue_id }}
+          ISSUE_ID: ${{ inputs.issue_id }}
         run: |
           set -euo pipefail
           # Strip any stray whitespace/newlines a secret may have been saved with.
@@ -120,7 +146,7 @@ jobs:
           # common case; escalate to Opus 4.8 ($5/$25) only for severe/critical.
           claude_args: "--model claude-opus-4-8 --max-turns 60 --permission-mode bypassPermissions"
           prompt: |
-            You are an autonomous fix agent running in CI for issue #${{ github.event.inputs.issue_id }}.
+            You are an autonomous fix agent running in CI for issue #${{ inputs.issue_id }}.
             Read the full issue first: ${{ runner.temp }}/issue.md
 
             GOAL: implement the smallest correct change that resolves the issue, on a
@@ -131,7 +157,7 @@ jobs:
               touch unrelated files.
             - NEVER modify .github/, workflows, CI config, secrets, or branch
               protection. NEVER push to or force-push `main`.
-            - Work on a new branch named `ai/issue-${{ github.event.inputs.issue_id }}-<short-slug>`.
+            - Work on a new branch named `ai/issue-${{ inputs.issue_id }}-<short-slug>`.
 
             BUILD ON THE LATEST CODE:
             - `git fetch origin` and branch from the latest default branch.
@@ -159,8 +185,8 @@ jobs:
             TESTS: write or update the relevant unit tests and run the suite. The change
             is not complete unless tests pass.
 
-            PULL REQUEST: title `[AI] ${{ github.event.inputs.title }}`. In the body
-            include: a short summary, "Closes issue #${{ github.event.inputs.issue_id }}",
+            PULL REQUEST: title `[AI] ${{ inputs.title }}`. In the body
+            include: a short summary, "Closes issue #${{ inputs.issue_id }}",
             STEP-BY-STEP instructions to view the change in the running app (which
             route/page, what to click), and POTENTIAL EDGE CASES to check.
 
@@ -178,7 +204,7 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           AI_BOT_USER_ID: ${{ secrets.AI_BOT_USER_ID }}
-          ISSUE_ID: ${{ github.event.inputs.issue_id }}
+          ISSUE_ID: ${{ inputs.issue_id }}
         run: |
           set -uo pipefail
           SUPABASE_URL="${SUPABASE_URL//[[:space:]]/}"
