@@ -131,6 +131,16 @@ jobs:
               over a low-confidence change. Don't spin: if the repo clearly lacks the
               context to implement, ask.
 
+            DON'T SPIN (you have a limited turn/cost budget — respect it):
+            - If the same command or approach fails ~2-3 times, or the environment is
+              broken (dependencies won't install, tests can't run, tooling is missing),
+              STOP immediately. Do not repeat a failing action hoping it works — change
+              approach once, and if that also fails, bail.
+            - When you bail, write the result file with status "failed" (or "needs_info"
+              if a human could realistically unblock you) and a one-line explanation of
+              what went wrong. Ending early with a clear reason is the correct outcome,
+              not a defeat — it saves wasted credits.
+
             TESTS: write or update the relevant unit tests and run the suite. The change
             is not complete unless tests pass.
 
