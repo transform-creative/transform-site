@@ -38,6 +38,8 @@ interface IssueModalProps {
   // client's approve / reject decision.
   businessMode?: boolean;
   focusComments?: boolean; // edit opened via the comments button
+  // Pre-select a severity level when opening the modal in create mode.
+  defaultSeverity?: IssueSeverity;
   onClose: () => void;
   onChanged: () => void; // tell the portal to refetch
 }
@@ -58,6 +60,7 @@ export function IssueModal({
   clients,
   businessMode = false,
   focusComments = false,
+  defaultSeverity,
   onClose,
   onChanged,
 }: IssueModalProps) {
@@ -90,7 +93,7 @@ export function IssueModal({
     setTitle(issue?.title ?? "");
     setDescription(issue?.description ?? "");
     setMoreInfo(issue?.more_info ?? "");
-    setSeverity((issue?.severity as IssueSeverity) ?? "low");
+    setSeverity((issue?.severity as IssueSeverity) ?? defaultSeverity ?? "low");
     setPickerOpen(false);
     setClientPickerOpen(false);
     setCommentBody("");

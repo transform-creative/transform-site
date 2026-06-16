@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { Business, ClientIssue, Profile } from "~/data/CustomTypes";
+import type { Business, ClientIssue, IssueSeverity, Profile } from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
   lastActivityAt,
@@ -94,6 +94,7 @@ export function ClientPortal({
   const [modal, setModal] = useState<{
     issueId: number | null;
     focusComments: boolean;
+    defaultSeverity?: IssueSeverity;
   } | null>(null);
   const mounted = useRef(true);
 
@@ -188,6 +189,10 @@ export function ClientPortal({
     setModal({ issueId: null, focusComments: false });
   }
 
+  function handleLogIssueWithSeverity(severity: IssueSeverity) {
+    setModal({ issueId: null, focusComments: false, defaultSeverity: severity });
+  }
+
   /** A single issue card, with the role-aware wiring shared by every tab. */
   const renderCard = (issue: ClientIssue) => (
     <IssueCard
@@ -222,14 +227,23 @@ export function ClientPortal({
         if (column.length === 0) return null;
         return (
           <div key={severity} className="col gap-10 severity-column">
-            <div className="row middle gap-5">
-              <div
-                className="severity-swatch"
-                style={{ background: severityColor(severity) }}
-              />
-              <h3>
-                {severityMeta(severity).label} ({column.length})
-              </h3>
+            <div className="row middle gap-5 between">
+              <div className="row middle gap-5">
+                <div
+                  className="severity-swatch"
+                  style={{ background: severityColor(severity) }}
+                />
+                <h3>
+                  {severityMeta(severity).label} ({column.length})
+                </h3>
+              </div>
+              <button
+                className="row middle gap-5 outline-accent severity-add-btn"
+                onClick={() => handleLogIssueWithSeverity(severity)}
+                title={`Add ${severityMeta(severity).label} issue`}
+              >
+                <Icon name="add-outline" size={16} color="var(--accent)" />
+              </button>
             </div>
             {column.map(renderCard)}
           </div>
@@ -335,6 +349,7 @@ export function ClientPortal({
         clients={isAdmin ? clients : undefined}
         businessMode={isAdmin}
         focusComments={modal?.focusComments}
+        defaultSeverity={modal?.defaultSeverity}
         onClose={() => setModal(null)}
         onChanged={reload}
       />
