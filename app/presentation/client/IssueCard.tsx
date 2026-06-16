@@ -88,6 +88,15 @@ export function IssueCard({
 
   return (
     <div className="boxed p-10 col gap-10 issue-card outline-accent">
+      {/* Created — kept at the very top so it doesn't get lost amongst the
+          status metadata further down */}
+      <div className="row middle gap-5">
+        <Icon name="add-circle-outline" size={14} color="var(--accent)" />
+        <p style={{ color: "var(--accent-lg)" }}>
+          <b>Created</b> {timeAgo(issue.created_at)}
+        </p>
+      </div>
+
       {/* Severity swatch + workflow / decision actions */}
       <div className="between middle">
         <div
@@ -143,13 +152,6 @@ export function IssueCard({
 
       {/* Status metadata */}
       <div className="col gap-5">
-        <div className="row middle gap-5">
-          <Icon name="add-circle-outline" size={14} color="var(--accent)" />
-          <p style={{color: "var(--accent-lg)"}}>
-            <b>Created</b> {timeAgo(issue.created_at)}
-          </p>
-        </div>
-
         {status === "rejected" && (
           <div className="row middle gap-5">
             <Icon name="close-circle" size={14} color="var(--dangerColor)" />
