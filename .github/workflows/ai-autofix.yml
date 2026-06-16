@@ -81,7 +81,11 @@ jobs:
             -d "{\"ai_status\":\"processing\",\"ai_run_id\":\"${{ github.run_id }}\",\"ai_updated_at\":\"$(date -u +%FT%TZ)\"}" || true
 
       - name: Run Claude
-        uses: anthropics/claude-code-action@v1 # TODO: pin to a commit SHA in production
+        # Pinned to a commit SHA (supply-chain safety). 
+        # Comment = human-readable
+        # version. Resolved 2026-06-16; bump deliberately, verifying the latest
+        # release at https://github.com/anthropics/claude-code-action/releases
+        uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1.0.99
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
