@@ -406,7 +406,7 @@ export function IssueModal({
           />
           <LabelInput
             name="Describe the problem"
-            placeholder="Describe the problem"
+            placeholder="Reason"
             value={description}
             isTextArea
             style={{ minHeight: 110 }}

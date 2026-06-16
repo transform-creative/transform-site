@@ -60,11 +60,31 @@ If the repo isn't in an org, add them as **repo** secrets
 | `SUPABASE_URL` | `https://hzfjmmakqwsmucxorhlb.supabase.co` | fixed |
 | `SUPABASE_SERVICE_ROLE_KEY` | service role key | Supabase Dashboard → **Settings → API** → `service_role` |
 | `AI_BOT_USER_ID` | the AI bot's auth user id | created once — see below |
+| `GH_APP_ID` | the GitHub App's numeric App ID | App settings → **General → App ID** |
+| `GH_APP_PRIVATE_KEY` | the GitHub App private key (PEM) | App settings → **General → Private keys → Generate a private key** |
 
 **Create the AI bot user once (reused for all repos):** Supabase Dashboard →
 **Authentication → Users → Add user** (e.g. `ai-bot@transformcreative.com.au`),
 then copy its **UUID** — that's `AI_BOT_USER_ID`. It's the author of the
 "needs more info" questions Claude posts back to the portal.
+
+**`GH_APP_ID` + `GH_APP_PRIVATE_KEY` — why and how:** the workflow opens its PR
+with a token minted from the GitHub App (via `actions/create-github-app-token`)
+rather than the default `GITHUB_TOKEN`. This sidesteps the org setting *"Allow
+GitHub Actions to create and approve pull requests"* (which blocks the default
+token) **without** granting that power org-wide, and attributes the PR to the App.
+- **App ID:** GitHub → **Settings → Developer settings → GitHub Apps → your app
+  → General → App ID** (a number; same value as Supabase's `GITHUB_APP_ID`).
+- **Private key:** same General page → **Private keys → Generate a private key**
+  → a `.pem` downloads. Paste its **full contents** (including the
+  `-----BEGIN…-----` / `-----END…-----` lines) as the secret. Use the key **as
+  downloaded** — no PKCS8 conversion needed here (that was only for the Supabase
+  edge function's Web Crypto). Delete the `.pem` after pasting.
+
+> **Never paste a private key into chat, a ticket, or a committed file.** If one
+> is exposed, rotate it: App settings → **Private keys** → delete it and generate
+> a new one. An App can hold several keys, so rotating one won't break the others
+> (e.g. the Supabase edge function's key stays valid).
 
 > `SUPABASE_SERVICE_ROLE_KEY` is powerful — keep it an org secret scoped only to
 > repos that use this pipeline.

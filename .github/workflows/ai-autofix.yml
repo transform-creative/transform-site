@@ -13,6 +13,8 @@
 #   SUPABASE_URL                Supabase project URL
 #   SUPABASE_SERVICE_ROLE_KEY   service role key (writes ai_* status back)
 #   AI_BOT_USER_ID              auth.users id used as the author of needs-info comments
+#   GH_APP_ID                   GitHub App id — used to mint the PR-creation token
+#   GH_APP_PRIVATE_KEY          GitHub App private key (PEM, as downloaded)
 
 name: AI auto-fix
 
@@ -83,6 +85,16 @@ jobs:
             "$SUPABASE_URL/rest/v1/issues?id=eq.$ISSUE_ID" \
             -d "{\"ai_status\":\"processing\",\"ai_run_id\":\"${{ github.run_id }}\",\"ai_updated_at\":\"$(date -u +%FT%TZ)\"}" || true
 
+      # Mint a token from our GitHub App. App-created PRs are NOT subject to the
+      # org "Allow GitHub Actions to create and approve pull requests" toggle, and
+      # the PR is attributed to the App. Needs secrets GH_APP_ID + GH_APP_PRIVATE_KEY.
+      - name: Mint GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - name: Run Claude
         # Pinned to a commit SHA (supply-chain safety). Comment = human-readable
         # version. Resolved 2026-06-16; bump deliberately, verifying the latest
@@ -92,7 +104,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ steps.app-token.outputs.token }}
           # TEMP (debugging): stream the agent's full output into the run log so we
           # can see the real PR-creation error. Revert to false once diagnosed —
           # full output can surface repo contents / command output in CI logs.
