@@ -5,7 +5,7 @@ import { DesignTab } from "./DesignTab";
 import { MediaTab } from "./MediaTab";
 import { SoftwareTab } from "./SoftwareTab";
 import { ContactTab } from "./ContactTab";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { PROJECTS } from "~/data/Objects";
 import { useGSAP } from "@gsap/react";
 import { SplitText, ScrollTrigger } from "gsap/all";
@@ -32,6 +32,10 @@ export function LandingPage({}: LandingPageProps) {
   const heroRef = useRef<HTMLDivElement>(null);
 
   gsap.registerPlugin(SplitText, ScrollTrigger);
+
+  useEffect(() => {
+    console.log("Hello from the Transform Creative home page!");
+  }, []);
 
   /*******************************************************
    * GSAP
