@@ -69,7 +69,10 @@ const BasicMenu = ({
       >
         <div
           ref={transitionRef}
-          style={{ zIndex: zIndex }}
+          // 100dvh (not the class's 100vh) so the bottom-anchored menu sits at
+          // the *visible* viewport bottom on mobile, instead of behind the
+          // browser toolbar where the submit button would be cut off.
+          style={{ zIndex: zIndex, height: "100dvh" }}
           className="fillScreen col middle bottom"
           onClick={() => {
             if (!disableClickOff) onClose();
@@ -90,7 +93,7 @@ const BasicMenu = ({
                 color="var(--accent-lg)"
               />
             </div>
-            <div style={{ padding: 10,overflowY:'auto', overflowX: 'clip', maxHeight: "75vh"}}>
+            <div style={{ padding: 10, overflowY: 'auto', overflowX: 'clip', maxHeight: "75dvh", paddingBottom: "max(10px, env(safe-area-inset-bottom))" }}>
               {icon && (
                 <div className="center" >
                   <IonIcon
