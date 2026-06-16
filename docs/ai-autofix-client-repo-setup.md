@@ -128,6 +128,8 @@ where id = <business_id>;
 If it stalls, check `ai_status` / `ai_error` on the issue row and the
 **dispatch-issue** edge function logs.
 
+## 7. Smoke test
+Don't forget to set up meticulous and get a github team account to actually enable the branch protection
 ---
 
 ## Troubleshooting
