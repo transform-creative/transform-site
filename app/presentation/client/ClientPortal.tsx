@@ -21,6 +21,8 @@ import { IssueCard } from "./IssueCard";
 import { IssueModal } from "./IssueModal";
 import "../../app-v2.css";
 
+console.log("ClientPortal page loaded");
+
 interface ClientPortalProps {
   clientId: string;
   // The business the viewer belongs to (resolved from their membership). Backs
