@@ -3,7 +3,8 @@
 // Triggered by a Supabase Database Webhook on `issues` INSERT. It does NOT call
 // Claude (that runs for minutes in GitHub Actions). It only: validates, gates,
 // mints a short-lived GitHub App token, fires a workflow_dispatch on the
-// business's repo, and marks the issue `queued`. Designed to return in <1s.
+// reporting client's repo, and marks the issue `queued`. Designed to return in
+// <1s.
 //
 // Required secrets (supabase secrets set ...):
 //   DISPATCH_WEBHOOK_SECRET   shared header the Database Webhook must send
@@ -21,12 +22,20 @@ const GH_HEADERS = {
   "User-Agent": "transform-dispatch-issue",
 };
 
+/** The repo-routing fields we read off a client's owned business. */
+interface BusinessRepo {
+  github_repo: string | null;
+  github_default_branch: string | null;
+  ai_autofix_enabled: boolean | null;
+}
+
 /** A Supabase Database Webhook payload for an INSERT on `issues`. */
 interface WebhookPayload {
   type: "INSERT" | "UPDATE" | "DELETE";
   table: string;
   record: {
     id: number;
+    client_id: string | null;
     business_id: number | null;
     severity: string | null;
     issue_type: string | null;
@@ -70,13 +79,22 @@ Deno.serve(async (req) => {
     return json({ skipped: "empty issue → needs_info" });
   }
 
-  // 3. Resolve the target repo from the business.
-  if (!issue.business_id) return await skip(supabase, issue.id, "no business");
-  const { data: business } = await supabase
+  // 3. Resolve the target repo from the CLIENT's own business.
+  //    `issue.business_id` is the agency the request was lodged to (e.g. the
+  //    Transform Creative board) — it is NOT where the client's code lives.
+  //    The repo to work in belongs to the client who reported the issue: the
+  //    business they own, linked by `businesses.user_id = issue.client_id`.
+  if (!issue.client_id) return await skip(supabase, issue.id, "no client");
+  const { data: ownedBusinesses } = await supabase
     .from("businesses")
     .select("github_repo, github_default_branch, ai_autofix_enabled")
-    .eq("id", issue.business_id)
-    .single();
+    .eq("user_id", issue.client_id);
+
+  // A client could own more than one business; prefer one that's actually wired
+  // up for auto-fix (enabled + has a repo) over an arbitrary first row.
+  const owned: BusinessRepo[] = ownedBusinesses ?? [];
+  const business =
+    owned.find((b) => b.ai_autofix_enabled && b.github_repo) ?? owned[0];
 
   if (!business?.ai_autofix_enabled || !business.github_repo) {
     return await skip(supabase, issue.id, "auto-fix disabled or no repo");

@@ -59,8 +59,8 @@ If the repo isn't in an org, add them as **repo** secrets
 | `ANTHROPIC_API_KEY` *or* `CLAUDE_CODE_OAUTH_TOKEN` | Claude credential | API key from the Anthropic console; or `claude setup-token` for a subscription |
 | `SUPABASE_URL` | `https://hzfjmmakqwsmucxorhlb.supabase.co` | fixed |
 | `SUPABASE_SERVICE_ROLE_KEY` | service role key | Supabase Dashboard → **Settings → API** → `service_role` |
-| `AI_BOT_USER_ID` | the AI bot's auth user id | created once — see below |
-| `GH_APP_ID` | the GitHub App's numeric App ID | App settings → **General → App ID** |
+| `AI_BOT_USER_ID` | 208491f6-85be-4ab8-92ae-c92b2ddcc38c (the AI bot's auth user id) | created once — see below |
+| `GH_APP_ID` | the GitHub App's numeric App ID from https://github.com/settings/apps/transform-creative-ai-autorun | App settings → **General → App ID** |
 | `GH_APP_PRIVATE_KEY` | the GitHub App private key (PEM) | App settings → **General → Private keys → Generate a private key** |
 
 **Create the AI bot user once (reused for all repos):** Supabase Dashboard →

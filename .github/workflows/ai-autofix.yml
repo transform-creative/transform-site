@@ -210,7 +210,11 @@ jobs:
                     ai_pr_number:$n,
                     ai_branch:(if $b=="" then null else $b end),
                     ai_error:(if $e=="" then null else $e end),
-                    ai_run_id:$r, ai_updated_at:$t}')"
+                    ai_run_id:$r, ai_updated_at:$t}
+                    # A successfully-opened PR moves the issue to "in_progress"
+                    # (deriveIssueStatus keys off started_at). Only stamp it on
+                    # pr_open so a failed/needs_info run never clears that state.
+                    + (if $s=="pr_open" then {started_at:$t} else {} end)')"
 
           # Post the questions as a comment so they show in the portal's comments panel.
           if [ "$status" = "needs_info" ] && [ -n "$questions" ] && [ -n "${AI_BOT_USER_ID:-}" ]; then

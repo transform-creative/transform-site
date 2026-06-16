@@ -76,20 +76,20 @@ app/
 
 The `/client/:id` route is a private dashboard for clients (see `app/presentation/client/`).
 
-- **`:id`** is the client's auth user id (`auth_clients.user_id`). A client may only view their own portal.
-- **Client vs admin detection**: a client is any signed-in user whose `session.user.app_metadata` carries a `client_of` (their `business_id`). The route guard in `ClientRoute.tsx` redirects non-clients to `/` and signed-out users to `/auth`.
-- **Tables** (all in Supabase, RLS enabled): `auth_clients`, `businesses`, `clients_to_businesses`, `issues`, `issue_comments`. Generated types live in `app/database/supabase.ts`; app-facing aliases (`Issue`, `IssueComment`, `AuthClient`, `Business`, `ClientIssue`, `IssueStatus`, …) in `app/data/CustomTypes.tsx`.
+- **`:id`** is the client's auth user id, which equals their `profiles.id` (the `profiles` row PK *is* the auth user id). A client may only view their own portal.
+- **Client vs admin detection**: a client is any signed-in user who has a `profiles_to_businesses` row with `role = 'client'`; `role = 'admin'` marks a business admin. (`getUserMembership` in `Read.tsx` resolves this, preferring an `admin` row.)
+- **Tables** (all in Supabase, RLS enabled): `profiles`, `profiles_to_businesses` (membership: `profile_id`, `business_id`, `role`), `businesses`, `issues`, `issue_comments`. `businesses.user_id` is the FK to the profile that **owns** the business. Generated types live in `app/database/supabase.ts`; app-facing aliases (`Issue`, `IssueComment`, `Business`, `Profile`, `ProfileToBusiness`, `BusinessRole`, `ClientIssue`, `IssueStatus`, …) in `app/data/CustomTypes.tsx`. ⚠️ The generated `supabase.ts` still contains stale `auth_clients` / `clients_to_businesses` table defs — those tables have been dropped; ignore them and regenerate when convenient.
 - **Issue severity** (drives the card colour swatch): `low | moderate | severe | critical | future` → see `severityColor()` in `commonBL`.
 - **Issue status is derived, not stored** — there is no status column. `deriveIssueStatus()` in `commonBL` infers it from timestamps: `approved` (`approved_at` set) → `awaiting_approval` (`updated_at` set) → `in_progress` (`started_at` set) → `not_started`.
-- **DB access is split by CRUD operation** in `app/database/`: `Read.tsx`, `Create.tsx`, `Update.tsx`, `Delete.tsx`. Currently only reads are wired (`getClientIssues`, `getAuthClient`); the "Log issue", approve/reject, and per-card "comments" buttons are **stubs**.
+- **DB access is split by CRUD operation** in `app/database/`: `Read.tsx`, `Create.tsx`, `Update.tsx`, `Delete.tsx`. Wired: reads (`getClientIssues`, `getProfile`, `getUserMembership`, `getBusinessById`, `getBusinessClients`, `getBusinessIssues`), inserts (`createIssue`, `createIssueComment`), and `updateIssue` — `IssueModal` uses these for "Log issue", comments, and approve/reject timestamp transitions. `Delete.tsx` is still a scaffold.
 
 ## AI Auto-Fix Pipeline
 
 When a client logs an issue that is **not** `severity = future` and **not**
-`issue_type = question`, an AI agent reads that business's GitHub repo, makes the
-change on a new branch, writes/updates tests, and opens a **pull request** for a
-human to review and merge. The agent can only ever *propose* — `main` is
-protected and the GitHub App has no admin rights.
+`issue_type = question`, an AI agent reads the **reporting client's own** GitHub
+repo, makes the change on a new branch, writes/updates tests, and opens a **pull
+request** for a human to review and merge. The agent can only ever *propose* —
+`main` is protected and the GitHub App has no admin rights.
 
 **Flow:** `issues` INSERT → Supabase Database Webhook → edge function
 `dispatch-issue` (fast, <1s: validates, gates, mints a scoped GitHub App token,
@@ -97,7 +97,14 @@ fires `workflow_dispatch`) → GitHub Actions `ai-autofix.yml` runs
 `anthropics/claude-code-action` (the long agentic work) → PR opened → status
 PATCHed back onto the issue → portal shows the PR link or the agent's questions.
 
-- **Repo mapping**: `businesses.github_repo` (`owner/repo`) + `ai_autofix_enabled`.
+- **Repo resolution (important)**: the target repo is the **reporting client's
+  own** business, found by `businesses.user_id = issues.client_id`, then reading
+  that row's `github_repo` (`owner/repo`) + `ai_autofix_enabled` +
+  `github_default_branch`. **Do NOT use `issues.business_id` to pick the repo** —
+  that column is the *agency the issue was lodged to* (the board it shows up on,
+  e.g. Transform Creative), not where the client's code lives. `businesses.user_id`
+  is the FK to the profile that **owns** that business. If a client owns more than
+  one business, the dispatcher prefers one with `ai_autofix_enabled` + a repo.
 - **New issue fields** (`app/data/CustomTypes.tsx`): `issue_type` (`bug|issue|question`),
   `more_info`, and the `ai_*` state columns. `ai_status`:
   `queued | processing | pr_open | needs_info | failed | skipped` (null = never
