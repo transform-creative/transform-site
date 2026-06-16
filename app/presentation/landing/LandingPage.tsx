@@ -37,6 +37,7 @@ export function LandingPage({}: LandingPageProps) {
    * GSAP
    */
   useGSAP(() => {
+    console.log("Transform Creative home page loaded");
     let tl = gsap.timeline();
     const videoEl = videoRef.current;
     const hero = heroRef.current;
