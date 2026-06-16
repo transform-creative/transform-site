@@ -61,6 +61,9 @@ jobs:
           ISSUE_ID: ${{ github.event.inputs.issue_id }}
         run: |
           set -euo pipefail
+          # Strip any stray whitespace/newlines a secret may have been saved with.
+          SUPABASE_URL="${SUPABASE_URL//[[:space:]]/}"
+          SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY//[[:space:]]/}"
           row=$(curl -fsS \
             -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
             -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
@@ -90,6 +93,12 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # This workflow is intentionally triggered by our GitHub App (a bot) via
+          # workflow_dispatch, which the action blocks by default. Allow it. The
+          # trigger surface is already locked down to workflow_dispatch by an
+          # authorized actor, so this adds no extra exposure. Tighten to the exact
+          # bot login instead of "*" if you prefer.
+          allowed_bots: "*"
           claude_args: "--model claude-opus-4-8 --max-turns 40"
           prompt: |
             You are an autonomous fix agent running in CI for issue #${{ github.event.inputs.issue_id }}.
@@ -142,6 +151,8 @@ jobs:
           ISSUE_ID: ${{ github.event.inputs.issue_id }}
         run: |
           set -uo pipefail
+          SUPABASE_URL="${SUPABASE_URL//[[:space:]]/}"
+          SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY//[[:space:]]/}"
           RESULT="${{ runner.temp }}/ai-result.json"
           if [ -f "$RESULT" ]; then
             status=$(jq -r '.status // "failed"' "$RESULT")
