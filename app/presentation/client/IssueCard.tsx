@@ -3,15 +3,11 @@ import type { SharedContextProps } from "~/data/CommonTypes";
 import type { ClientIssue } from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
+  issueActionPatch,
   severityColor,
   timeAgo,
 } from "~/business/commonBL";
-import {
-  approveIssue,
-  markIssueUpdated,
-  rejectIssue,
-  startIssue,
-} from "~/database/Update";
+import { updateIssue } from "~/database/Update";
 import { Icon } from "../elements/Icon";
 
 interface IssueCardProps {
@@ -54,13 +50,23 @@ export function IssueCard({
   // The client only acts on a pending update.
   const showClientDecision = !businessMode && status === "awaiting_approval";
 
-  /** Business workflow: start the work or mark it updated for approval. */
-  async function handleBusinessAction(action: "start" | "update") {
+  /**
+   * Business workflow: start the work, mark it updated for approval, or skip
+   * the client's review and approve it outright.
+   */
+  async function handleBusinessAction(action: "start" | "update" | "skip") {
     try {
-      action === "start"
-        ? await startIssue(issue.id)
-        : await markIssueUpdated(issue.id);
-      context.popAlert(action === "start" ? "Marked as started" : "Marked as updated");
+      await updateIssue(
+        issue.id,
+        issueActionPatch(action === "skip" ? "approve" : action)
+      );
+      context.popAlert(
+        action === "start"
+          ? "Marked as started"
+          : action === "skip"
+            ? "Approved"
+            : "Marked as updated"
+      );
       onChanged();
     } catch {
       context.popAlert("Something went wrong", "Please try again", true);
@@ -70,9 +76,7 @@ export function IssueCard({
   /** Client decision: approve the update, or send it back to Transform. */
   async function handleDecision(decision: "approve" | "reject") {
     try {
-      decision === "approve"
-        ? await approveIssue(issue.id)
-        : await rejectIssue(issue.id);
+      await updateIssue(issue.id, issueActionPatch(decision));
       context.popAlert(decision === "approve" ? "Approved" : "Sent back");
       onChanged();
     } catch {
@@ -98,13 +102,15 @@ export function IssueCard({
           </button>
         )}
         {businessAction === "update" && (
-          <button
-            className="row middle gap-5 accentButton"
-            onClick={() => handleBusinessAction("update")}
-          >
-            <Icon name="checkmark-circle" size={18} color="var(--bkg)" />
-            Complete
-          </button>
+          <div className="row middle gap-5">
+            <button
+              className="row middle gap-5 accentButton"
+              onClick={() => handleBusinessAction("update")}
+            >
+              <Icon name="checkmark-circle" size={18} color="var(--bkg)" />
+              Submit
+            </button>
+          </div>
         )}
         {showClientDecision && (
           <div className="row middle gap-5">
@@ -137,7 +143,7 @@ export function IssueCard({
       <div className="col gap-5">
         <div className="row middle gap-5">
           <Icon name="add-circle-outline" size={14} color="var(--accent)" />
-          <p>
+          <p style={{color: "var(--accent-lg)"}}>
             <b>Created</b> {timeAgo(issue.created_at)}
           </p>
         </div>
@@ -189,18 +195,27 @@ export function IssueCard({
         {status === "approved" && (
           <div className="row middle gap-5">
             <Icon name="checkmark-circle" size={14} color="var(--accent)" />
-            <p>Completed</p>
+            <p>Approved</p>
           </div>
         )}
       </div>
 
       {/* Comments — opens the issue focused on the comments panel */}
       <button
-        className={`outline-secondary w-100 center ${commentCount > 0 && "accent"}`}
+        className={` w-100 center ${commentCount > 0 ? "accent" : "outline"}`}
         onClick={() => onOpen(true)}
       >
         {commentCount} comments
       </button>
+      {businessAction === "update" &&
+          <button
+              className="row center middle gap-5 outline-secondary"
+              onClick={() => handleBusinessAction("skip")}
+            >
+              <Icon name="flash-outline" size={18} color="var(--txt)" />
+              Skip review
+            </button>
+      }
     </div>
   );
 }

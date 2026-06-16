@@ -1,5 +1,10 @@
 import { IoniconName } from "~/data/Ionicons";
-import type { Issue, IssueSeverity, IssueStatus } from "~/data/CustomTypes";
+import type {
+  Issue,
+  IssueSeverity,
+  IssueStatus,
+  IssueUpdate,
+} from "~/data/CustomTypes";
 
 /*******************************************
  * Get the icon name for the type of project this is
@@ -75,6 +80,27 @@ export function deriveIssueStatus(issue: Issue): IssueStatus {
   if (issue.rejected_at) return "rejected";
   if (issue.started_at) return "in_progress";
   return "not_started";
+}
+
+/*******************************************
+ * A workflow action a card/modal can take on an issue. The inverse of
+ * `deriveIssueStatus`: maps the action to the timestamp patch that moves the
+ * issue into the corresponding status, for feeding to `updateIssue`.
+ */
+export type IssueAction = "start" | "update" | "approve" | "reject";
+
+export function issueActionPatch(action: IssueAction): IssueUpdate {
+  const now = new Date().toISOString();
+  switch (action) {
+    case "start":
+      return { started_at: now };
+    case "update":
+      return { updated_at: now, rejected_at: null };
+    case "approve":
+      return { approved_at: now, rejected_at: null };
+    case "reject":
+      return { rejected_at: now, updated_at: null, approved_at: null };
+  }
 }
 
 /*******************************************

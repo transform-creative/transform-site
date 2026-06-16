@@ -136,7 +136,7 @@ GSAP is used extensively. Key patterns:
 ## Environment Variables
 
 ```
-VITE_SUPABASE_URL=https://xpifawxwcwazatwwhcpf.supabase.co
+VITE_SUPABASE_URL=https://hzfjmmakqwsmucxorhlb.supabase.co
 VITE_SUPABASE_ANON_KEY=<publishable key>
 ```
 

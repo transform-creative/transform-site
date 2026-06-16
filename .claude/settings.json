@@ -28,7 +28,34 @@
       "mcp__claude_ai_Supabase__generate_typescript_types",
       "PowerShell(npm run typecheck)",
       "mcp__claude_ai_Supabase__apply_migration",
-      "PowerShell(npx tsc --noEmit)"
+      "PowerShell(npx tsc --noEmit)",
+      "PowerShell(npx tsc --noEmit 2>&1)",
+      "PowerShell(npx tsc:*)",
+      "PowerShell(tsc:*)",
+      "Bash(npx tsc:*)",
+      "Bash(tsc:*)",
+      "PowerShell(npx react-router typegen)",
+      "PowerShell(npx react-router:*)",
+      "Bash(npx react-router typegen)",
+      "Bash(npx react-router:*)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('.claude/settings.json','utf8'\\)\\); console.log\\('valid JSON'\\)\")",
+      "mcp__claude_ai_Supabase__execute_sql"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/.dev.vars*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/secrets/**)",
+      "Read(**/credentials/**)",
+      "Read(**/.aws/**)",
+      "Read(**/.ssh/**)",
+      "Read(**/config/database.yml)",
+      "Write(**/.env*)",
+      "Write(**/secrets/**)",
+      "Write(**/.ssh/**)"
     ]
   }
 }

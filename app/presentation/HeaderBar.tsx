@@ -127,8 +127,6 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
 
   const user = context.session?.user;
   const isSignedIn = !!user;
-  // Clients carry their business id in app_metadata.client_of
-  const isClient = !!user?.app_metadata?.client_of;
 
   async function handleSignOut() {
     const result = await supabaseSignOut();
@@ -210,22 +208,10 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
         Contact
       </button>
       <div className="div10" />
-      {isSignedIn && isClient ? (
-        <button
-          onClick={() => {
-            navigate(`/client/${user!.id}`);
-            onClose();
-          }}
-          style={{ textDecoration: "none", fontSize: textSize }}
-          className="gap-10 row center middle"
-        >
-          <Icon name="person-circle-outline" color="var(--accent)" size={35} />
-          Client portal
-        </button>
-      ) : isSignedIn ? (
+      {isSignedIn ? (
         <>
-          {/* Business owners reach their board on their own id; the route guard
-              verifies ownership and redirects anyone who isn't an owner. */}
+          {/* Any signed-in user reaches their board on their own id; the route
+              guard resolves their membership and admits or redirects them. */}
           <button
             onClick={() => {
               navigate(`/client/${user!.id}`);

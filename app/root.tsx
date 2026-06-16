@@ -66,7 +66,7 @@ export function HydrateFallback() {
       className="col middle center"
     >
       <img
-        src="transform-icon-color-donut.png"
+        src="/transform-icon-color-donut.png"
         className="spin360"
         style={{ height: 100, width: 100 }}
         alt="digital content for positive change | Adelaide based film, software and design business"

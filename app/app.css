@@ -9,8 +9,8 @@
   --txt: #191919;
   --bkg: #e2e1d8;
   --accent-sm: #d8d7ce;
-  --accent-md: #cacac4;
-  --accent-lg: #92918b;
+  --accent-md: #bebeb6;
+  --accent-lg: #575653;
   --accent: #436940;
   --secondaryColor: #de976f;
   --thirdColor: #94bc91;
@@ -19,9 +19,9 @@
     var(--accent),
     var(--accent-md)
   );
-  --warningColor: #faae88;
-  --safeColor: #c8fa88;
-  --dangerColor: #ed7373;
+  --warningColor: #c78438;
+  --safeColor: #8dbe4d;
+  --dangerColor: #c44646;
 
   --nav-bar-spacing: 300px;
   --borderRadius: 5px;

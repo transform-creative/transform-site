@@ -7,11 +7,17 @@ import type { Database } from "~/database/supabase";
 
 /** Row types straight from the database schema */
 export type Issue = Database["public"]["Tables"]["issues"]["Row"];
+/** The patch shape accepted when updating an issue */
+export type IssueUpdate = Database["public"]["Tables"]["issues"]["Update"];
 export type IssueComment = Database["public"]["Tables"]["issue_comments"]["Row"];
-export type AuthClient = Database["public"]["Tables"]["auth_clients"]["Row"];
 export type Business = Database["public"]["Tables"]["businesses"]["Row"];
-export type ClientToBusiness =
-  Database["public"]["Tables"]["clients_to_businesses"]["Row"];
+/** A person (the source of truth for clients and business admins) */
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+/** Links a profile to a business with a role (drives all permission checks) */
+export type ProfileToBusiness =
+  Database["public"]["Tables"]["profiles_to_businesses"]["Row"];
+/** The role a profile plays within a business */
+export type BusinessRole = "admin" | "client";
 
 /** The severity levels an issue can have (drives the card's colour swatch) */
 export type IssueSeverity =
@@ -33,14 +39,9 @@ export type IssueStatus =
   | "rejected"
   | "approved";
 
-/** An issue joined with its full comments list, as rendered on the portal */
-export type ClientIssue = Issue & { issue_comments: IssueComment[] };
-
 /**
- * A `ClientIssue` plus the uploading client, as loaded for the business/admin
- * board so each card can show who reported the issue. Extends `ClientIssue`
- * so it stays assignable wherever a `ClientIssue` is expected.
+ * An issue joined with its full comments list, as rendered on the portal.
+ * Used by both the client and the business/admin board; the admin board
+ * resolves each issue's reporting client name in JS from its client list.
  */
-export type BusinessIssue = ClientIssue & {
-  auth_clients: Pick<AuthClient, "user_id" | "name"> | null;
-};
+export type ClientIssue = Issue & { issue_comments: IssueComment[] };

@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { AuthClient, ClientIssue, IssueSeverity } from "~/data/CustomTypes";
+import type { ClientIssue, IssueSeverity, Profile } from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
+  issueActionPatch,
   severityColor,
   severityMeta,
   SEVERITY_OPTIONS,
   timeAgo,
 } from "~/business/commonBL";
 import { createIssue, createIssueComment } from "~/database/Create";
-import {
-  approveIssue,
-  markIssueUpdated,
-  rejectIssue,
-  startIssue,
-  updateIssue,
-} from "~/database/Update";
+import { updateIssue } from "~/database/Update";
 import { Icon } from "../elements/Icon";
 import { LabelInput } from "../elements/LabelInput/LabelInput";
 import BasicMenu from "../elements/BasicMenu";
@@ -32,7 +27,7 @@ interface IssueModalProps {
   businessId: number | null;
   // When present (admin/business board) the create form shows a client picker
   // so the issue is attributed to a real client rather than the admin.
-  clients?: Pick<AuthClient, "user_id" | "name">[];
+  clients?: Pick<Profile, "id" | "full_name">[];
   // Business board: drives the start → mark-updated workflow rather than the
   // client's approve / reject decision.
   businessMode?: boolean;
@@ -97,9 +92,9 @@ export function IssueModal({
         typeof window !== "undefined"
           ? window.localStorage.getItem(LAST_CLIENT_KEY)
           : null;
-      const fallback = clients[0]?.user_id ?? "";
+      const fallback = clients[0]?.id ?? "";
       setSelectedClientId(
-        clients.some((c) => c.user_id === remembered) ? remembered! : fallback
+        clients.some((c) => c.id === remembered) ? remembered! : fallback
       );
     }
   }, [issue?.id, active]);
@@ -114,8 +109,8 @@ export function IssueModal({
   const status = issue ? deriveIssueStatus(issue) : "not_started";
   const meta = severityMeta(severity);
   const selectedClientName = clients?.find(
-    (c) => c.user_id === selectedClientId
-  )?.name;
+    (c) => c.id === selectedClientId
+  )?.full_name;
 
   /** Create or save the issue from the form. */
   async function handleSubmit() {
@@ -173,9 +168,7 @@ export function IssueModal({
   async function handleBusinessAction(action: "start" | "update") {
     if (!issue) return;
     try {
-      action === "start"
-        ? await startIssue(issue.id)
-        : await markIssueUpdated(issue.id);
+      await updateIssue(issue.id, issueActionPatch(action));
       context.popAlert(action === "start" ? "Marked as started" : "Marked as updated");
       onChanged();
       onClose();
@@ -188,9 +181,7 @@ export function IssueModal({
   async function handleDecision(decision: "approve" | "reject") {
     if (!issue) return;
     try {
-      decision === "approve"
-        ? await approveIssue(issue.id)
-        : await rejectIssue(issue.id);
+      await updateIssue(issue.id, issueActionPatch(decision));
       context.popAlert(decision === "approve" ? "Approved" : "Sent back");
       onChanged();
       onClose();
@@ -245,7 +236,7 @@ export function IssueModal({
                 onClick={() => handleBusinessAction("update")}
               >
                 <Icon name="checkmark-circle" size={20} color="var(--bkg)" />
-                Complete
+                Submit
               </button>
             )}
             {isEdit && !businessMode && status === "awaiting_approval" && (
@@ -327,11 +318,11 @@ export function IssueModal({
                 <div className="col boxed severity-list">
                   {clients!.map((c) => (
                     <button
-                      key={c.user_id}
+                      key={c.id}
                       type="button"
                       className="row middle gap-10 severity-option"
                       onClick={() => {
-                        setSelectedClientId(c.user_id);
+                        setSelectedClientId(c.id);
                         setClientPickerOpen(false);
                       }}
                     >
@@ -341,7 +332,7 @@ export function IssueModal({
                         color="var(--accent)"
                       />
                       <p>
-                        <b>{c.name || "Unnamed client"}</b>
+                        <b>{c.full_name || "Unnamed client"}</b>
                       </p>
                     </button>
                   ))}
@@ -396,7 +387,7 @@ export function IssueModal({
                   <button
                     key={opt.value}
                     type="button"
-                    className="row middle gap-10 severity-option"
+                    className="row middle gap-10 severity-option m-5"
                     onClick={() => {
                       setSeverity(opt.value);
                       setPickerOpen(false);
@@ -433,12 +424,12 @@ export function IssueModal({
             ) : (
               issue.issue_comments.map((comment) => (
                 <div key={comment.id} className="col comment-card">
-                  <p>
+                  <p style={{color: "var(--accent-lg)"}}>
                     <b
                       style={
                         comment.author_user_id === clientId
                           ? { color: "var(--accent)" }
-                          : undefined
+                          : { color: "var(--txt)" }
                       }
                     >
                       {comment.author_user_id === clientId

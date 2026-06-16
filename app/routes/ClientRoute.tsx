@@ -3,7 +3,7 @@ import { useOutletContext, useParams } from "react-router";
 import type { Session } from "@supabase/supabase-js";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import type { Business } from "~/data/CustomTypes";
-import { getBusinessForUser } from "~/database/Read";
+import { getBusinessById, getUserMembership } from "~/database/Read";
 import { ClientPortal } from "~/presentation/client/ClientPortal";
 import { Route } from "../+types/root";
 
@@ -18,6 +18,12 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+// The viewer's resolved access: which business they belong to and as what role.
+// `business` is only loaded for admins. `undefined` while still resolving.
+type Access =
+  | { role: "client"; businessId: number }
+  | { role: "admin"; businessId: number; business: Business };
+
 export default function ClientRoute() {
   const context: SharedContextProps = useOutletContext();
   const { id } = useParams<{ id: string }>();
@@ -25,15 +31,9 @@ export default function ClientRoute() {
   // `session` is `undefined` while auth is still resolving on first load.
   const session = context.session as Session | null | undefined;
   const user = session?.user;
-  // A client is any signed-in user whose app_metadata carries a `client_of`
-  // (their business id). They may only view their own portal.
-  const isClient = !!user?.app_metadata?.client_of;
   const isOwnPortal = !!user && user.id === id;
-  // An admin is a signed-in user who owns a `businesses` row. `undefined` while
-  // we're still checking; `null` once we know they own no business.
-  const [business, setBusiness] = useState<Business | null | undefined>(
-    undefined
-  );
+  // The resolved access; `undefined` while we look up the membership.
+  const [access, setAccess] = useState<Access | null | undefined>(undefined);
 
   useEffect(() => {
     // Wait until the session has resolved before deciding.
@@ -49,43 +49,53 @@ export default function ClientRoute() {
       return;
     }
 
-    // Clients are admitted directly; no business lookup needed.
-    if (isClient) {
-      setBusiness(null);
-      return;
-    }
-
-    // Otherwise the only way in is owning a business — look it up.
+    // The single source of truth: the user's profiles_to_businesses membership.
     let active = true;
-    getBusinessForUser(user.id)
-      .then((b) => {
+    getUserMembership(user.id)
+      .then(async (membership) => {
         if (!active) return;
-        setBusiness(b);
-        if (!b) context.navigate("/");
+        if (!membership) {
+          context.navigate("/");
+          return;
+        }
+        if (membership.role === "client") {
+          setAccess({ role: "client", businessId: membership.business_id });
+          return;
+        }
+        // Admin: load the business backing the board.
+        const business = await getBusinessById(membership.business_id);
+        if (!active) return;
+        if (!business) {
+          context.navigate("/");
+          return;
+        }
+        setAccess({
+          role: "admin",
+          businessId: membership.business_id,
+          business,
+        });
       })
       .catch(() => {
         if (!active) return;
-        setBusiness(null);
+        setAccess(null);
         context.navigate("/");
       });
     return () => {
       active = false;
     };
-  }, [session, user, isClient, isOwnPortal, id]);
+  }, [session, user, isOwnPortal, id]);
 
-  // Don't render the portal to unauthorised viewers while we redirect.
-  if (!user || !isOwnPortal || !id) {
+  // Don't render the portal to unauthorised viewers while we redirect, or until
+  // the membership lookup has resolved.
+  if (!user || !isOwnPortal || !id || !access) {
     return null;
   }
 
-  if (isClient) {
-    return <ClientPortal clientId={id} />;
-  }
-
-  // Admin path: wait until the business ownership check resolves.
-  if (business === undefined || !business) {
-    return null;
-  }
-
-  return <ClientPortal clientId={id} business={business} />;
+  return (
+    <ClientPortal
+      clientId={id}
+      businessId={access.businessId}
+      business={access.role === "admin" ? access.business : undefined}
+    />
+  );
 }

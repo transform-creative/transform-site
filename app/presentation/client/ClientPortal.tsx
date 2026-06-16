@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type {
-  AuthClient,
-  Business,
-  BusinessIssue,
-  ClientIssue,
-} from "~/data/CustomTypes";
+import type { Business, ClientIssue, Profile } from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
   lastActivityAt,
@@ -15,10 +10,10 @@ import {
   SEVERITY_COLUMN_ORDER,
 } from "~/business/commonBL";
 import {
-  getAuthClient,
   getBusinessClients,
   getBusinessIssues,
   getClientIssues,
+  getProfile,
 } from "~/database/Read";
 import { supabaseSignOut } from "~/database/Auth";
 import { Icon } from "../elements/Icon";
@@ -28,8 +23,11 @@ import "../../app-v2.css";
 
 interface ClientPortalProps {
   clientId: string;
-  // When present the viewer is a business owner/admin: the board loads every
-  // issue for the business (across all clients) and cards show the uploader.
+  // The business the viewer belongs to (resolved from their membership). Backs
+  // the board and is attached to any issue they log.
+  businessId: number;
+  // When present the viewer is a business admin: the board loads every issue
+  // for the business (across all clients) and cards show the uploader.
   business?: Business | null;
 }
 
@@ -73,16 +71,18 @@ function byActivity(list: ClientIssue[]): ClientIssue[] {
  */
 export function ClientPortal({
   clientId,
+  businessId,
   business,
 }: ClientPortalProps) {
   const context: SharedContextProps = useOutletContext();
   const isAdmin = !!business;
-  const [client, setClient] = useState<AuthClient | null>(null);
+  const [client, setClient] = useState<Profile | null>(null);
   const [issues, setIssues] = useState<ClientIssue[]>([]);
-  // The business's clients, loaded in admin mode for the "log issue" picker.
-  const [clients, setClients] = useState<
-    Pick<AuthClient, "user_id" | "name">[]
-  >([]);
+  // The business's clients, loaded in admin mode for the "log issue" picker and
+  // to resolve each card's reporting-client name.
+  const [clients, setClients] = useState<Pick<Profile, "id" | "full_name">[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   // The active board tab. Clients lead with what needs their approval; the
   // business leads with the work it's actively pushing forward.
@@ -96,15 +96,6 @@ export function ClientPortal({
     focusComments: boolean;
   } | null>(null);
   const mounted = useRef(true);
-
-  // The business id backing the board. For an admin it's the business they own;
-  // for a client it's the `client_of` they belong to (used when logging issues).
-  const clientOf = context.session?.user?.app_metadata?.client_of;
-  const businessId = isAdmin
-    ? business!.id
-    : clientOf != null && Number.isFinite(Number(clientOf))
-      ? Number(clientOf)
-      : null;
 
   const reload = useCallback(async () => {
     try {
@@ -138,7 +129,7 @@ export function ClientPortal({
           setClients(clientList);
         } else {
           const [clientData, issueData] = await Promise.all([
-            getAuthClient(clientId),
+            getProfile(clientId),
             getClientIssues(clientId),
           ]);
           if (!mounted.current) return;
@@ -177,6 +168,12 @@ export function ClientPortal({
   // (or a previously-selected tab) has emptied out.
   const activeTab = tabs.find((t) => t.key === selectedTab) ?? tabs[0] ?? null;
 
+  // Maps a client's id to their name, for labelling cards on the admin board.
+  const clientNameById = useMemo(
+    () => new Map(clients.map((c) => [c.id, c.full_name])),
+    [clients],
+  );
+
   // The live issue backing the modal, looked up fresh from state by id.
   const modalIssue =
     modal?.issueId != null
@@ -197,7 +194,7 @@ export function ClientPortal({
       key={issue.id}
       issue={issue}
       clientName={
-        isAdmin ? (issue as BusinessIssue).auth_clients?.name : undefined
+        isAdmin ? clientNameById.get(issue.client_id) ?? undefined : undefined
       }
       businessMode={isAdmin}
       onOpen={(focusComments) => openIssue(issue.id, !!focusComments)}
@@ -266,7 +263,7 @@ export function ClientPortal({
                 <h3>
                   {isAdmin
                     ? business?.name || "Your business"
-                    : client?.name || "Client name"}
+                    : client?.full_name || "Client name"}
                 </h3>
                 <button
                   className="row middle outline-secondary gap-5"
@@ -294,9 +291,9 @@ export function ClientPortal({
           </div>
         </div>
         {loading ? (
-          <p className="center w-100">Loading…</p>
+          <p className="center w-100" style={{minHeight: "90vh"}}>Loading…</p>
         ) : issues.length === 0 ? (
-          <div className="col middle center gap-10 mt2">
+          <div className="col middle center gap-10 outline" style={{minHeight: "90vh"}}>
             <Icon
               name="checkmark-circle"
               size={48}

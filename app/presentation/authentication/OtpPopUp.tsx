@@ -46,12 +46,11 @@ export function OtpPopUp({
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (context.session?.user) {
-      const role =
-        context.session.user.app_metadata.role;
-      role === "admin"
-        ? navigate("/admin")
-        : navigate("/");
+    const user = context.session?.user;
+    if (user) {
+      // Send the signed-in user to their portal; the route guard resolves
+      // their membership (admin vs client) from profiles_to_businesses.
+      navigate(`/client/${user.id}`);
     }
   }, [context.session]);
 

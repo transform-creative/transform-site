@@ -1,15 +1,15 @@
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
 import type {
-  AuthClient,
   Business,
-  BusinessIssue,
+  BusinessRole,
   ClientIssue,
+  Profile,
 } from "~/data/CustomTypes";
 
 /*************************
  * Read all issues for a client, each with its full comments list.
- * @param clientId The auth_clients.user_id (uuid) of the client
+ * @param clientId The profile id (uuid) of the client
  */
 export async function getClientIssues(
   clientId: string
@@ -30,20 +30,18 @@ export async function getClientIssues(
 }
 
 /*************************
- * Read a single client (auth_clients) record by their user id.
- * @param userId The auth_clients.user_id (uuid)
+ * Read a single profile by its id. Used to show the client's own name.
+ * @param userId The profile id (uuid), equal to the auth user id
  */
-export async function getAuthClient(
-  userId: string
-): Promise<AuthClient | null> {
+export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
-    .from("auth_clients")
+    .from("profiles")
     .select("*")
-    .eq("user_id", userId)
+    .eq("id", userId)
     .maybeSingle();
 
   if (error) {
-    await logError(error, ["getAuthClient", "Read"]);
+    await logError(error, ["getProfile", "Read"]);
     throw error;
   }
 
@@ -51,21 +49,50 @@ export async function getAuthClient(
 }
 
 /*************************
- * Read the business owned by a given auth user, if any. Used to detect an
- * admin/business owner (they own a `businesses` row) and get its id.
- * @param userId The auth user id (businesses.user_id)
+ * Read the current user's business membership — the source of truth for whether
+ * they're a business admin or a client, and which business they belong to.
+ * Prefers an `admin` row if the user happens to have more than one membership.
+ * @param userId The auth/profile id (uuid)
  */
-export async function getBusinessForUser(
+export async function getUserMembership(
   userId: string
+): Promise<{ business_id: number; role: BusinessRole } | null> {
+  const { data, error } = await supabase
+    .from("profiles_to_businesses")
+    .select("business_id, role")
+    .eq("profile_id", userId)
+    .not("business_id", "is", null);
+
+  if (error) {
+    await logError(error, ["getUserMembership", "Read"]);
+    throw error;
+  }
+
+  const rows = data ?? [];
+  const chosen = rows.find((r) => r.role === "admin") ?? rows[0];
+  if (!chosen || chosen.business_id == null) return null;
+
+  return {
+    business_id: chosen.business_id,
+    role: chosen.role === "admin" ? "admin" : "client",
+  };
+}
+
+/*************************
+ * Read a business by its id, for loading the admin's board.
+ * @param businessId The businesses.id
+ */
+export async function getBusinessById(
+  businessId: number
 ): Promise<Business | null> {
   const { data, error } = await supabase
     .from("businesses")
     .select("*")
-    .eq("user_id", userId)
+    .eq("id", businessId)
     .maybeSingle();
 
   if (error) {
-    await logError(error, ["getBusinessForUser", "Read"]);
+    await logError(error, ["getBusinessById", "Read"]);
     throw error;
   }
 
@@ -74,17 +101,16 @@ export async function getBusinessForUser(
 
 /*************************
  * Read every client linked to a business, for the admin "log issue" picker.
- * @param businessId The businesses.id of the owned business
+ * @param businessId The businesses.id of the admin's business
  */
 export async function getBusinessClients(
   businessId: number
-): Promise<Pick<AuthClient, "user_id" | "name">[]> {
+): Promise<Pick<Profile, "id" | "full_name">[]> {
   const { data, error } = await supabase
-    .from("clients_to_businesses")
-    .select(
-      "auth_clients!clients_to_businesses_auth_client_id_fkey(user_id, name)"
-    )
-    .eq("business_id", businessId);
+    .from("profiles_to_businesses")
+    .select("profiles!inner(id, full_name)")
+    .eq("business_id", businessId)
+    .eq("role", "client");
 
   if (error) {
     await logError(error, ["getBusinessClients", "Read"]);
@@ -92,21 +118,22 @@ export async function getBusinessClients(
   }
 
   return (data ?? [])
-    .map((row) => row.auth_clients)
-    .filter((c): c is Pick<AuthClient, "user_id" | "name"> => !!c);
+    .map((row) => row.profiles)
+    .filter((p): p is Pick<Profile, "id" | "full_name"> => !!p);
 }
 
 /*************************
  * Read every issue for a business (across all its clients), each with its full
- * comments list and the uploading client, for the admin/business board.
- * @param businessId The businesses.id of the owned business
+ * comments list, for the admin/business board. The reporting client's name is
+ * resolved in JS from `getBusinessClients`.
+ * @param businessId The businesses.id of the admin's business
  */
 export async function getBusinessIssues(
   businessId: number
-): Promise<BusinessIssue[]> {
+): Promise<ClientIssue[]> {
   const { data, error } = await supabase
     .from("issues")
-    .select("*, issue_comments(*), auth_clients(user_id, name)")
+    .select("*, issue_comments(*)")
     .eq("business_id", businessId)
     .is("approved_at", null)
     .order("created_at", { ascending: false });
@@ -116,5 +143,5 @@ export async function getBusinessIssues(
     throw error;
   }
 
-  return (data ?? []) as BusinessIssue[];
+  return (data ?? []) as ClientIssue[];
 }

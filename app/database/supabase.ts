@@ -16,24 +16,32 @@ export type Database = {
     Tables: {
       auth_clients: {
         Row: {
-          asoc_business: string | null
+          asoc_business: number | null
           created_at: string
           name: string | null
           user_id: string
         }
         Insert: {
-          asoc_business?: string | null
+          asoc_business?: number | null
           created_at?: string
           name?: string | null
           user_id?: string
         }
         Update: {
-          asoc_business?: string | null
+          asoc_business?: number | null
           created_at?: string
           name?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "auth_clients_asoc_business_fkey"
+            columns: ["asoc_business"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bulk_imports: {
         Row: {
@@ -566,8 +574,8 @@ export type Database = {
             foreignKeyName: "issues_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: "auth_clients"
-            referencedColumns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -743,6 +751,45 @@ export type Database = {
           user_name?: string | null
         }
         Relationships: []
+      }
+      profiles_to_businesses: {
+        Row: {
+          business_id: number | null
+          created_at: string
+          id: number
+          profile_id: string | null
+          role: string | null
+        }
+        Insert: {
+          business_id?: number | null
+          created_at?: string
+          id?: number
+          profile_id?: string | null
+          role?: string | null
+        }
+        Update: {
+          business_id?: number | null
+          created_at?: string
+          id?: number
+          profile_id?: string | null
+          role?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_to_businesses_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_to_businesses_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
