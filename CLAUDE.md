@@ -83,6 +83,39 @@ The `/client/:id` route is a private dashboard for clients (see `app/presentatio
 - **Issue status is derived, not stored** — there is no status column. `deriveIssueStatus()` in `commonBL` infers it from timestamps: `approved` (`approved_at` set) → `awaiting_approval` (`updated_at` set) → `in_progress` (`started_at` set) → `not_started`.
 - **DB access is split by CRUD operation** in `app/database/`: `Read.tsx`, `Create.tsx`, `Update.tsx`, `Delete.tsx`. Currently only reads are wired (`getClientIssues`, `getAuthClient`); the "Log issue", approve/reject, and per-card "comments" buttons are **stubs**.
 
+## AI Auto-Fix Pipeline
+
+When a client logs an issue that is **not** `severity = future` and **not**
+`issue_type = question`, an AI agent reads that business's GitHub repo, makes the
+change on a new branch, writes/updates tests, and opens a **pull request** for a
+human to review and merge. The agent can only ever *propose* — `main` is
+protected and the GitHub App has no admin rights.
+
+**Flow:** `issues` INSERT → Supabase Database Webhook → edge function
+`dispatch-issue` (fast, <1s: validates, gates, mints a scoped GitHub App token,
+fires `workflow_dispatch`) → GitHub Actions `ai-autofix.yml` runs
+`anthropics/claude-code-action` (the long agentic work) → PR opened → status
+PATCHed back onto the issue → portal shows the PR link or the agent's questions.
+
+- **Repo mapping**: `businesses.github_repo` (`owner/repo`) + `ai_autofix_enabled`.
+- **New issue fields** (`app/data/CustomTypes.tsx`): `issue_type` (`bug|issue|question`),
+  `more_info`, and the `ai_*` state columns. `ai_status`:
+  `queued | processing | pr_open | needs_info | failed | skipped` (null = never
+  dispatched). See `aiStatusMeta()` / `ISSUE_TYPE_OPTIONS` in `commonBL`.
+- **One run at a time per repo** via the workflow's `concurrency` group; each run
+  branches from the latest `main` and reads recent open PRs.
+- **The `ai_*` columns are written only by the service role** (edge function /
+  workflow), never by clients.
+- **Key files**: `supabase/functions/dispatch-issue/index.ts`,
+  `.github/workflows/ai-autofix.yml` (canonical template — copied into each client
+  repo), `supabase/migrations/`. Setup + ops docs:
+  `supabase/AI_AUTOFIX.md` (global) and `docs/ai-autofix-client-repo-setup.md`
+  (per-repo onboarding).
+- **Security backbone**: GitHub App with no Administration permission, protected
+  `main` (human merge), minimal workflow `permissions`, PRs opened via an App
+  token (`actions/create-github-app-token`), SHA-pinned actions, secret-gated
+  webhook. Treat every AI PR as untrusted code and review it fully.
+
 ## Data
 
 Portfolio projects, contact details, and client logos are **all static** — defined in `app/data/Objects.tsx` as a `PROJECTS` array and related constants. Project media is hosted at:
