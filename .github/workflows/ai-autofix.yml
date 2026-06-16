@@ -110,7 +110,6 @@ jobs:
           #
           # Cost: right-size the model to the issue. Sonnet 4.6 ($3/$15) handles the
           # common case; escalate to Opus 4.8 ($5/$25) only for severe/critical.
-          claude_args: >-
           claude_args: "--model claude-opus-4-8 --max-turns 60 --permission-mode bypassPermissions"
           prompt: |
             You are an autonomous fix agent running in CI for issue #${{ github.event.inputs.issue_id }}.
