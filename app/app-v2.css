@@ -94,6 +94,13 @@ a[role="button"].accent {
   color: var(--bkg);
 }
 
+/* Keep accent button text readable on hover (global button:hover turns it
+   the same green as the background, making it invisible) */
+button.accent:hover,
+button.accent:hover * {
+  color: var(--bkg);
+}
+
 h1.accent.boxed,
 h2.accent.boxed,
 h3.accent.boxed,
