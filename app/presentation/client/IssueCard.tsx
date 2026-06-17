@@ -5,6 +5,7 @@ import {
   aiStatusMeta,
   deriveIssueStatus,
   issueActionPatch,
+  issueTypeMeta,
   severityColor,
   timeAgo,
 } from "~/business/commonBL";
@@ -39,6 +40,7 @@ export function IssueCard({
   const status = deriveIssueStatus(issue);
   const commentCount = issue.issue_comments?.length ?? 0;
   const ai = aiStatusMeta(issue.ai_status);
+  const typeMeta = issueTypeMeta(issue.issue_type);
 
   // The business pushes an issue forward: start it, then mark it updated (also
   // used to re-submit something the client sent back).
@@ -51,23 +53,28 @@ export function IssueCard({
         : null;
   // The client only acts on a pending update.
   const showClientDecision = !businessMode && status === "awaiting_approval";
+  // The business can approve on the client's behalf when an update has sat in
+  // "awaiting client approval" too long and the client hasn't actioned it.
+  const showAdminApprove = businessMode && status === "awaiting_approval";
 
   /**
-   * Business workflow: start the work, mark it updated for approval, or skip
-   * the client's review and approve it outright.
+   * Business workflow: start the work, mark it updated for approval, skip the
+   * client's review, or approve a pending update on the client's behalf. "skip"
+   * and "approve" both finalise the issue; they differ only in the label shown.
    */
-  async function handleBusinessAction(action: "start" | "update" | "skip") {
+  async function handleBusinessAction(
+    action: "start" | "update" | "skip" | "approve"
+  ) {
     try {
-      await updateIssue(
-        issue.id,
-        issueActionPatch(action === "skip" ? "approve" : action)
-      );
+      const patchAction =
+        action === "skip" || action === "approve" ? "approve" : action;
+      await updateIssue(issue.id, issueActionPatch(patchAction));
       context.popAlert(
         action === "start"
           ? "Marked as started"
-          : action === "skip"
-            ? "Approved"
-            : "Marked as updated"
+          : action === "update"
+            ? "Marked as updated"
+            : "Approved"
       );
       onChanged();
     } catch {
@@ -106,11 +113,11 @@ export function IssueCard({
         {businessAction === "update" && (
           <div className="row middle gap-5">
             <button
-              className="row middle gap-5 accentButton"
+              className="row middle gap-5 outline-accent"
               onClick={() => handleBusinessAction("update")}
             >
-              <Icon name="checkmark-circle" size={18} color="var(--bkg)" />
-              Submit
+              <Icon name="checkmark-circle" size={18} color="var(--accent)" />
+              Finish
             </button>
           </div>
         )}
@@ -130,11 +137,27 @@ export function IssueCard({
             />
           </div>
         )}
+        {showAdminApprove && (
+          <button
+            className="row middle gap-5 outline-accent"
+            onClick={() => handleBusinessAction("approve")}
+            title="Approve on the client's behalf"
+          >
+            <Icon name="checkmark-circle" size={18} color="var(--accent)" />
+            Approve now
+          </button>
+        )}
       </div>
 
       {clientName && (
-        <h3 className="outline-secondary pl-5">{clientName || "NO CLIENT"}</h3>
+        <h3 className="">{clientName || "NO CLIENT"}</h3>
       )}
+       <div className="row middle gap-5">
+          <Icon name={typeMeta.icon} size={14} color="var(--accent-lg)" />
+          <p style={{color: "var(--accent-lg)"}}>
+           · {timeAgo(issue.created_at)}
+          </p>
+        </div>
 
       {/* Issue text — opens the issue */}
       <p className="clickable" onClick={() => onOpen(false)}>
@@ -143,12 +166,7 @@ export function IssueCard({
 
       {/* Status metadata */}
       <div className="col gap-5">
-        <div className="row middle gap-5">
-          <Icon name="add-circle-outline" size={14} color="var(--accent)" />
-          <p style={{color: "var(--accent-lg)"}}>
-            <b>Created</b> {timeAgo(issue.created_at)}
-          </p>
-        </div>
+       
 
         {status === "rejected" && (
           <div className="row middle gap-5">
@@ -164,14 +182,14 @@ export function IssueCard({
               size={14}
               color="var(--accent-lg)"
             />
-            <p>In progress</p>
+            <p><b>In progress</b></p>
           </div>
         )}
 
         {status === "not_started" && (
           <div className="row middle gap-5">
             <Icon name="ellipse-outline" size={14} color="var(--accent-lg)" />
-            <p>{businessMode ? "Awaiting action" : "Not started"}</p>
+            <p><b>{businessMode ? "Awaiting action" : "Not started"}</b></p>
           </div>
         )}
 
@@ -180,7 +198,7 @@ export function IssueCard({
             <div className="row middle gap-5">
               <Icon name="checkmark-circle" size={14} color="var(--accent)" />
               <p>
-                <b>Updated</b> {timeAgo(issue.updated_at)}
+                <b>Done</b> {timeAgo(issue.updated_at)}
               </p>
             </div>
             <div className="row middle gap-5">
@@ -189,7 +207,7 @@ export function IssueCard({
                 size={14}
                 color="var(--warningColor)"
               />
-              <p>{businessMode ? "Awaiting client approval" : "Pending your approval"}</p>
+              <p>Awaiting approval</p>
             </div>
           </>
         )}
@@ -213,6 +231,7 @@ export function IssueCard({
       {/* Link to the AI's pull request once it has opened one — business admins only */}
       {businessMode && issue.ai_pr_url && (
         <a
+        role="button"
           className="row center middle gap-5 outline-accent"
           href={issue.ai_pr_url}
           target="_blank"

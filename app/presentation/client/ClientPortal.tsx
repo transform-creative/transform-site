@@ -80,10 +80,12 @@ export function ClientPortal({
   const [issues, setIssues] = useState<ClientIssue[]>([]);
   // The business's clients, loaded in admin mode for the "log issue" picker and
   // to resolve each card's reporting-client name.
-  const [clients, setClients] = useState<Pick<Profile, "id" | "full_name">[]>(
-    [],
-  );
+  const [clients, setClients] = useState<
+    Pick<Profile, "id" | "first_name" | "last_name">[]
+  >([]);
   const [loading, setLoading] = useState(true);
+  // Drives the refresh button's spinner / disabled state when manually refreshed.
+  const [refreshing, setRefreshing] = useState(false);
   // The active board tab. Clients lead with what needs their approval; the
   // business leads with the work it's actively pushing forward.
   const [selectedTab, setSelectedTab] = useState<TabKey>(
@@ -155,6 +157,20 @@ export function ClientPortal({
     };
   }, [clientId, isAdmin, business?.id]);
 
+  // Refresh the board whenever the user re-opens the portal (returns to the
+  // tab / refocuses the window), so the issues are never left stale.
+  useEffect(() => {
+    const onReopen = () => {
+      if (document.visibilityState === "visible") reload();
+    };
+    document.addEventListener("visibilitychange", onReopen);
+    window.addEventListener("focus", onReopen);
+    return () => {
+      document.removeEventListener("visibilitychange", onReopen);
+      window.removeEventListener("focus", onReopen);
+    };
+  }, [reload]);
+
   // The open issues split into the three tab buckets, and the tabs that
   // actually have something to show (empty tabs are hidden).
   const buckets = useMemo(() => groupIssues(issues), [issues]);
@@ -171,7 +187,13 @@ export function ClientPortal({
 
   // Maps a client's id to their name, for labelling cards on the admin board.
   const clientNameById = useMemo(
-    () => new Map(clients.map((c) => [c.id, c.full_name])),
+    () =>
+      new Map(
+        clients.map((c) => [
+          c.id,
+          [c.first_name, c.last_name].filter(Boolean).join(" "),
+        ]),
+      ),
     [clients],
   );
 
@@ -187,6 +209,17 @@ export function ClientPortal({
 
   function handleLogIssue() {
     setModal({ issueId: null, focusComments: false });
+  }
+
+  /** Manual refresh from the header button: spins the icon and confirms. */
+  async function handleRefresh() {
+    if (refreshing) return;
+    setRefreshing(true);
+    await reload();
+    if (mounted.current) {
+      setRefreshing(false);
+      context.popAlert("Issues refreshed");
+    }
   }
 
   function handleLogIssueWithSeverity(severity: IssueSeverity) {
@@ -277,7 +310,7 @@ export function ClientPortal({
                 <h3>
                   {isAdmin
                     ? business?.name || "Your business"
-                    : client?.full_name || "Client name"}
+                    : client?.first_name || "Client name"}
                 </h3>
                 <button
                   className="row middle outline-secondary gap-5"
@@ -290,13 +323,27 @@ export function ClientPortal({
                   Sign out
                 </button>
               </div>
-              <button
-                className="accentButton row middle gap-5"
-                onClick={handleLogIssue}
-              >
-                <Icon name="add-outline" color="var(--bkg)" />
-                Log issue
-              </button>
+              <div className="row middle gap-10">
+                <button
+                  className="row middle outline-secondary"
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  title="Refresh issues"
+                >
+                  <Icon
+                    name="refresh-outline"
+                    color="var(--accent)"
+                    className={refreshing ? "spin360" : ""}
+                  />
+                </button>
+                <button
+                  className="accentButton row middle gap-5"
+                  onClick={handleLogIssue}
+                >
+                  <Icon name="add-outline" color="var(--bkg)" />
+                  Log issue
+                </button>
+              </div>
             </div>
             <h1 className="accent">Welcome back.</h1>
             <p className="">

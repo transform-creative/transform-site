@@ -78,9 +78,20 @@ export const ISSUE_TYPE_OPTIONS: {
   icon: IoniconName;
 }[] = [
   { value: "bug", label: "Bug", icon: "bug-outline" },
-  { value: "issue", label: "Issue", icon: "construct-outline" },
+  { value: "issue", label: "Feature", icon: "construct-outline" },
   { value: "question", label: "Question", icon: "help-circle-outline" },
 ];
+
+/*******************************************
+ * The label + icon for an issue's type, used to badge the issue card. Falls
+ * back to the "issue" (feature) option for an unknown/null type.
+ */
+export function issueTypeMeta(type: string | null) {
+  return (
+    ISSUE_TYPE_OPTIONS.find((o) => o.value === type) ??
+    ISSUE_TYPE_OPTIONS[1]
+  );
+}
 
 /*******************************************
  * Map an AI auto-fix status to a short label, swatch colour and icon for the

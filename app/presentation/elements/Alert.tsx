@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { Transition, TransitionGroup } from "react-transition-group";
 import type { ActivatableElement } from "~/data/CommonTypes";
 import { Icon } from "./Icon";
+import "../../app-v2.css"
 
 interface SavedModalProps extends ActivatableElement {
   timeout?: number;
@@ -63,7 +64,7 @@ export default function Alert({
     >
       <div
         ref={transitionRef}
-        className="boxed s1 m0 p0 outline"
+        className="boxed s1 m0 mt-20 outline"
         style={{
           background: ` ${
             state == "fail"
@@ -88,13 +89,13 @@ export default function Alert({
                 : "close-circle-outline"
             }`}
             size={20}
-            color={state == "fail" ? "var(--txt)" : "var(--txt)"}
+            color={state == "fail" ? "var(--bkg)" : "var(--bkg)"}
           />
 
           <div>
             {header && (
               <h3
-                style={{ color: "#111111" }}
+                style={{ color: "var(--bkg)" }}
                 className="m1 textCenter"
               >
                 {header}
@@ -102,7 +103,7 @@ export default function Alert({
             )}
             {body && (
               <p
-                style={{ color: "#111111" }}
+                style={{ color: "var(--bkg)" }}
                 className="m1 textCenter"
               >
                 {body}
@@ -114,7 +115,7 @@ export default function Alert({
             className="buttonIcon m0"
             name="close"
             style={{
-              color: "var(--txt)",
+              color: "var(--bkg)",
               right: 20,
               width: 15,
             }}

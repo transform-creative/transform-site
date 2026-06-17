@@ -105,10 +105,10 @@ export async function getBusinessById(
  */
 export async function getBusinessClients(
   businessId: number
-): Promise<Pick<Profile, "id" | "full_name">[]> {
+): Promise<Pick<Profile, "id" | "first_name" | "last_name">[]> {
   const { data, error } = await supabase
     .from("profiles_to_businesses")
-    .select("profiles!inner(id, full_name)")
+    .select("profiles!inner(id, first_name, last_name)")
     .eq("business_id", businessId)
     .eq("role", "client");
 
@@ -119,7 +119,9 @@ export async function getBusinessClients(
 
   return (data ?? [])
     .map((row) => row.profiles)
-    .filter((p): p is Pick<Profile, "id" | "full_name"> => !!p);
+    .filter(
+      (p): p is Pick<Profile, "id" | "first_name" | "last_name"> => !!p,
+    );
 }
 
 /*************************

@@ -33,7 +33,7 @@ interface IssueModalProps {
   businessId: number | null;
   // When present (admin/business board) the create form shows a client picker
   // so the issue is attributed to a real client rather than the admin.
-  clients?: Pick<Profile, "id" | "full_name">[];
+  clients?: Pick<Profile, "id" | "first_name" | "last_name">[];
   // Business board: drives the start → mark-updated workflow rather than the
   // client's approve / reject decision.
   businessMode?: boolean;
@@ -76,7 +76,8 @@ export function IssueModal({
     // Entering create mode — reset so a prior edit session doesn't leak through.
     frozenIssueRef.current = null;
   }
-  const displayIssue = issue ?? (!active ? frozenIssueRef.current : null);
+  const displayIssue =
+    issue ?? (!active ? frozenIssueRef.current : null);
   const isEdit = !!displayIssue;
   // Admins logging a new issue choose which client it's for.
   const showClientPicker = !isEdit && !!clients;
@@ -105,7 +106,9 @@ export function IssueModal({
     setTitle(issue?.title ?? "");
     setDescription(issue?.description ?? "");
     setMoreInfo(issue?.more_info ?? "");
-    setSeverity((issue?.severity as IssueSeverity) ?? defaultSeverity ?? "low");
+    setSeverity(
+      (issue?.severity as IssueSeverity) ?? defaultSeverity ?? "low",
+    );
     setPickerOpen(false);
     setClientPickerOpen(false);
     setCommentBody("");
@@ -119,7 +122,9 @@ export function IssueModal({
           : null;
       const fallback = clients[0]?.id ?? "";
       setSelectedClientId(
-        clients.some((c) => c.id === remembered) ? remembered! : fallback
+        clients.some((c) => c.id === remembered)
+          ? remembered!
+          : fallback,
       );
     }
   }, [issue?.id, active]);
@@ -133,23 +138,40 @@ export function IssueModal({
     moreInfo !== (issue?.more_info ?? "") ||
     severity !== ((issue?.severity as IssueSeverity) ?? "low");
 
-  const status = displayIssue ? deriveIssueStatus(displayIssue) : "not_started";
+  const status = displayIssue
+    ? deriveIssueStatus(displayIssue)
+    : "not_started";
   const meta = severityMeta(severity);
-  const selectedClientName = clients?.find(
-    (c) => c.id === selectedClientId
-  )?.full_name;
+  const selectedClient = clients?.find(
+    (c) => c.id === selectedClientId,
+  );
+  const selectedClientName = selectedClient
+    ? [selectedClient.first_name, selectedClient.last_name]
+        .filter(Boolean)
+        .join(" ")
+    : undefined;
 
   /** Create or save the issue from the form. */
   async function handleSubmit() {
     if (!description.trim()) {
-      context.popAlert("Add a description", "Tell us what the problem is", true);
+      context.popAlert(
+        "Add a description",
+        "Tell us what the problem is",
+        true,
+      );
       return;
     }
 
     // Admins attribute the issue to the chosen client; clients log it as themselves.
-    const createClientId = showClientPicker ? selectedClientId : clientId;
+    const createClientId = showClientPicker
+      ? selectedClientId
+      : clientId;
     if (showClientPicker && !createClientId) {
-      context.popAlert("Pick a client", "Choose who this issue is for", true);
+      context.popAlert(
+        "Pick a client",
+        "Choose who this issue is for",
+        true,
+      );
       return;
     }
 
@@ -177,14 +199,21 @@ export function IssueModal({
           severity,
         });
         if (showClientPicker && typeof window !== "undefined") {
-          window.localStorage.setItem(LAST_CLIENT_KEY, createClientId);
+          window.localStorage.setItem(
+            LAST_CLIENT_KEY,
+            createClientId,
+          );
         }
         context.popAlert("Issue logged", "We'll take a look shortly");
         onChanged();
         onClose();
       }
     } catch {
-      context.popAlert("Could not save your issue", "Please try again", true);
+      context.popAlert(
+        "Could not save your issue",
+        "Please try again",
+        true,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -199,16 +228,36 @@ export function IssueModal({
         ? "update"
         : null;
 
-  /** Business workflow (edit mode header): start the work or mark it updated. */
-  async function handleBusinessAction(action: "start" | "update") {
+  // The business can approve on the client's behalf once the work is awaiting
+  // approval and the client hasn't actioned it.
+  const showAdminApprove =
+    businessMode && status === "awaiting_approval";
+
+  /**
+   * Business workflow (edit mode header): start the work, mark it updated, or
+   * approve a pending update on the client's behalf.
+   */
+  async function handleBusinessAction(
+    action: "start" | "update" | "approve",
+  ) {
     if (!issue) return;
     try {
       await updateIssue(issue.id, issueActionPatch(action));
-      context.popAlert(action === "start" ? "Marked as started" : "Marked as updated");
+      context.popAlert(
+        action === "start"
+          ? "Marked as started"
+          : action === "update"
+            ? "Marked as updated"
+            : "Approved",
+      );
       onChanged();
       onClose();
     } catch {
-      context.popAlert("Something went wrong", "Please try again", true);
+      context.popAlert(
+        "Something went wrong",
+        "Please try again",
+        true,
+      );
     }
   }
 
@@ -217,11 +266,17 @@ export function IssueModal({
     if (!issue) return;
     try {
       await updateIssue(issue.id, issueActionPatch(decision));
-      context.popAlert(decision === "approve" ? "Approved" : "Sent back");
+      context.popAlert(
+        decision === "approve" ? "Approved" : "Sent back",
+      );
       onChanged();
       onClose();
     } catch {
-      context.popAlert("Something went wrong", "Please try again", true);
+      context.popAlert(
+        "Something went wrong",
+        "Please try again",
+        true,
+      );
     }
   }
 
@@ -238,7 +293,11 @@ export function IssueModal({
       setCommentBody("");
       onChanged();
     } catch {
-      context.popAlert("Could not post your comment", "Please try again", true);
+      context.popAlert(
+        "Could not post your comment",
+        "Please try again",
+        true,
+      );
     } finally {
       setCommentSubmitting(false);
     }
@@ -255,40 +314,74 @@ export function IssueModal({
         {/* Left panel — the form */}
         <div className="col gap-10 issue-modal-form">
           <div className="between middle">
-            <h3 className="accent">New feature or issue request</h3>
+            {!!displayIssue || (
+              <h2 className="accent">New request</h2>
+            )}
             {isEdit && businessAction === "start" && (
               <button
                 className="row middle gap-5 outline-accent"
                 onClick={() => handleBusinessAction("start")}
               >
-                <Icon name="play-circle-outline" size={20} color="var(--accent)" />
+                <Icon
+                  name="play-circle-outline"
+                  size={20}
+                  color="var(--accent)"
+                />
                 Start
               </button>
             )}
             {isEdit && businessAction === "update" && (
               <button
-                className="row middle gap-5 accentButton"
+                className="row middle gap-5 outline-accent"
                 onClick={() => handleBusinessAction("update")}
               >
-                <Icon name="checkmark-circle" size={20} color="var(--bkg)" />
-                Submit
-              </button>
-            )}
-            {isEdit && !businessMode && status === "awaiting_approval" && (
-              <div className="row middle gap-5">
                 <Icon
                   name="checkmark-circle"
-                  size={26}
+                  size={20}
                   color="var(--accent)"
-                  onClick={() => handleDecision("approve")}
                 />
+                Finish
+              </button>
+            )}
+              <div className="row middle gap-5">
+              {displayIssue && (
+                <p style={{ color: "var(--accent-lg)" }}>
+                  {timeAgo(displayIssue?.created_at || new Date())}
+                </p>
+              )}
+            </div>
+            {isEdit &&
+              !businessMode &&
+              status === "awaiting_approval" && (
+                <div className="row middle gap-5">
+                  <Icon
+                    name="checkmark-circle"
+                    size={26}
+                    color="var(--accent)"
+                    onClick={() => handleDecision("approve")}
+                  />
+                  <Icon
+                    name="close-circle"
+                    size={26}
+                    color="var(--dangerColor)"
+                    onClick={() => handleDecision("reject")}
+                  />
+                </div>
+              )}
+          
+            {isEdit && showAdminApprove && (
+              <button
+                className="row middle gap-5 outline-accent"
+                onClick={() => handleBusinessAction("approve")}
+                title="Approve on the client's behalf"
+              >
                 <Icon
-                  name="close-circle"
-                  size={26}
-                  color="var(--dangerColor)"
-                  onClick={() => handleDecision("reject")}
+                  name="checkmark-circle"
+                  size={20}
+                  color="var(--accent)"
                 />
-              </div>
+                Approve now
+              </button>
             )}
           </div>
 
@@ -300,14 +393,20 @@ export function IssueModal({
                 key={opt.value}
                 type="button"
                 className={`row middle center gap-5 w-100 ${
-                  issueType === opt.value ? "accentButton" : "outline-accent"
+                  issueType === opt.value
+                    ? "accentButton"
+                    : "outline-accent"
                 }`}
                 onClick={() => setIssueType(opt.value)}
               >
                 <Icon
                   name={opt.icon}
                   size={16}
-                  color={issueType === opt.value ? "var(--bkg)" : "var(--accent)"}
+                  color={
+                    issueType === opt.value
+                      ? "var(--bkg)"
+                      : "var(--accent)"
+                  }
                 />
                 {opt.label}
               </button>
@@ -317,15 +416,13 @@ export function IssueModal({
           {/* Edit-only metadata */}
           {isEdit && displayIssue && (
             <div className="col gap-5">
-              <div className="row middle gap-5">
-                <Icon name="add-circle-outline" size={14} color="var(--accent)" />
-                <p>
-                  <b>Created</b> {timeAgo(displayIssue.created_at)}
-                </p>
-              </div>
               {status === "awaiting_approval" && (
                 <div className="row middle gap-5">
-                  <Icon name="checkmark-circle" size={14} color="var(--accent)" />
+                  <Icon
+                    name="checkmark-circle"
+                    size={14}
+                    color="var(--accent)"
+                  />
                   <p>
                     <b>Updated</b> {timeAgo(displayIssue.updated_at)}
                   </p>
@@ -333,7 +430,11 @@ export function IssueModal({
               )}
               {status === "rejected" && (
                 <div className="row middle gap-5">
-                  <Icon name="close-circle" size={14} color="var(--dangerColor)" />
+                  <Icon
+                    name="close-circle"
+                    size={14}
+                    color="var(--dangerColor)"
+                  />
                   <p>Sent back</p>
                 </div>
               )}
@@ -389,7 +490,11 @@ export function IssueModal({
                         color="var(--accent)"
                       />
                       <p>
-                        <b>{c.full_name || "Unnamed client"}</b>
+                        <b>
+                          {[c.first_name, c.last_name]
+                            .filter(Boolean)
+                            .join(" ") || "Unnamed client"}
+                        </b>
                       </p>
                     </button>
                   ))}
@@ -489,7 +594,7 @@ export function IssueModal({
             ) : (
               displayIssue.issue_comments.map((comment) => (
                 <div key={comment.id} className="col comment-card">
-                  <p style={{color: "var(--accent-lg)"}}>
+                  <p style={{ color: "var(--accent-lg)" }}>
                     <b
                       style={
                         comment.author_user_id === clientId

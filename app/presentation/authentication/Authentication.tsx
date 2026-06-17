@@ -85,7 +85,7 @@ export function Authentication({}: AuthenticationProps) {
             style={{ fontSize: 40 }}
             className="mt3 center"
           >
-            Sign in please person
+            Get your one time login link
           </h1>
         </div>
         <div className="w-100">
