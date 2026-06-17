@@ -3,8 +3,10 @@ import { render } from "@react-email/render";
 import { Heading, Section, Text } from "react-email";
 import {
   baseUrl,
+  card,
   formatTimestamp,
   h1,
+  label,
   p,
   small,
 } from "./styles.ts";
@@ -33,6 +35,7 @@ export interface IssueForReviewClientEmailProps {
   created_at?: string | null;
   updated_at?: string | null;
   business_name?: string | null;
+  latest_comment?: string | null;
   pr_url?: string | null;
 }
 
@@ -47,6 +50,7 @@ export default function IssueForReviewClientEmail({
   created_at,
   updated_at,
   business_name,
+  latest_comment,
   pr_url,
 }: IssueForReviewClientEmailProps) {
   const preview = title
@@ -85,6 +89,15 @@ export default function IssueForReviewClientEmail({
         more_info={more_info}
         created_at={formatTimestamp(created_at)}
       />
+
+      {latest_comment ? (
+        <Section style={card}>
+          <Text style={label}>What we changed</Text>
+          <Text style={{ ...p, margin: 0 }}>
+            {latest_comment}
+          </Text>
+        </Section>
+      ) : null}
 
       {updated_at ? (
         <Text style={p}>

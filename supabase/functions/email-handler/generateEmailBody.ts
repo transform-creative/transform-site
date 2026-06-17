@@ -13,6 +13,7 @@
 import { render } from "npm:@react-email/render@0.0.12";
 import NewIssueDeveloperEmail from "../_shared/emails/templates/NewIssueDeveloperEmail.tsx";
 import IssueForReviewClientEmail from "../_shared/emails/templates/IssueForReviewClientEmail.tsx";
+import IssueRejectedDeveloperEmail from "../_shared/emails/templates/IssueRejectedDeveloperEmail.tsx";
 
 const endpoint = "https://smtp.maileroo.com/api/v2/emails/";
 
@@ -37,6 +38,8 @@ export async function sendEmail(data: any) {
       return await sendNewIssueDeveloperEmail(data);
     case "issue.ready_for_review":
       return await sendIssueForReviewClientEmail(data);
+    case "issue.rejected":
+      return await sendIssueRejectedDeveloperEmail(data);
     default:
       return {
         error: `invalid_template ${data.type}`,
@@ -113,6 +116,38 @@ async function sendIssueForReviewClientEmail(data: any) {
   console.info("sending IssueForReviewClientEmail", {
     issue_id: data.issue_id,
     to: emailBody.to.address,
+  });
+
+  const response = await fetch(
+    endpoint,
+    getEmailWithHeaders(emailBody),
+  );
+  if (!response.ok) {
+    const detail = await response.text();
+    return {
+      error: `Maileroo ${response.status} ${response.statusText}: ${detail}`,
+    };
+  }
+  return { data: response };
+}
+
+/*****************************************
+ * sendIssueRejectedDeveloperEmail — fires to support@transformcreative.com.au
+ * when a client sends an issue back. Carries the client's feedback
+ * (`latest_comment`) so devs know what's still wrong.
+ */
+async function sendIssueRejectedDeveloperEmail(data: any) {
+  const emailBody = {
+    to: DEVELOPER,
+    from: SENDING_EMAIL,
+    subject: data.title
+      ? `Sent back: ${data.title}`
+      : "A client sent an issue back",
+    html: render(IssueRejectedDeveloperEmail(data)),
+  };
+
+  console.info("sending IssueRejectedDeveloperEmail", {
+    issue_id: data.issue_id,
   });
 
   const response = await fetch(

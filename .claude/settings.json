@@ -84,7 +84,9 @@
       "PowerShell(npm view vite versions --json)",
       "PowerShell(npm run build)",
       "WebFetch(domain:maileroo.com)",
-      "PowerShell(npm run typecheck 2>&1)"
+      "PowerShell(npm run typecheck 2>&1)",
+      "PowerShell(npm run check:functions)",
+      "PowerShell(supabase functions deploy email-handler --project-ref hzfjmmakqwsmucxorhlb --no-verify-jwt)"
     ],
     "deny": [
       "Read(**/.env*)",

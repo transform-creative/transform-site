@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import type { ClientIssue } from "~/data/CustomTypes";
@@ -10,7 +11,9 @@ import {
   timeAgo,
 } from "~/business/commonBL";
 import { updateIssue } from "~/database/Update";
+import { createIssueComment } from "~/database/Create";
 import { Icon } from "../elements/Icon";
+import CommentPopup from "../elements/CommentPopup";
 
 interface IssueCardProps {
   issue: ClientIssue;
@@ -39,6 +42,10 @@ export function IssueCard({
 }: IssueCardProps) {
   const context: SharedContextProps = useOutletContext();
   const status = deriveIssueStatus(issue);
+  // Which status change is waiting on a comment: "finish" (admin marks updated,
+  // comment optional) or "reject" (client sends back, comment required).
+  const [popup, setPopup] = useState<"finish" | "reject" | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const commentCount = issue.issue_comments?.length ?? 0;
   const ai = aiStatusMeta(issue.ai_status);
   const typeMeta = issueTypeMeta(issue.issue_type);
@@ -108,6 +115,35 @@ export function IssueCard({
     }
   }
 
+  /**
+   * Finish/reject flow with a comment. Posts the comment first (so the email
+   * trigger that fires on the status change finds it as the latest comment),
+   * then applies the timestamp patch. Finish's comment is optional; reject's is
+   * enforced by the popup, so an empty body only ever reaches here for finish.
+   */
+  async function handleCommentSubmit(body: string) {
+    if (!popup) return;
+    const action = popup === "finish" ? "update" : "reject";
+    try {
+      setSubmitting(true);
+      if (body) {
+        await createIssueComment({
+          issue_id: issue.id,
+          body,
+          author_user_id: context.session?.user?.id,
+        });
+      }
+      await updateIssue(issue.id, issueActionPatch(action));
+      context.popAlert(action === "update" ? "Marked as updated" : "Sent back");
+      setPopup(null);
+      onChanged();
+    } catch {
+      context.popAlert("Something went wrong", "Please try again", true);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <div
       className="boxed p-10 col gap-5 outline-accent"
@@ -172,7 +208,7 @@ export function IssueCard({
           <div className="row middle gap-5">
             <button
               className="row middle gap-5 outline-accent"
-              onClick={() => handleBusinessAction("update")}
+              onClick={() => setPopup("finish")}
             >
               <Icon
                 name="checkmark-circle"
@@ -195,7 +231,7 @@ export function IssueCard({
               name="close-circle"
               size={20}
               color="var(--dangerColor)"
-              onClick={() => handleDecision("reject")}
+              onClick={() => setPopup("reject")}
             />
           </div>
         )}
@@ -315,6 +351,21 @@ export function IssueCard({
           Skip review
         </button>
       )}
+
+      <CommentPopup
+        active={popup !== null}
+        onClose={() => setPopup(null)}
+        onSubmit={handleCommentSubmit}
+        submitting={submitting}
+        required={popup === "reject"}
+        title={popup === "reject" ? "Send this back" : "Mark as finished"}
+        prompt={
+          popup === "reject"
+            ? "Tell us what's still wrong so we can fix it."
+            : "Add a note about what you changed (optional)."
+        }
+        confirmLabel={popup === "reject" ? "Send back" : "Finish"}
+      />
     </div>
   );
 }
