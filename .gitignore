@@ -1,9 +1,13 @@
 .DS_Store
 /node_modules/
+node_modules/
 
 # React Router
 /.react-router/
 /build/
+
+# react-email preview build artifacts
+.react-email/
 .env
 .env.local
 .env.*
