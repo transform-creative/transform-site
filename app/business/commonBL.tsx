@@ -77,9 +77,9 @@ export const ISSUE_TYPE_OPTIONS: {
   label: string;
   icon: IoniconName;
 }[] = [
-  { value: "bug", label: "Bug", icon: "bug-outline" },
-  { value: "issue", label: "Feature", icon: "construct-outline" },
-  { value: "question", label: "Question", icon: "help-circle-outline" },
+  { value: "bug", label: "Bug", icon: "bug" },
+  { value: "issue", label: "Feature", icon: "construct" },
+  { value: "question", label: "Question", icon: "help-circle" },
 ];
 
 /*******************************************

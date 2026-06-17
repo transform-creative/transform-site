@@ -53,10 +53,12 @@ export function IssueCard({
         ? "update"
         : null;
   // The client only acts on a pending update.
-  const showClientDecision = !businessMode && status === "awaiting_approval";
+  const showClientDecision =
+    !businessMode && status === "awaiting_approval";
   // The business can approve on the client's behalf when an update has sat in
   // "awaiting client approval" too long and the client hasn't actioned it.
-  const showAdminApprove = businessMode && status === "awaiting_approval";
+  const showAdminApprove =
+    businessMode && status === "awaiting_approval";
 
   /**
    * Business workflow: start the work, mark it updated for approval, skip the
@@ -64,22 +66,28 @@ export function IssueCard({
    * and "approve" both finalise the issue; they differ only in the label shown.
    */
   async function handleBusinessAction(
-    action: "start" | "update" | "skip" | "approve"
+    action: "start" | "update" | "skip" | "approve",
   ) {
     try {
       const patchAction =
-        action === "skip" || action === "approve" ? "approve" : action;
+        action === "skip" || action === "approve"
+          ? "approve"
+          : action;
       await updateIssue(issue.id, issueActionPatch(patchAction));
       context.popAlert(
         action === "start"
           ? "Marked as started"
           : action === "update"
             ? "Marked as updated"
-            : "Approved"
+            : "Approved",
       );
       onChanged();
     } catch {
-      context.popAlert("Something went wrong", "Please try again", true);
+      context.popAlert(
+        "Something went wrong",
+        "Please try again",
+        true,
+      );
     }
   }
 
@@ -87,27 +95,68 @@ export function IssueCard({
   async function handleDecision(decision: "approve" | "reject") {
     try {
       await updateIssue(issue.id, issueActionPatch(decision));
-      context.popAlert(decision === "approve" ? "Approved" : "Sent back");
+      context.popAlert(
+        decision === "approve" ? "Approved" : "Sent back",
+      );
       onChanged();
     } catch {
-      context.popAlert("Something went wrong", "Please try again", true);
+      context.popAlert(
+        "Something went wrong",
+        "Please try again",
+        true,
+      );
     }
   }
 
   return (
-    <div className="boxed p-10 col gap-10 outline-accent" style={{width: 280}}>
+    <div
+      className="boxed p-10 col gap-5 outline-accent"
+      style={{
+        width: 280,
+        borderColor: severityColor(issue.severity),
+      }}
+    >
       {/* Severity swatch + workflow / decision actions */}
-      <div className="between middle">
+      {status === "awaiting_approval" ? (
         <div
-          className="severity-swatch"
-          style={{ background: severityColor(issue.severity) }}
-        />
+          className="row middle gap-5 pl-5 boxed"
+          style={{ background: "var(--warningColor)" }}
+        >
+          <Icon name="alert-circle" size={14} />
+          <p>Needs approval</p>
+        </div>
+      ) : businessMode && ai && (
+          <div className="row middle gap-5 boxed pl-5" style={{background: ai.color}}>
+            <Icon name={ai.icon} size={14} color={'var(--bkg)'} />
+            <p style={{ color: 'var(--bkg)' }}>{ai.label}</p>
+          </div>
+        )}
+      {status === "in_progress" && (
+        <div className="row middle gap-5 boxed accent pl-5">
+          <Icon name="code-working" size={14} />
+          <p>{businessMode ? timeAgo(issue.started_at) : "Working on it"}</p>
+        </div>
+      )}
+      
+      <div className="between middle mt-5">
+        <div>
+          {" "}
+          <Icon
+            name={typeMeta.icon}
+            size={28}
+            color={severityColor(issue.severity)}
+          />
+        </div>
         {businessAction === "start" && (
           <button
             className="row middle gap-5 outline-accent"
             onClick={() => handleBusinessAction("start")}
           >
-            <Icon name="play-circle-outline" size={18} color="var(--accent)" />
+            <Icon
+              name="play-circle-outline"
+              size={18}
+              color="var(--accent)"
+            />
             Start
           </button>
         )}
@@ -117,7 +166,11 @@ export function IssueCard({
               className="row middle gap-5 outline-accent"
               onClick={() => handleBusinessAction("update")}
             >
-              <Icon name="checkmark-circle" size={18} color="var(--accent)" />
+              <Icon
+                name="checkmark-circle"
+                size={18}
+                color="var(--accent)"
+              />
               Finish
             </button>
           </div>
@@ -140,125 +193,120 @@ export function IssueCard({
         )}
         {showAdminApprove && (
           <button
-            className="row middle gap-5 outline-accent"
+            className="row middle gap-5 outline"
             onClick={() => handleBusinessAction("approve")}
             title="Approve on the client's behalf"
           >
-            <Icon name="checkmark-circle" size={18} color="var(--accent)" />
-            Approve now
+            <Icon
+              name="checkmark-circle"
+              size={18}
+              color="var(--txt)"
+            />
+            Close
           </button>
         )}
       </div>
-
-      {label && (
-        <h3 className="">{label}</h3>
-      )}
-       <div className="row middle gap-5">
-          <Icon name={typeMeta.icon} size={14} color="var(--accent-lg)" />
-          <p style={{color: "var(--accent-lg)"}}>
-           · {timeAgo(issue.created_at)}
-          </p>
-        </div>
-
-      {/* Issue text — opens the issue */}
-      <p className="clickable" onClick={() => onOpen(false)}>
-        {issue.title || issue.description || "Untitled issue"}
-      </p>
-
+      
+      <div className="pb-5" style={{borderBottom: '1px solid var(--accent-lg)'}}>
+        {label && <h3 className="" style={{color: severityColor(issue.severity)}}>{label}</h3>}
+        {/* Issue text — opens the issue */}
+        <p className="clickable" onClick={() => onOpen(false)}>
+          {issue.title || issue.description || "Untitled issue"}
+        </p>
+      </div>
+<div className="row middle gap-5">
+        <p style={{ color: "var(--accent-lg)" }}>
+          <strong>Lodged</strong> {timeAgo(issue.created_at)}
+        </p>
+      </div>
       {/* Status metadata */}
       <div className="col gap-5">
-       
-
         {status === "rejected" && (
           <div className="row middle gap-5">
-            <Icon name="close-circle" size={14} color="var(--dangerColor)" />
-            <p>Sent back</p>
-          </div>
-        )}
-
-        {status === "in_progress" && (
-          <div className="row middle gap-5">
             <Icon
-              name="information-circle-outline"
+              name="close-circle"
               size={14}
-              color="var(--accent-lg)"
+              color="var(--dangerColor)"
             />
-            <p><b>In progress</b></p>
+            <p>Sent back</p>
           </div>
         )}
 
         {status === "not_started" && (
           <div className="row middle gap-5">
-            <Icon name="ellipse-outline" size={14} color="var(--accent-lg)" />
-            <p><b>{businessMode ? "Awaiting action" : "Not started"}</b></p>
+            <Icon
+              name="ellipse-outline"
+              size={14}
+              color="var(--accent-lg)"
+            />
+            <p>{businessMode ? "Awaiting action" : "Not started"}</p>
           </div>
         )}
 
         {status === "awaiting_approval" && (
           <>
             <div className="row middle gap-5">
-              <Icon name="checkmark-circle" size={14} color="var(--accent)" />
-              <p>
-                <b>Done</b> {timeAgo(issue.updated_at)}
-              </p>
-            </div>
-            <div className="row middle gap-5">
               <Icon
-                name="alert-circle"
+                name="checkmark-circle"
                 size={14}
-                color="var(--warningColor)"
+                color="var(--accent)"
               />
-              <p><b>Not approved</b></p>
+              <p style={{ color: "var(--accent-lg)" }}>
+                {timeAgo(issue.updated_at)}
+              </p>
             </div>
           </>
         )}
 
         {status === "approved" && (
           <div className="row middle gap-5">
-            <Icon name="checkmark-circle" size={14} color="var(--accent)" />
+            <Icon
+              name="checkmark-circle"
+              size={14}
+              color="var(--accent)"
+            />
             <p>Approved</p>
           </div>
         )}
 
         {/* AI auto-fix status (only once dispatched) — business admins only */}
-        {businessMode && ai && (
-          <div className="row middle gap-5">
-            <Icon name={ai.icon} size={14} color={ai.color} />
-            <p style={{ color: ai.color }}>{ai.label}</p>
-          </div>
-        )}
+       
       </div>
 
       {/* Link to the AI's pull request once it has opened one — business admins only */}
       {businessMode && issue.ai_pr_url && (
         <a
-        role="button"
+          role="button"
           className="row center middle gap-5 outline-accent"
           href={issue.ai_pr_url}
           target="_blank"
           rel="noreferrer"
         >
-          <Icon name="git-pull-request-outline" size={18} color="var(--accent)" />
+          <Icon
+            name="git-pull-request-outline"
+            size={18}
+            color="var(--accent)"
+          />
           View pull request
         </a>
       )}
 
-      {/* Comments — opens the issue focused on the comments panel */}
+      {/* Comments — pinned to the card's bottom edge */}
       <button
-        className={` w-100 center ${commentCount > 0 ? "accent" : "outline"}`}
+        className={`mt-auto w-100 center ${commentCount > 0 ? "accent" : "outline"}`}
         onClick={() => onOpen(true)}
       >
         {commentCount} comments
       </button>
-      {businessAction === "update" &&
-          <button
-              className="row center middle gap-5 outline-secondary"
-              onClick={() => handleBusinessAction("skip")}
-            >
-              <Icon name="flash-outline" size={18} color="var(--txt)" />
-              Skip review
-            </button>
-      }
+      {businessAction === "update" && (
+        <button
+          className="row center middle gap-5 outline-secondary"
+          onClick={() => handleBusinessAction("skip")}
+        >
+          <Icon name="flash-outline" size={18} color="var(--txt)" />
+          Skip review
+        </button>
+      )}
     </div>
   );
 }

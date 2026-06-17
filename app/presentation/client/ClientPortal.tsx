@@ -1,7 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { Business, ClientIssue, IssueSeverity, Profile } from "~/data/CustomTypes";
+import type {
+  Business,
+  ClientIssue,
+  IssueSeverity,
+  Profile,
+} from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
   lastActivityAt,
@@ -50,7 +61,9 @@ const TAB_META: { key: TabKey; label: string }[] = [
 ];
 
 /** Split the open issues into the three tab buckets by derived status. */
-function groupIssues(issues: ClientIssue[]): Record<TabKey, ClientIssue[]> {
+function groupIssues(
+  issues: ClientIssue[],
+): Record<TabKey, ClientIssue[]> {
   const buckets: Record<TabKey, ClientIssue[]> = {
     needs_approval: [],
     being_updated: [],
@@ -58,17 +71,21 @@ function groupIssues(issues: ClientIssue[]): Record<TabKey, ClientIssue[]> {
   };
   for (const issue of issues) {
     const status = deriveIssueStatus(issue);
-    if (status === "awaiting_approval") buckets.needs_approval.push(issue);
+    if (status === "awaiting_approval")
+      buckets.needs_approval.push(issue);
     else if (status === "in_progress" || status === "rejected")
       buckets.being_updated.push(issue);
-    else if (status === "not_started") buckets.not_started.push(issue);
+    else if (status === "not_started")
+      buckets.not_started.push(issue);
   }
   return buckets;
 }
 
 /** Sort a copy of the list by most recent activity, newest first. */
 function byActivity(list: ClientIssue[]): ClientIssue[] {
-  return [...list].sort((a, b) => lastActivityAt(b) - lastActivityAt(a));
+  return [...list].sort(
+    (a, b) => lastActivityAt(b) - lastActivityAt(a),
+  );
 }
 
 /******************************
@@ -141,11 +158,13 @@ export function ClientPortal({
       try {
         setLoading(true);
         if (isAdmin) {
-          const [issueData, clientList, orgNames] = await Promise.all([
-            getBusinessIssues(business!.id),
-            getBusinessClients(business!.id),
-            getOrgNamesForBoard(business!.id),
-          ]);
+          const [issueData, clientList, orgNames] = await Promise.all(
+            [
+              getBusinessIssues(business!.id),
+              getBusinessClients(business!.id),
+              getOrgNamesForBoard(business!.id),
+            ],
+          );
           if (!mounted.current) return;
           setIssues(issueData);
           setClients(clientList);
@@ -207,14 +226,16 @@ export function ClientPortal({
   const buckets = useMemo(() => groupIssues(issues), [issues]);
   const tabs = useMemo(
     () =>
-      TAB_META.map((t) => ({ ...t, count: buckets[t.key].length })).filter(
-        (t) => t.count > 0,
-      ),
+      TAB_META.map((t) => ({
+        ...t,
+        count: buckets[t.key].length,
+      })).filter((t) => t.count > 0),
     [buckets],
   );
   // The active tab falls back to the first visible one when the role default
   // (or a previously-selected tab) has emptied out.
-  const activeTab = tabs.find((t) => t.key === selectedTab) ?? tabs[0] ?? null;
+  const activeTab =
+    tabs.find((t) => t.key === selectedTab) ?? tabs[0] ?? null;
 
   // Maps a client's id to their name, for labelling cards on the admin board.
   const clientNameById = useMemo(
@@ -254,7 +275,11 @@ export function ClientPortal({
   }
 
   function handleLogIssueWithSeverity(severity: IssueSeverity) {
-    setModal({ issueId: null, focusComments: false, defaultSeverity: severity });
+    setModal({
+      issueId: null,
+      focusComments: false,
+      defaultSeverity: severity,
+    });
   }
 
   /** A single issue card, with the role-aware wiring shared by every tab. */
@@ -266,14 +291,14 @@ export function ClientPortal({
         isAdmin
           ? // The agency board aggregates many orgs: label each card with the
             // org the ticket belongs to (falling back to the reporter's name).
-            (issue.client_business_id != null
+            ((issue.client_business_id != null
               ? orgNameById.get(issue.client_business_id)
               : undefined) ??
             clientNameById.get(issue.client_id) ??
-            undefined
+            undefined)
           : // In an org, label colleagues' issues (but not your own).
             issue.client_id !== clientId
-            ? clientNameById.get(issue.client_id) ?? undefined
+            ? (clientNameById.get(issue.client_id) ?? undefined)
             : undefined
       }
       businessMode={isAdmin}
@@ -284,7 +309,7 @@ export function ClientPortal({
 
   /** Tab body: cards laid out left-to-right with even spacing, newest first. */
   const renderGrid = (list: ClientIssue[]) => (
-    <div className="row wrap gap-20 w-100 start">
+    <div className="row wrap gap-20 w-100 stretch">
       {byActivity(list).map(renderCard)}
     </div>
   );
@@ -317,7 +342,11 @@ export function ClientPortal({
                 onClick={() => handleLogIssueWithSeverity(severity)}
                 title={`Add ${severityMeta(severity).label} issue`}
               >
-                <Icon name="add-outline" size={16} color="var(--accent)" />
+                <Icon
+                  name="add-outline"
+                  size={16}
+                  color="var(--accent)"
+                />
               </button>
             </div>
             {column.map(renderCard)}
@@ -342,13 +371,19 @@ export function ClientPortal({
   }
 
   return (
-    <div className="col middle gap-20 ml-20 mr-20" style={{minHeight: "90vh"}}>
+    <div
+      className="col middle gap-20 ml-20 mr-20"
+      style={{ minHeight: "90vh" }}
+    >
       <div className="col w-75 gap-20">
         {/* Header */}
-        <div className="row relative ">
+        <div
+          className="row relative p-20 r-10 outline-secondary"
+          style={{ background: "var(--accent-sm)" }}
+        >
           <div className="w-100 col start center">
-            <div className="row middle between gap-10 w-100">
-              <div className="row middle gap-10">
+            <div className="row middle between gap-10 w-100 shrink-col">
+              <div className="row middle gap-10 shrink-col">
                 <h3>
                   {isAdmin
                     ? business?.name || "Your business"
@@ -389,16 +424,21 @@ export function ClientPortal({
                 </button>
               </div>
             </div>
-            <h1 className="accent">Welcome back.</h1>
+            <h1 className="accent shrink-col">Welcome back.</h1>
             <p className="">
-             <strong>{issues.length}</strong> issues available
+              <strong>{issues.length}</strong> issues available
             </p>
           </div>
         </div>
         {loading ? (
-          <p className="center w-100" style={{minHeight: "90vh"}}>Loading…</p>
+          <p className="center w-100" style={{ minHeight: "90vh" }}>
+            Loading…
+          </p>
         ) : issues.length === 0 ? (
-          <div className="col middle center gap-10 outline" style={{minHeight: "90vh"}}>
+          <div
+            className="col middle center gap-10 outline"
+            style={{ minHeight: "90vh" }}
+          >
             <Icon
               name="checkmark-circle"
               size={48}
@@ -408,18 +448,39 @@ export function ClientPortal({
             <p>There are no issues to show right now.</p>
           </div>
         ) : (
-          <div className="col gap-20 w-100">
+          <div className="col gap-20 w-100 ">
             {/* Tab bar — left-aligned buttons, one per non-empty bucket */}
-            <div className="row wrap gap-10">
+            <div className="row wrap gap-10 ">
               {tabs.map((t) => (
                 <button
                   key={t.key}
-                  className={
-                    `${activeTab?.key === t.key ? "accentButton" : "outline-secondary"}  row gap-5 middle center`
-                  }
+                  className={`${activeTab?.key === t.key ? "accentButton" : "outline-secondary"}  row gap-5 middle center`}
                   onClick={() => setSelectedTab(t.key)}
                 >
-                  {t.label} <div className="col middle center" style={{height: 30, width: 30, background: activeTab?.key === t.key ? "var(--bkg)" : "var(--accent-md)", borderRadius: 15}}><b style={{color: activeTab?.key === t.key ? "var(--accent)" : "var(--txt)"}}>{t.count}</b></div>
+                  {t.label}{" "}
+                  <div
+                    className="col middle center"
+                    style={{
+                      height: 30,
+                      width: 30,
+                      background:
+                        activeTab?.key === t.key
+                          ? "var(--bkg)"
+                          : "var(--accent-md)",
+                      borderRadius: 15,
+                    }}
+                  >
+                    <b
+                      style={{
+                        color:
+                          activeTab?.key === t.key
+                            ? "var(--accent)"
+                            : "var(--txt)",
+                      }}
+                    >
+                      {t.count}
+                    </b>
+                  </div>
                 </button>
               ))}
             </div>

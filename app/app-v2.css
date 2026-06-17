@@ -524,6 +524,11 @@ h5.center {
   flex-wrap: wrap;
 }
 
+/* Push an element to the end of its flex container (e.g. pin to card bottom) */
+.mt-auto {
+  margin-top: auto;
+}
+
 .fixed {
   position: fixed;
 }
