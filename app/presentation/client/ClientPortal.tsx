@@ -10,11 +10,13 @@ import {
   SEVERITY_COLUMN_ORDER,
 } from "~/business/commonBL";
 import {
+  getBusinessById,
   getBusinessClients,
   getBusinessIssues,
   getClientIssues,
   getOrgIssues,
   getOrgMembers,
+  getOrgNamesForBoard,
   getProfile,
 } from "~/database/Read";
 import { supabaseSignOut } from "~/database/Auth";
@@ -84,6 +86,13 @@ export function ClientPortal({
   const context: SharedContextProps = useOutletContext();
   const isAdmin = !!business;
   const [client, setClient] = useState<Profile | null>(null);
+  // The viewer's own org name (client mode), shown beside their first name.
+  const [orgName, setOrgName] = useState<string | null>(null);
+  // Maps an org's id (issue.client_business_id) to its name, for labelling each
+  // card on the agency/admin board (which aggregates many orgs).
+  const [orgNameById, setOrgNameById] = useState<Map<number, string>>(
+    () => new Map(),
+  );
   const [issues, setIssues] = useState<ClientIssue[]>([]);
   // The business's clients, loaded in admin mode for the "log issue" picker and
   // to resolve each card's reporting-client name.
@@ -132,27 +141,34 @@ export function ClientPortal({
       try {
         setLoading(true);
         if (isAdmin) {
-          const [issueData, clientList] = await Promise.all([
+          const [issueData, clientList, orgNames] = await Promise.all([
             getBusinessIssues(business!.id),
             getBusinessClients(business!.id),
+            getOrgNamesForBoard(business!.id),
           ]);
           if (!mounted.current) return;
           setIssues(issueData);
           setClients(clientList);
+          setOrgNameById(orgNames);
         } else {
-          const [clientData, issueData, memberList] = await Promise.all([
-            getProfile(clientId),
-            orgBusinessId != null
-              ? getOrgIssues(orgBusinessId)
-              : getClientIssues(clientId),
-            orgBusinessId != null
-              ? getOrgMembers(orgBusinessId)
-              : Promise.resolve([]),
-          ]);
+          const [clientData, issueData, memberList, orgBiz] =
+            await Promise.all([
+              getProfile(clientId),
+              orgBusinessId != null
+                ? getOrgIssues(orgBusinessId)
+                : getClientIssues(clientId),
+              orgBusinessId != null
+                ? getOrgMembers(orgBusinessId)
+                : Promise.resolve([]),
+              orgBusinessId != null
+                ? getBusinessById(orgBusinessId)
+                : Promise.resolve(null),
+            ]);
           if (!mounted.current) return;
           setClient(clientData);
           setIssues(issueData);
           setClients(memberList);
+          setOrgName(orgBiz?.name ?? null);
         }
       } catch (error) {
         if (mounted.current)
@@ -246,9 +262,15 @@ export function ClientPortal({
     <IssueCard
       key={issue.id}
       issue={issue}
-      clientName={
+      label={
         isAdmin
-          ? clientNameById.get(issue.client_id) ?? undefined
+          ? // The agency board aggregates many orgs: label each card with the
+            // org the ticket belongs to (falling back to the reporter's name).
+            (issue.client_business_id != null
+              ? orgNameById.get(issue.client_business_id)
+              : undefined) ??
+            clientNameById.get(issue.client_id) ??
+            undefined
           : // In an org, label colleagues' issues (but not your own).
             issue.client_id !== clientId
             ? clientNameById.get(issue.client_id) ?? undefined
@@ -330,7 +352,9 @@ export function ClientPortal({
                 <h3>
                   {isAdmin
                     ? business?.name || "Your business"
-                    : client?.first_name || "Client name"}
+                    : `${client?.first_name || "Client name"}${
+                        orgName ? ` · ${orgName}` : ""
+                      }`}
                 </h3>
                 <button
                   className="row middle outline-secondary gap-5"

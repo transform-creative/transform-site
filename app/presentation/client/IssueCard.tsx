@@ -14,8 +14,9 @@ import { Icon } from "../elements/Icon";
 
 interface IssueCardProps {
   issue: ClientIssue;
-  // When set (admin/business board) the card shows who uploaded the issue.
-  clientName?: string | null;
+  // A label shown above the issue text: the org the ticket belongs to on the
+  // agency/admin board, or the colleague who posted it on a shared client board.
+  label?: string | null;
   // Business board: shows the "Start" / "Mark updated" workflow actions rather
   // than the client's approve / reject decision.
   businessMode?: boolean;
@@ -31,7 +32,7 @@ interface IssueCardProps {
  */
 export function IssueCard({
   issue,
-  clientName,
+  label,
   businessMode = false,
   onOpen,
   onChanged,
@@ -149,8 +150,8 @@ export function IssueCard({
         )}
       </div>
 
-      {clientName && (
-        <h3 className="">{clientName || "NO CLIENT"}</h3>
+      {label && (
+        <h3 className="">{label}</h3>
       )}
        <div className="row middle gap-5">
           <Icon name={typeMeta.icon} size={14} color="var(--accent-lg)" />

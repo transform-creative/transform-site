@@ -185,6 +185,29 @@ export async function getUserMembership(
 }
 
 /*************************
+ * Resolve each issue's org (issues.client_business_id) to its business name for
+ * an agency board, returned as an id→name map for labelling cards. Agency admins
+ * can't read client-org `businesses` rows under RLS, so this goes through the
+ * `agency_board_org_names` security-definer function (gated to admins of the
+ * board).
+ * @param boardId The agency board's businesses.id (e.g. 129)
+ */
+export async function getOrgNamesForBoard(
+  boardId: number
+): Promise<Map<number, string>> {
+  const { data, error } = await supabase.rpc("agency_board_org_names", {
+    p_board_id: boardId,
+  });
+
+  if (error) {
+    await logError(error, ["getOrgNamesForBoard", "Read"]);
+    throw error;
+  }
+
+  return new Map((data ?? []).map((row) => [row.id, row.name]));
+}
+
+/*************************
  * Read a business by its id, for loading the admin's board.
  * @param businessId The businesses.id
  */

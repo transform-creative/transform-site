@@ -19,7 +19,8 @@ import {
  * NewIssueDeveloperEmail
  * Goes to support@transformcreative.org.au whenever a new row lands in
  * `issues`. Gives the dev team enough triage info — title, description,
- * severity/type pills, who reported it and against which business — to act
+ * severity/type pills, who reported it and which organisation it belongs to
+ * (`business_name` = the issue's org, `issues.client_business_id`) — to act
  * without first opening the portal.
  */
 export interface NewIssueDeveloperEmailProps {
@@ -48,7 +49,6 @@ export default function NewIssueDeveloperEmail({
   created_at,
   reporter_name,
   reporter_email,
-  business_id,
   business_name,
   ai_status,
   github_repo,
@@ -57,9 +57,9 @@ export default function NewIssueDeveloperEmail({
     ? `New ${issue_type ?? "issue"}: ${title}`
     : "A new issue has been logged on the board.";
 
-  const boardUrl = business_id
-    ? `${baseUrl}/client/${business_id}`
-    : `${baseUrl}/client`;
+  // `/client` forwards whoever clicks to their own board — never link a raw
+  // business id here (the portal route is keyed by the viewer's user id).
+  const boardUrl = `${baseUrl}/client`;
 
   return (
     <EmailWrapper previewText={preview}>
