@@ -13,7 +13,7 @@
 //   WORKFLOW_FILE             optional, defaults to "ai-autofix.yml"
 // Provided automatically by the platform: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const GITHUB_API = "https://api.github.com";
 const GH_HEADERS = {

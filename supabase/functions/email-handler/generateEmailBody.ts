@@ -19,12 +19,12 @@ const endpoint = "https://smtp.maileroo.com/api/v2/emails/";
 // Where developer / admin notifications go. Kept as a constant — also acts as
 // the fallback recipient when a client-bound email is missing an address.
 const DEVELOPER = {
-  address: "support@transformcreative.org.au",
+  address: "support@transformcreative.com.au",
   display_name: "Transform Creative Support",
 };
 
 const SENDING_EMAIL = {
-  address: "no-reply@transformcreative.org.au",
+  address: "hello@transformcreative.com.au",
   display_name: "Transform Creative",
 };
 
@@ -82,7 +82,10 @@ async function sendNewIssueDeveloperEmail(data: any) {
     getEmailWithHeaders(emailBody),
   );
   if (!response.ok) {
-    return { error: response };
+    const detail = await response.text();
+    return {
+      error: `Maileroo ${response.status} ${response.statusText}: ${detail}`,
+    };
   }
   return { data: response };
 }
@@ -117,7 +120,10 @@ async function sendIssueForReviewClientEmail(data: any) {
     getEmailWithHeaders(emailBody),
   );
   if (!response.ok) {
-    return { error: response };
+    const detail = await response.text();
+    return {
+      error: `Maileroo ${response.status} ${response.statusText}: ${detail}`,
+    };
   }
   return { data: response };
 }

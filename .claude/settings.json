@@ -70,7 +70,20 @@
       "PowerShell(Remove-Item package-lock.json -Force; npm install 2>&1 | Select-String -Pattern \"EPERM|changed|added|removed|npm error|ERESOLVE\" ; Write-Output \"---EXIT:$LASTEXITCODE---\")",
       "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\")",
       "PowerShell(npm run typecheck 2>&1 | Select-Object -Last 20; Write-Output \"---TYPECHECK EXIT:$LASTEXITCODE---\")",
-      "PowerShell(npm run build 2>&1 | Select-Object -Last 25; Write-Output \"---BUILD EXIT:$LASTEXITCODE---\")"
+      "PowerShell(npm run build 2>&1 | Select-Object -Last 25; Write-Output \"---BUILD EXIT:$LASTEXITCODE---\")",
+      "Bash(deno --version)",
+      "PowerShell(npm run typecheck 2>&1 | Select-Object -Last 15; Write-Output \"---TYPECHECK EXIT:$LASTEXITCODE---\")",
+      "PowerShell(npm run check:functions 2>&1 | Select-String -Pattern \"Task|Check|error|Found|EXIT\"; Write-Output \"---EXIT:$LASTEXITCODE---\")",
+      "PowerShell(npm audit --audit-level=high)",
+      "PowerShell(npm audit --json)",
+      "PowerShell(npm ls esbuild vite @react-router/dev vite-node 2>$null)",
+      "PowerShell(npm ls esbuild --all 2>$null)",
+      "PowerShell(node -e \"console.log\\(require\\('vite/package.json'\\).dependencies.esbuild\\)\")",
+      "PowerShell(npm view vite version)",
+      "PowerShell(npm view vite dependencies.esbuild)",
+      "PowerShell(npm view vite versions --json)",
+      "PowerShell(npm run build)",
+      "WebFetch(domain:maileroo.com)"
     ],
     "deny": [
       "Read(**/.env*)",

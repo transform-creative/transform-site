@@ -234,7 +234,7 @@ export function IssueDetailsCard({
 
       {business_name ? (
         <Text style={detailRow}>
-          <Text style={label}>Business</Text>
+          <Text style={label}>Organisation</Text>
           {business_name}
         </Text>
       ) : null}

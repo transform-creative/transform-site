@@ -34,9 +34,9 @@ const queueName = "general_email_queue";
 async function processMessage(message: any) {
   const data = message.message;
 
-  const { data: result, error } = await sendEmail(data);
-  if (error != null) {
-    throw error;
+  const sendResult = await sendEmail(data);
+  if (sendResult.error != null) {
+    throw sendResult.error;
   }
 
   const { error: deleteError } = await supabase

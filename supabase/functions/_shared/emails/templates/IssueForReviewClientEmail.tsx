@@ -84,7 +84,6 @@ export default function IssueForReviewClientEmail({
         issue_type={issue_type}
         more_info={more_info}
         created_at={formatTimestamp(created_at)}
-        business_name={business_name}
       />
 
       {updated_at ? (
