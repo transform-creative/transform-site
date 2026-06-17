@@ -33,6 +33,14 @@ on:
 
 jobs:
   autofix:
+    # The reusable workflow requests these; a called workflow can only get
+    # permissions the CALLER already holds, so grant them here. (The repo's
+    # default GITHUB_TOKEN is read-only, which is why omitting this fails with
+    # "is only allowed 'contents: read'".)
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     # CHANGE THIS to your central repo if it isn't `transformcreative/ci`.
     uses: transformcreative/ci/.github/workflows/ai-autofix.yml@v1
     secrets: inherit

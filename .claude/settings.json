@@ -54,7 +54,12 @@
       "Bash(grep -E 'v1\\(\\\\.[0-9]+\\)*$')",
       "Bash(grep -oE 'v[0-9]+\\\\.[0-9]+\\\\.[0-9]+$')",
       "mcp__claude_ai_Supabase__deploy_edge_function",
-      "WebSearch"
+      "WebSearch",
+      "PowerShell(gh repo view transformcreative/ci --json name,visibility,defaultBranchRef 2>&1)",
+      "PowerShell(gh api repos/transformcreative/ci/git/refs/tags/v1 2>&1)",
+      "PowerShell(gh api \"repos/transformcreative/ci/contents/.github/workflows/ai-autofix.yml?ref=v1\" --jq '.path' 2>&1)",
+      "PowerShell(\"---TAGS---\")",
+      "PowerShell(\"---FILE---\")"
     ],
     "deny": [
       "Read(**/.env*)",
