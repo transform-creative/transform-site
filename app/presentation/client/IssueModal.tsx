@@ -17,6 +17,7 @@ import {
   timeAgo,
 } from "~/business/commonBL";
 import { createIssue, createIssueComment } from "~/database/Create";
+import { getClientOrgBusinessId } from "~/database/Read";
 import { updateIssue } from "~/database/Update";
 import { Icon } from "../elements/Icon";
 import { LabelInput } from "../elements/LabelInput/LabelInput";
@@ -31,6 +32,10 @@ interface IssueModalProps {
   issue: ClientIssue | null; // null = create mode, present = edit mode
   clientId: string;
   businessId: number | null;
+  // The viewer's org id, stamped onto issues they log themselves so the issue
+  // shows on their org's shared board. Admins resolve the chosen client's org
+  // instead (see handleSubmit). Null when the viewer has no org.
+  clientBusinessId?: number | null;
   // When present (admin/business board) the create form shows a client picker
   // so the issue is attributed to a real client rather than the admin.
   clients?: Pick<Profile, "id" | "first_name" | "last_name">[];
@@ -57,6 +62,7 @@ export function IssueModal({
   issue,
   clientId,
   businessId,
+  clientBusinessId = null,
   clients,
   businessMode = false,
   focusComments = false,
@@ -207,9 +213,16 @@ export function IssueModal({
         onChanged();
         onClose();
       } else {
+        // The org the issue belongs to (drives the shared client board). When an
+        // admin logs for a client, resolve that client's org; otherwise it's the
+        // viewer's own org.
+        const resolvedClientBusinessId = showClientPicker
+          ? await getClientOrgBusinessId(createClientId)
+          : clientBusinessId;
         await createIssue({
           client_id: createClientId,
           business_id: businessId,
+          client_business_id: resolvedClientBusinessId,
           issue_type: issueType,
           title,
           description,

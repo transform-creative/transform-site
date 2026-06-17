@@ -13,6 +13,8 @@ import {
   getBusinessClients,
   getBusinessIssues,
   getClientIssues,
+  getOrgIssues,
+  getOrgMembers,
   getProfile,
 } from "~/database/Read";
 import { supabaseSignOut } from "~/database/Auth";
@@ -26,6 +28,10 @@ interface ClientPortalProps {
   // The business the viewer belongs to (resolved from their membership). Backs
   // the board and is attached to any issue they log.
   businessId: number;
+  // The viewer's organisation (client mode only). The source of truth for the
+  // shared client board: every issue with this `client_business_id` is shown,
+  // so colleagues see each other's issues. Null when the client has no org.
+  orgBusinessId?: number | null;
   // When present the viewer is a business admin: the board loads every issue
   // for the business (across all clients) and cards show the uploader.
   business?: Business | null;
@@ -72,6 +78,7 @@ function byActivity(list: ClientIssue[]): ClientIssue[] {
 export function ClientPortal({
   clientId,
   businessId,
+  orgBusinessId = null,
   business,
 }: ClientPortalProps) {
   const context: SharedContextProps = useOutletContext();
@@ -104,7 +111,9 @@ export function ClientPortal({
     try {
       const issueData = isAdmin
         ? await getBusinessIssues(business!.id)
-        : await getClientIssues(clientId);
+        : orgBusinessId != null
+          ? await getOrgIssues(orgBusinessId)
+          : await getClientIssues(clientId);
       if (mounted.current) setIssues(issueData);
     } catch {
       if (mounted.current)
@@ -114,7 +123,7 @@ export function ClientPortal({
           true,
         );
     }
-  }, [clientId, isAdmin, business?.id]);
+  }, [clientId, isAdmin, business?.id, orgBusinessId]);
 
   useEffect(() => {
     mounted.current = true;
@@ -131,13 +140,19 @@ export function ClientPortal({
           setIssues(issueData);
           setClients(clientList);
         } else {
-          const [clientData, issueData] = await Promise.all([
+          const [clientData, issueData, memberList] = await Promise.all([
             getProfile(clientId),
-            getClientIssues(clientId),
+            orgBusinessId != null
+              ? getOrgIssues(orgBusinessId)
+              : getClientIssues(clientId),
+            orgBusinessId != null
+              ? getOrgMembers(orgBusinessId)
+              : Promise.resolve([]),
           ]);
           if (!mounted.current) return;
           setClient(clientData);
           setIssues(issueData);
+          setClients(memberList);
         }
       } catch (error) {
         if (mounted.current)
@@ -155,7 +170,7 @@ export function ClientPortal({
     return () => {
       mounted.current = false;
     };
-  }, [clientId, isAdmin, business?.id]);
+  }, [clientId, isAdmin, business?.id, orgBusinessId]);
 
   // Refresh the board whenever the user re-opens the portal (returns to the
   // tab / refocuses the window), so the issues are never left stale.
@@ -232,7 +247,12 @@ export function ClientPortal({
       key={issue.id}
       issue={issue}
       clientName={
-        isAdmin ? clientNameById.get(issue.client_id) ?? undefined : undefined
+        isAdmin
+          ? clientNameById.get(issue.client_id) ?? undefined
+          : // In an org, label colleagues' issues (but not your own).
+            issue.client_id !== clientId
+            ? clientNameById.get(issue.client_id) ?? undefined
+            : undefined
       }
       businessMode={isAdmin}
       onOpen={(focusComments) => openIssue(issue.id, !!focusComments)}
@@ -393,6 +413,7 @@ export function ClientPortal({
         issue={modalIssue}
         clientId={clientId}
         businessId={businessId}
+        clientBusinessId={orgBusinessId}
         clients={isAdmin ? clients : undefined}
         businessMode={isAdmin}
         focusComments={modal?.focusComments}

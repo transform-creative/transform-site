@@ -21,7 +21,7 @@ export function meta({}: Route.MetaArgs) {
 // The viewer's resolved access: which business they belong to and as what role.
 // `business` is only loaded for admins. `undefined` while still resolving.
 type Access =
-  | { role: "client"; businessId: number }
+  | { role: "client"; businessId: number; orgBusinessId: number | null }
   | { role: "admin"; businessId: number; business: Business };
 
 export default function ClientRoute() {
@@ -59,7 +59,11 @@ export default function ClientRoute() {
           return;
         }
         if (membership.role === "client") {
-          setAccess({ role: "client", businessId: membership.business_id });
+          setAccess({
+            role: "client",
+            businessId: membership.business_id,
+            orgBusinessId: membership.orgBusinessId,
+          });
           return;
         }
         // Admin: load the business backing the board.
@@ -95,6 +99,7 @@ export default function ClientRoute() {
     <ClientPortal
       clientId={id}
       businessId={access.businessId}
+      orgBusinessId={access.role === "client" ? access.orgBusinessId : null}
       business={access.role === "admin" ? access.business : undefined}
     />
   );

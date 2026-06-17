@@ -27,18 +27,19 @@ The site is a portfolio/marketing website showcasing past projects and allowing 
 
 ```
 app/
-├── business/        # Utility functions (e.g. icon mapping)
+├── business/        # commonBL.tsx — issue business logic (severity, derived status, AI-status meta, icon mapping)
 ├── data/
-│   ├── CommonTypes.tsx   # Shared TypeScript types
+│   ├── CommonTypes.tsx   # Shared app types (e.g. SharedContextProps, AlertType)
+│   ├── CustomTypes.tsx   # DB-derived types/aliases (Issue, ClientIssue, Business, …)
 │   ├── Objects.tsx       # ALL static data: projects, contact info, client logos
 │   └── Ionicons.tsx      # Ionicon type definitions
 ├── database/
 │   ├── SupabaseClient.tsx  # Supabase client init (typed createClient<Database>)
 │   ├── supabase.ts         # Generated DB schema types (source of truth)
 │   ├── Auth.tsx            # OTP sign-in / sign-out functions
-│   ├── Read.tsx            # SELECT queries (getClientIssues, getAuthClient)
-│   ├── Create.tsx          # INSERT operations (scaffold)
-│   ├── Update.tsx          # UPDATE operations (scaffold)
+│   ├── Read.tsx            # SELECT queries (getOrgIssues, getUserMembership, …)
+│   ├── Create.tsx          # INSERT operations (createIssue, createIssueComment)
+│   ├── Update.tsx          # UPDATE operations (updateIssue)
 │   └── Delete.tsx          # DELETE operations (scaffold)
 ├── presentation/
 │   ├── HeaderBar.tsx       # Sticky nav, mobile hamburger
@@ -48,14 +49,16 @@ app/
 │   ├── media/              # Portfolio listing page
 │   ├── software/           # Software showcase
 │   ├── authentication/     # OTP sign-in form
-│   └── client/             # Client portal (ClientPortal, IssueCard)
+│   └── client/             # Client portal (ClientPortal, IssueCard, IssueModal)
 ├── routes/                 # Route-level page components
 │   ├── LandingRoute.tsx    # /
 │   ├── HomeRoute.tsx       # /home (same content as /)
 │   ├── MediaRoute.tsx      # /portfolio
 │   ├── ContactRoute.tsx    # /contact
-│   ├── AuthenticationRoute.tsx
-│   └── ClientRoute.tsx     # /client/:id (clients only, auth-guarded)
+│   ├── DevelopmentRoute.tsx # /development
+│   ├── AuthenticationRoute.tsx # /auth
+│   ├── ErrorBoundary.tsx   # catch-all route
+│   └── ClientRoute.tsx     # /client/:id (clients & agency admins, auth-guarded)
 ├── root.tsx                # Root layout, session state, alert system, responsive tracking
 ├── routes.ts               # Route config
 └── app.css                 # Global CSS vars, utility classes, animations
@@ -69,19 +72,26 @@ app/
 | `/home` | LandingPage | Duplicate of `/` |
 | `/portfolio` | Portfolio | Project listing with type filters |
 | `/contact` | ContactTab | Email CTA |
-| `/authentication` | Authentication | Supabase OTP sign-in |
-| `/client/:id` | ClientPortal | Logged-in **clients only**. `:id` = the client's auth `user_id`. |
+| `/development` | DevelopmentRoute | Software/development showcase |
+| `/auth` | Authentication | Supabase OTP sign-in |
+| `/client/:id` | ClientPortal | Logged-in **clients & agency admins** (own portal only). `:id` = the viewer's auth `user_id`. |
 
 ## Client Portal
 
 The `/client/:id` route is a private dashboard for clients (see `app/presentation/client/`).
 
 - **`:id`** is the client's auth user id, which equals their `profiles.id` (the `profiles` row PK *is* the auth user id). A client may only view their own portal.
-- **Client vs admin detection**: a client is any signed-in user who has a `profiles_to_businesses` row with `role = 'client'`; `role = 'admin'` marks a business admin. (`getUserMembership` in `Read.tsx` resolves this, preferring an `admin` row.)
-- **Tables** (all in Supabase, RLS enabled): `profiles`, `profiles_to_businesses` (membership: `profile_id`, `business_id`, `role`), `businesses`, `issues`, `issue_comments`. `businesses.user_id` is the FK to the profile that **owns** the business. Generated types live in `app/database/supabase.ts`; app-facing aliases (`Issue`, `IssueComment`, `Business`, `Profile`, `ProfileToBusiness`, `BusinessRole`, `ClientIssue`, `IssueStatus`, …) in `app/data/CustomTypes.tsx`. ⚠️ The generated `supabase.ts` still contains stale `auth_clients` / `clients_to_businesses` table defs — those tables have been dropped; ignore them and regenerate when convenient.
+- **Organisations (org-shared issues)**: an **organisation is a `business`**, and membership lives in `profiles_to_businesses`. A client is an **`admin` member of their own org business**; adding more `admin` members to the same business puts those people in one org. **Members of an org share one issue board** — they see, comment on, edit, and delete each other's issues (enforced by RLS, below). Use `select grant_client_access(p_user_id, p_org_id)` to add someone to an org (calling it with the same `p_org_id` for two users groups them).
+- **`role = 'admin'` now has two meanings**, disambiguated by whether the business has `client` members:
+  - **Agency admin** = admin of an *agency board* (a business that also has `client` members, e.g. Transform Creative = 129). Sees the whole multi-client board.
+  - **Org member** = admin of an *org* business (no `client` members). A normal client; their portal shows the org's shared board.
+  `getUserMembership` in `Read.tsx` resolves this (an admin row counts as the agency board only if that board has client members) and, for clients, returns their `orgBusinessId`.
+- **Issues key columns**: `client_id` = **who posted** the issue (display + linkage only). `client_business_id` = the **org the issue belongs to** and the **source of truth for fetching the client board** (`getOrgIssues`). `business_id` = the **agency board** it was lodged to (e.g. 129) — unchanged, gives the agency full oversight and drives `getBusinessIssues`. The reporter's org and the issue's org can differ (a person may post into an org they don't "own"); always trust `client_business_id`. It's resolved **client-side** and passed in on insert — no DB trigger. (Repo resolution for AI auto-fix still uses `businesses.user_id = client_id`, *not* `client_business_id`; see that section.)
+- **Tables** (all in Supabase, RLS enabled): `profiles`, `profiles_to_businesses` (membership: `profile_id`, `business_id`, `role`), `businesses`, `issues`, `issue_comments`. `businesses.user_id` (and legacy `businesses.profile`) is the FK to the profile that **owns** the business — but org membership is now the source of truth via `profiles_to_businesses`, not ownership. Generated types live in `app/database/supabase.ts`; app-facing aliases (`Issue`, `IssueComment`, `Business`, `Profile`, `ProfileToBusiness`, `BusinessRole`, `ClientIssue`, `IssueStatus`, …) in `app/data/CustomTypes.tsx`.
+- **RLS for the shared board**: `current_user_owns_business(x)` (security-definer) = "am I an `admin` member of business `x`". Issue/comment SELECT/UPDATE/DELETE policies grant access via `client_id = auth.uid()` OR `current_user_owns_business(business_id)` (agency) OR `current_user_owns_business(client_business_id)` (org members). A client may only insert/edit into their own org. `client_org_business_id(uuid)` (security-definer) resolves a client's org id for the admin "log issue for a client" flow (a client's org is otherwise invisible to the agency admin under RLS). See migration `supabase/migrations/20260617010000_org_shared_issues.sql`.
 - **Issue severity** (drives the card colour swatch): `low | moderate | severe | critical | future` → see `severityColor()` in `commonBL`.
 - **Issue status is derived, not stored** — there is no status column. `deriveIssueStatus()` in `commonBL` infers it from timestamps: `approved` (`approved_at` set) → `awaiting_approval` (`updated_at` set) → `in_progress` (`started_at` set) → `not_started`.
-- **DB access is split by CRUD operation** in `app/database/`: `Read.tsx`, `Create.tsx`, `Update.tsx`, `Delete.tsx`. Wired: reads (`getClientIssues`, `getProfile`, `getUserMembership`, `getBusinessById`, `getBusinessClients`, `getBusinessIssues`), inserts (`createIssue`, `createIssueComment`), and `updateIssue` — `IssueModal` uses these for "Log issue", comments, and approve/reject timestamp transitions. `Delete.tsx` is still a scaffold.
+- **DB access is split by CRUD operation** in `app/database/`: `Read.tsx`, `Create.tsx`, `Update.tsx`, `Delete.tsx`. Wired: reads (`getOrgIssues` + `getOrgMembers` for the shared client board, `getClientIssues` as the fallback when a client has no org, `getProfile`, `getUserMembership`, `getBusinessById`, `getBusinessClients`, `getBusinessIssues`, `getClientOrgBusinessId`), inserts (`createIssue`, `createIssueComment`), and `updateIssue` — `IssueModal` uses these for "Log issue", comments, and approve/reject timestamp transitions. `ClientPortal` (client mode) loads `getOrgIssues`/`getOrgMembers` and labels each card with the colleague who posted it. `Delete.tsx` is still a scaffold.
 
 ## AI Auto-Fix Pipeline
 
@@ -130,7 +140,9 @@ Portfolio projects, contact details, and client logos are **all static** — def
 https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/
 ```
 
-No dynamic database queries exist yet. Supabase is initialised (env vars configured) but only used for authentication.
+The **marketing/portfolio pages are entirely static** (from `Objects.tsx`). Dynamic
+database queries are used by the **Client Portal** only (issues, comments,
+memberships, businesses) — see that section and `app/database/`.
 
 ## Shared State (React Router Outlet Context)
 
@@ -138,7 +150,8 @@ No dynamic database queries exist yet. Supabase is initialised (env vars configu
 
 ```ts
 {
-  popAlert: (message: string, type: AlertType) => void,
+  // (header, body?, isError?) — see PopAlertFn in CommonTypes.tsx
+  popAlert: (header: string, body?: string, isError?: boolean) => void,
   session: Session | null,
   navigate: NavigateFunction,
   inShrink: boolean   // true when viewport width < 1200px
@@ -185,8 +198,8 @@ Both are set in `.env.local` and exposed via `import.meta.env.*`.
 ## Supabase Status
 
 - **Auth**: Configured and working (OTP email magic link)
-- **Database**: Connected. The client portal reads from `issues` / `issue_comments` / `auth_clients` (see `app/database/Read.tsx`). Generated schema types in `app/database/supabase.ts`; the client is typed `createClient<Database>`.
-- When adding database features, create tables via Supabase dashboard, regenerate `app/database/supabase.ts`, then add typed queries to the matching CRUD file in `app/database/` (`Read`/`Create`/`Update`/`Delete`).
+- **Database**: Connected. The client portal reads from `issues` / `issue_comments` / `profiles` / `profiles_to_businesses` / `businesses` (see `app/database/Read.tsx`). Generated schema types in `app/database/supabase.ts`; the client is typed `createClient<Database>`.
+- When adding database features: write a migration in `supabase/migrations/` (apply it to the live project — the repo keeps a `.sql` copy for parity), regenerate `app/database/supabase.ts`, add/adjust the app-facing alias in `app/data/CustomTypes.tsx`, then add typed queries to the matching CRUD file in `app/database/` (`Read`/`Create`/`Update`/`Delete`). Tables have **RLS enabled** — add policies in the migration.
 
 ## TypeScript Conventions
 

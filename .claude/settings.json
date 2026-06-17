@@ -83,7 +83,8 @@
       "PowerShell(npm view vite dependencies.esbuild)",
       "PowerShell(npm view vite versions --json)",
       "PowerShell(npm run build)",
-      "WebFetch(domain:maileroo.com)"
+      "WebFetch(domain:maileroo.com)",
+      "PowerShell(npm run typecheck 2>&1)"
     ],
     "deny": [
       "Read(**/.env*)",

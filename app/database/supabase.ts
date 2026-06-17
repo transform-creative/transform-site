@@ -14,35 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      auth_clients: {
-        Row: {
-          asoc_business: number | null
-          created_at: string
-          name: string | null
-          user_id: string
-        }
-        Insert: {
-          asoc_business?: number | null
-          created_at?: string
-          name?: string | null
-          user_id?: string
-        }
-        Update: {
-          asoc_business?: number | null
-          created_at?: string
-          name?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "auth_clients_asoc_business_fkey"
-            columns: ["asoc_business"]
-            isOneToOne: false
-            referencedRelation: "businesses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       bulk_imports: {
         Row: {
           created_at: string
@@ -241,42 +212,6 @@ export type Database = {
             columns: ["import_id"]
             isOneToOne: false
             referencedRelation: "bulk_imports"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      clients_to_businesses: {
-        Row: {
-          auth_client_id: string | null
-          business_id: number | null
-          created_at: string
-          id: number
-        }
-        Insert: {
-          auth_client_id?: string | null
-          business_id?: number | null
-          created_at?: string
-          id?: number
-        }
-        Update: {
-          auth_client_id?: string | null
-          business_id?: number | null
-          created_at?: string
-          id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "clients_to_businesses_auth_client_id_fkey"
-            columns: ["auth_client_id"]
-            isOneToOne: false
-            referencedRelation: "auth_clients"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "clients_to_businesses_business_id_fkey"
-            columns: ["business_id"]
-            isOneToOne: false
-            referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
         ]
@@ -543,6 +478,7 @@ export type Database = {
           ai_updated_at: string | null
           approved_at: string | null
           business_id: number | null
+          client_business_id: number | null
           client_id: string
           created_at: string
           description: string | null
@@ -566,6 +502,7 @@ export type Database = {
           ai_updated_at?: string | null
           approved_at?: string | null
           business_id?: number | null
+          client_business_id?: number | null
           client_id: string
           created_at?: string
           description?: string | null
@@ -589,6 +526,7 @@ export type Database = {
           ai_updated_at?: string | null
           approved_at?: string | null
           business_id?: number | null
+          client_business_id?: number | null
           client_id?: string
           created_at?: string
           description?: string | null
@@ -605,6 +543,13 @@ export type Database = {
           {
             foreignKeyName: "issues_business_id_fkey"
             columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "issues_client_business_id_fkey"
+            columns: ["client_business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
@@ -950,6 +895,10 @@ export type Database = {
         Args: { p_business_id: number; p_client_id: string }
         Returns: boolean
       }
+      client_org_business_id: {
+        Args: { p_client_id: string }
+        Returns: number
+      }
       current_user_owns_business: {
         Args: { p_business_id: number }
         Returns: boolean
@@ -1025,6 +974,10 @@ export type Database = {
           customer: string
           id: string
         }[]
+      }
+      grant_client_access: {
+        Args: { p_business_id?: number; p_org_id: number; p_user_id: string }
+        Returns: undefined
       }
       http: {
         Args: { request: Database["public"]["CompositeTypes"]["http_request"] }
@@ -1153,6 +1106,10 @@ export type Database = {
       }
       increment_invoice_count: { Args: { row_id: number }; Returns: undefined }
       is_admin: { Args: { user_id: string }; Returns: boolean }
+      profile_belongs_to_business: {
+        Args: { p_business_id: number; p_profile_id: string }
+        Returns: boolean
+      }
       reset_invoice_count: { Args: { row_id: number }; Returns: undefined }
       send_email_message: { Args: { message: Json }; Returns: Json }
       send_email_sendgrid: { Args: { message: Json }; Returns: Json }
