@@ -42,6 +42,7 @@ interface WebhookPayload {
     title: string | null;
     description: string | null;
     more_info: string | null;
+    ai_status: string | null;
   } | null;
 }
 
@@ -70,6 +71,9 @@ Deno.serve(async (req) => {
   );
 
   // 2. Cheap gates — never spend a GitHub run on these.
+  // An admin can opt the issue out of the AI up-front: the modal inserts the row
+  // already marked `skipped`, so honour that without overwriting the reason.
+  if (issue.ai_status === "skipped") return json({ skipped: "skipped by admin" });
   if (issue.severity === "future") return await skip(supabase, issue.id, "severity future");
   if (issue.issue_type === "question") return await skip(supabase, issue.id, "type question");
 

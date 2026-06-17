@@ -87,6 +87,10 @@ export function IssueModal({
   const [description, setDescription] = useState("");
   const [moreInfo, setMoreInfo] = useState("");
   const [severity, setSeverity] = useState<IssueSeverity>("low");
+  // Admin-only: skip the AI auto-fix for this issue. Defaults on for admins —
+  // the work is handled by a human unless they opt the AI in. (Hidden + ignored
+  // for clients; the `ai_*` columns are admin/service-role writable only.)
+  const [skipAi, setSkipAi] = useState(businessMode);
   const [pickerOpen, setPickerOpen] = useState(false);
   // Viewport coords the severity pop-over anchors to (set from the trigger).
   const [pickerCoords, setPickerCoords] = useState({ x: 0, y: 0 });
@@ -109,6 +113,8 @@ export function IssueModal({
     setSeverity(
       (issue?.severity as IssueSeverity) ?? defaultSeverity ?? "low",
     );
+    // Edit mode reflects the stored state; create mode defaults on for admins.
+    setSkipAi(issue ? issue.ai_status === "skipped" : businessMode);
     setPickerOpen(false);
     setClientPickerOpen(false);
     setCommentBody("");
@@ -136,7 +142,8 @@ export function IssueModal({
     title !== (issue?.title ?? "") ||
     description !== (issue?.description ?? "") ||
     moreInfo !== (issue?.more_info ?? "") ||
-    severity !== ((issue?.severity as IssueSeverity) ?? "low");
+    severity !== ((issue?.severity as IssueSeverity) ?? "low") ||
+    (businessMode && skipAi !== (issue?.ai_status === "skipped"));
 
   const status = displayIssue
     ? deriveIssueStatus(displayIssue)
@@ -178,12 +185,23 @@ export function IssueModal({
     try {
       setSubmitting(true);
       if (isEdit && issue) {
+        // Admins can toggle the AI skip; only patch `ai_status` when it actually
+        // changes so we never clobber an in-flight run (queued / processing /
+        // pr_open) by re-saving an unrelated field edit.
+        const aiPatch =
+          businessMode && skipAi !== (issue.ai_status === "skipped")
+            ? {
+                ai_status: skipAi ? "skipped" : null,
+                ai_error: skipAi ? "Skipped by admin" : null,
+              }
+            : {};
         await updateIssue(issue.id, {
           issue_type: issueType,
           title,
           description,
           more_info: moreInfo,
           severity,
+          ...aiPatch,
         });
         context.popAlert("Issue updated");
         onChanged();
@@ -197,6 +215,11 @@ export function IssueModal({
           description,
           more_info: moreInfo,
           severity,
+          // Pre-skip the pipeline when an admin opts out (the dispatch-issue
+          // edge function honours an inserted `ai_status = 'skipped'`).
+          ...(businessMode && skipAi
+            ? { ai_status: "skipped", ai_error: "Skipped by admin" }
+            : {}),
         });
         if (showClientPicker && typeof window !== "undefined") {
           window.localStorage.setItem(
@@ -575,6 +598,19 @@ export function IssueModal({
               </div>
             </ContextModal>
           </div>
+
+          {/* Admin-only: skip the AI auto-fix for this issue */}
+          {businessMode && (
+            <label className="row middle gap-10 clickable">
+              <input
+                type="checkbox"
+                style={{width: 20, height: 20}}
+                checked={skipAi}
+                onChange={(e) => setSkipAi(e.target.checked)}
+              />
+              <p>Skip AI completion</p>
+            </label>
+          )}
 
           <button
             className="accentButton w-100 center middle gap-5"

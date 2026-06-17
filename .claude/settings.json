@@ -59,7 +59,18 @@
       "PowerShell(gh api repos/transformcreative/ci/git/refs/tags/v1 2>&1)",
       "PowerShell(gh api \"repos/transformcreative/ci/contents/.github/workflows/ai-autofix.yml?ref=v1\" --jq '.path' 2>&1)",
       "PowerShell(\"---TAGS---\")",
-      "PowerShell(\"---FILE---\")"
+      "PowerShell(\"---FILE---\")",
+      "PowerShell(npm audit)",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "PowerShell(npm ls react-router @react-router/node @react-router/serve vite 2>$null)",
+      "PowerShell(npm audit fix 2>&1 | Select-String -Pattern \"EPERM|changed|added|removed|vulnerabilit\" ; Write-Output \"---EXIT:$LASTEXITCODE---\")",
+      "PowerShell(npm view react-router dist-tags --json)",
+      "PowerShell(npm view @react-router/dev version)",
+      "PowerShell(npm install 2>&1 | Select-String -Pattern \"EPERM|changed|added|removed|npm error|npm warn ERESOLVE\" ; Write-Output \"---EXIT:$LASTEXITCODE---\")",
+      "PowerShell(Remove-Item package-lock.json -Force; npm install 2>&1 | Select-String -Pattern \"EPERM|changed|added|removed|npm error|ERESOLVE\" ; Write-Output \"---EXIT:$LASTEXITCODE---\")",
+      "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\")",
+      "PowerShell(npm run typecheck 2>&1 | Select-Object -Last 20; Write-Output \"---TYPECHECK EXIT:$LASTEXITCODE---\")",
+      "PowerShell(npm run build 2>&1 | Select-Object -Last 25; Write-Output \"---BUILD EXIT:$LASTEXITCODE---\")"
     ],
     "deny": [
       "Read(**/.env*)",

@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /c/Users/isaac/source/transform-site -type f \\\\\\( -name \"*.tsx\" -o -name \"*.ts\" \\\\\\) -exec grep -l \"admin\\\\|protected\\\\|private\\\\|requireAuth\\\\|guard\" {} \\\\;)"
+      "Bash(find /c/Users/isaac/source/transform-site -type f \\\\\\( -name \"*.tsx\" -o -name \"*.ts\" \\\\\\) -exec grep -l \"admin\\\\|protected\\\\|private\\\\|requireAuth\\\\|guard\" {} \\\\;)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run typecheck)"
     ]
   }
 }
