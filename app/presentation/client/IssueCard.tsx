@@ -161,7 +161,7 @@ export function IssueCard({
 
       {/* Issue text — opens the issue */}
       <p className="clickable" onClick={() => onOpen(false)}>
-        {issue.description || issue.title || "Untitled issue"}
+        {issue.title || issue.description || "Untitled issue"}
       </p>
 
       {/* Status metadata */}
