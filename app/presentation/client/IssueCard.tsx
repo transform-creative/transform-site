@@ -94,7 +94,7 @@ export function IssueCard({
   }
 
   return (
-    <div className="boxed p-10 col gap-10 issue-card outline-accent">
+    <div className="boxed p-10 col gap-10 outline-accent" style={{width: 280}}>
       {/* Severity swatch + workflow / decision actions */}
       <div className="between middle">
         <div
@@ -203,11 +203,11 @@ export function IssueCard({
             </div>
             <div className="row middle gap-5">
               <Icon
-                name="alert-circle-outline"
+                name="alert-circle"
                 size={14}
                 color="var(--warningColor)"
               />
-              <p>Awaiting approval</p>
+              <p><b>Not approved</b></p>
             </div>
           </>
         )}

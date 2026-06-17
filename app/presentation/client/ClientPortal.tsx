@@ -371,11 +371,11 @@ export function ClientPortal({
                 <button
                   key={t.key}
                   className={
-                    activeTab?.key === t.key ? "accentButton" : "outline-secondary"
+                    `${activeTab?.key === t.key ? "accentButton" : "outline-secondary"}  row gap-5 middle center`
                   }
                   onClick={() => setSelectedTab(t.key)}
                 >
-                  {t.label} ({t.count})
+                  {t.label} <div className="col middle center" style={{height: 30, width: 30, background: activeTab?.key === t.key ? "var(--bkg)" : "var(--accent-md)", borderRadius: 15}}><b style={{color: activeTab?.key === t.key ? "var(--accent)" : "var(--txt)"}}>{t.count}</b></div>
                 </button>
               ))}
             </div>

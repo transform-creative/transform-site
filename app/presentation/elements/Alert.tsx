@@ -64,7 +64,7 @@ export default function Alert({
     >
       <div
         ref={transitionRef}
-        className="boxed s1 m0 mt-20 outline"
+        className="boxed s1 mt-20 outline"
         style={{
           background: ` ${
             state == "fail"
@@ -77,7 +77,7 @@ export default function Alert({
           width: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          top: -280,
+          top: -260,
         }}
       >
         <div className="row between middle p1">
