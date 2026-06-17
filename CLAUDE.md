@@ -86,7 +86,7 @@ The `/client/:id` route is a private dashboard for clients (see `app/presentatio
   - **Agency admin** = admin of an *agency board* (a business that also has `client` members, e.g. Transform Creative = 129). Sees the whole multi-client board.
   - **Org member** = admin of an *org* business (no `client` members). A normal client; their portal shows the org's shared board.
   `getUserMembership` in `Read.tsx` resolves this (an admin row counts as the agency board only if that board has client members) and, for clients, returns their `orgBusinessId`.
-- **Issues key columns**: `client_id` = **who posted** the issue (display + linkage only). `client_business_id` = the **org the issue belongs to** and the **source of truth for fetching the client board** (`getOrgIssues`). `business_id` = the **agency board** it was lodged to (e.g. 129) — unchanged, gives the agency full oversight and drives `getBusinessIssues`. The reporter's org and the issue's org can differ (a person may post into an org they don't "own"); always trust `client_business_id`. It's resolved **client-side** and passed in on insert — no DB trigger. (Repo resolution for AI auto-fix still uses `businesses.user_id = client_id`, *not* `client_business_id`; see that section.)
+- **Issues key columns**: `client_id` = **who posted** the issue (display + linkage only). `client_business_id` = the **org the issue belongs to** and the **source of truth for fetching the client board** (`getOrgIssues`). `business_id` = the **agency board** it was lodged to (e.g. 129) — unchanged, gives the agency full oversight and drives `getBusinessIssues`. The reporter's org and the issue's org can differ (a person may post into an org they don't "own"); always trust `client_business_id`. It's resolved **client-side** and passed in on insert — no DB trigger. (Repo resolution for AI auto-fix uses `client_business_id` to find the org's repo, falling back to `businesses.user_id = client_id` only for legacy null-org issues; see that section.)
 - **Tables** (all in Supabase, RLS enabled): `profiles`, `profiles_to_businesses` (membership: `profile_id`, `business_id`, `role`), `businesses`, `issues`, `issue_comments`. `businesses.user_id` (and legacy `businesses.profile`) is the FK to the profile that **owns** the business — but org membership is now the source of truth via `profiles_to_businesses`, not ownership. Generated types live in `app/database/supabase.ts`; app-facing aliases (`Issue`, `IssueComment`, `Business`, `Profile`, `ProfileToBusiness`, `BusinessRole`, `ClientIssue`, `IssueStatus`, …) in `app/data/CustomTypes.tsx`.
 - **RLS for the shared board**: `current_user_owns_business(x)` (security-definer) = "am I an `admin` member of business `x`". Issue/comment SELECT/UPDATE/DELETE policies grant access via `client_id = auth.uid()` OR `current_user_owns_business(business_id)` (agency) OR `current_user_owns_business(client_business_id)` (org members). A client may only insert/edit into their own org. `client_org_business_id(uuid)` (security-definer) resolves a client's org id for the admin "log issue for a client" flow (a client's org is otherwise invisible to the agency admin under RLS). See migration `supabase/migrations/20260617010000_org_shared_issues.sql`.
 - **Issue severity** (drives the card colour swatch): `low | moderate | severe | critical | future` → see `severityColor()` in `commonBL`.
@@ -96,7 +96,7 @@ The `/client/:id` route is a private dashboard for clients (see `app/presentatio
 ## AI Auto-Fix Pipeline
 
 When a client logs an issue that is **not** `severity = future` and **not**
-`issue_type = question`, an AI agent reads the **reporting client's own** GitHub
+`issue_type = question`, an AI agent reads the **issue's org** GitHub
 repo, makes the change on a new branch, writes/updates tests, and opens a **pull
 request** for a human to review and merge. The agent can only ever *propose* —
 `main` is protected and the GitHub App has no admin rights.
@@ -107,14 +107,17 @@ fires `workflow_dispatch`) → GitHub Actions `ai-autofix.yml` runs
 `anthropics/claude-code-action` (the long agentic work) → PR opened → status
 PATCHed back onto the issue → portal shows the PR link or the agent's questions.
 
-- **Repo resolution (important)**: the target repo is the **reporting client's
-  own** business, found by `businesses.user_id = issues.client_id`, then reading
-  that row's `github_repo` (`owner/repo`) + `ai_autofix_enabled` +
-  `github_default_branch`. **Do NOT use `issues.business_id` to pick the repo** —
-  that column is the *agency the issue was lodged to* (the board it shows up on,
-  e.g. Transform Creative), not where the client's code lives. `businesses.user_id`
-  is the FK to the profile that **owns** that business. If a client owns more than
-  one business, the dispatcher prefers one with `ai_autofix_enabled` + a repo.
+- **Repo resolution (important)**: the target repo is the **issue's org**, found
+  by `businesses.id = issues.client_business_id`, then reading that row's
+  `github_repo` (`owner/repo`) + `ai_autofix_enabled` + `github_default_branch`.
+  The org is a `business`; **any admin member** of it (not just its owner) can
+  lodge an issue, so the org id — not the reporter's ownership — is the source of
+  truth. **Do NOT use `issues.business_id` to pick the repo** — that column is the
+  *agency the issue was lodged to* (the board it shows up on, e.g. Transform
+  Creative), not where the client's code lives. **Fallback**: for legacy issues
+  with no `client_business_id`, the dispatcher falls back to the reporter's owned
+  business (`businesses.user_id = issues.client_id`), preferring one with
+  `ai_autofix_enabled` + a repo when the client owns more than one.
 - **New issue fields** (`app/data/CustomTypes.tsx`): `issue_type` (`bug|issue|question`),
   `more_info`, and the `ai_*` state columns. `ai_status`:
   `queued | processing | pr_open | needs_info | failed | skipped` (null = never

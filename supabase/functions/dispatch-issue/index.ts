@@ -37,6 +37,7 @@ interface WebhookPayload {
     id: number;
     client_id: string | null;
     business_id: number | null;
+    client_business_id: number | null;
     severity: string | null;
     issue_type: string | null;
     title: string | null;
@@ -83,22 +84,35 @@ Deno.serve(async (req) => {
     return json({ skipped: "empty issue → needs_info" });
   }
 
-  // 3. Resolve the target repo from the CLIENT's own business.
+  // 3. Resolve the target repo from the issue's ORG (`client_business_id`).
   //    `issue.business_id` is the agency the request was lodged to (e.g. the
   //    Transform Creative board) — it is NOT where the client's code lives.
-  //    The repo to work in belongs to the client who reported the issue: the
-  //    business they own, linked by `businesses.user_id = issue.client_id`.
-  if (!issue.client_id) return await skip(supabase, issue.id, "no client");
-  const { data: ownedBusinesses } = await supabase
-    .from("businesses")
-    .select("github_repo, github_default_branch, ai_autofix_enabled")
-    .eq("user_id", issue.client_id);
+  //    The repo lives on the org the issue belongs to: an org is a `business`,
+  //    and `client_business_id` is the source of truth for it. Any admin member
+  //    of that org (not just its owner) can lodge an issue, so resolving by the
+  //    reporter's *ownership* misses shared orgs — use the org id directly.
+  let business: BusinessRepo | undefined;
 
-  // A client could own more than one business; prefer one that's actually wired
-  // up for auto-fix (enabled + has a repo) over an arbitrary first row.
-  const owned: BusinessRepo[] = ownedBusinesses ?? [];
-  const business =
-    owned.find((b) => b.ai_autofix_enabled && b.github_repo) ?? owned[0];
+  if (issue.client_business_id) {
+    const { data } = await supabase
+      .from("businesses")
+      .select("github_repo, github_default_branch, ai_autofix_enabled")
+      .eq("id", issue.client_business_id)
+      .maybeSingle();
+    business = data ?? undefined;
+  }
+
+  // Fallback for legacy issues with no org stamped: the reporter's own business,
+  // linked by `businesses.user_id = issue.client_id`. A client could own more
+  // than one business; prefer one wired up for auto-fix over an arbitrary first.
+  if (!business && issue.client_id) {
+    const { data: ownedBusinesses } = await supabase
+      .from("businesses")
+      .select("github_repo, github_default_branch, ai_autofix_enabled")
+      .eq("user_id", issue.client_id);
+    const owned: BusinessRepo[] = ownedBusinesses ?? [];
+    business = owned.find((b) => b.ai_autofix_enabled && b.github_repo) ?? owned[0];
+  }
 
   if (!business?.ai_autofix_enabled || !business.github_repo) {
     return await skip(supabase, issue.id, "auto-fix disabled or no repo");

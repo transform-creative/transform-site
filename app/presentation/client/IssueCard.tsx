@@ -126,8 +126,16 @@ export function IssueCard({
           <p>Needs approval</p>
         </div>
       ) : businessMode && ai && (
-          <div className="row middle gap-5 boxed pl-5" style={{background: ai.color}}>
-            <Icon name={ai.icon} size={14} color={'var(--bkg)'} />
+          <div
+            className={`row middle gap-5 boxed pl-5 ${ai.label === "AI working" ? "aiGradient" : ""}`}
+            style={ai.label === "AI working" ? undefined : { background: ai.color }}
+          >
+            <Icon
+              name={ai.icon}
+              size={14}
+              color={'var(--bkg)'}
+              className={ai.label === "AI working" ? "spinPause" : ""}
+            />
             <p style={{ color: 'var(--bkg)' }}>{ai.label}</p>
           </div>
         )}

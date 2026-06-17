@@ -537,6 +537,40 @@ th {
     transform: rotate(360deg);
   }
 }
+
+/* One full spin (1s) then a 2s pause, looping */
+.spinPause {
+  animation: spinPause 3s linear infinite;
+}
+
+@keyframes spinPause {
+  0% {
+    transform: rotate(0deg);
+  }
+  33%,
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animated techno gradient for the "AI working" badge */
+.aiGradient {
+  background: linear-gradient(
+    100deg,
+    var(--accent),
+    var(--thirdColor),
+    #4ea0c9,
+    var(--accent)
+  );
+  background-size: 300% 100%;
+  animation: aiGradient 4s linear infinite;
+}
+
+@keyframes aiGradient {
+  100% {
+    background-position: 300% 0;
+  }
+}
 .boxedAccent {
   color: #eeeeee !important;
   border-radius: var(--borderRadius);
