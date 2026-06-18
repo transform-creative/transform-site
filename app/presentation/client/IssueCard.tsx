@@ -44,7 +44,9 @@ export function IssueCard({
   const status = deriveIssueStatus(issue);
   // Which status change is waiting on a comment: "finish" (admin marks updated,
   // comment optional) or "reject" (client sends back, comment required).
-  const [popup, setPopup] = useState<"finish" | "reject" | null>(null);
+  const [popup, setPopup] = useState<"finish" | "reject" | null>(
+    null,
+  );
   const [submitting, setSubmitting] = useState(false);
   const commentCount = issue.issue_comments?.length ?? 0;
   const ai = aiStatusMeta(issue.ai_status);
@@ -134,11 +136,17 @@ export function IssueCard({
         });
       }
       await updateIssue(issue.id, issueActionPatch(action));
-      context.popAlert(action === "update" ? "Marked as updated" : "Sent back");
+      context.popAlert(
+        action === "update" ? "Marked as updated" : "Sent back",
+      );
       setPopup(null);
       onChanged();
     } catch {
-      context.popAlert("Something went wrong", "Please try again", true);
+      context.popAlert(
+        "Something went wrong",
+        "Please try again",
+        true,
+      );
     } finally {
       setSubmitting(false);
     }
@@ -161,30 +169,40 @@ export function IssueCard({
           <Icon name="alert-circle" size={14} />
           <p>Needs approval</p>
         </div>
-      ) : businessMode && ai && (
+      ) : (
+        businessMode &&
+        ai && (
           <div
             className={`row middle gap-5 boxed pl-5 ${ai.label === "AI working" ? "aiGradient" : ""}`}
-            style={ai.label === "AI working" ? undefined : { background: ai.color }}
+            style={
+              ai.label === "AI working"
+                ? undefined
+                : { background: ai.color }
+            }
           >
             <Icon
               name={ai.icon}
               size={14}
-              color={'var(--bkg)'}
+              color={"var(--bkg)"}
               className={ai.label === "AI working" ? "spinPause" : ""}
             />
-            <p style={{ color: 'var(--bkg)' }}>{ai.label}</p>
+            <p style={{ color: "var(--bkg)" }}>{ai.label}</p>
           </div>
-        )}
+        )
+      )}
       {status === "in_progress" && (
         <div className="row middle gap-5 boxed accent pl-5">
           <Icon name="code-working" size={14} />
-          <p>{businessMode ? timeAgo(issue.started_at) : "Working on it"}</p>
+          <p>
+            {businessMode
+              ? timeAgo(issue.started_at)
+              : "Working on it"}
+          </p>
         </div>
       )}
-      
+
       <div className="between middle mt-5">
-        <div>
-          {" "}
+        <div className="clickable" onClick={() => onOpen(false)}>
           <Icon
             name={typeMeta.icon}
             size={28}
@@ -250,15 +268,25 @@ export function IssueCard({
           </button>
         )}
       </div>
-      
-      <div className="pb-5" style={{borderBottom: '1px solid var(--accent-lg)'}}>
-        {label && <h3 className="" style={{color: severityColor(issue.severity)}}>{label}</h3>}
+
+      <div
+        className="clickable pb-5 r0" onClick={() => onOpen(false)}
+        style={{ borderBottom: "1px solid var(--accent-lg)" }}
+      >
+        {label && (
+          <h3
+            className=""
+            style={{ color: severityColor(issue.severity) }}
+          >
+            {label}
+          </h3>
+        )}
         {/* Issue text — opens the issue */}
-        <p className="clickable" onClick={() => onOpen(false)}>
+        <p >
           {issue.title || issue.description || "Untitled issue"}
         </p>
       </div>
-<div className="row middle gap-5">
+      <div className="row middle gap-5">
         <p style={{ color: "var(--accent-lg)" }}>
           <strong>Lodged</strong> {timeAgo(issue.created_at)}
         </p>
@@ -314,7 +342,6 @@ export function IssueCard({
         )}
 
         {/* AI auto-fix status (only once dispatched) — business admins only */}
-       
       </div>
 
       {/* Link to the AI's pull request once it has opened one — business admins only */}
@@ -358,7 +385,9 @@ export function IssueCard({
         onSubmit={handleCommentSubmit}
         submitting={submitting}
         required={popup === "reject"}
-        title={popup === "reject" ? "Send this back" : "Mark as finished"}
+        title={
+          popup === "reject" ? "Send this back" : "Mark as finished"
+        }
         prompt={
           popup === "reject"
             ? "Tell us what's still wrong so we can fix it."

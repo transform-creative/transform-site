@@ -570,6 +570,10 @@ h5.center {
   min-width: 220px;
 }
 
+.org-filter {
+  min-width: 220px;
+}
+
 .severity-add-btn {
   padding: 2px 6px;
 }

@@ -33,6 +33,7 @@ import {
 } from "~/database/Read";
 import { supabaseSignOut } from "~/database/Auth";
 import { Icon } from "../elements/Icon";
+import TypeInput from "../elements/TypeInput";
 import { IssueCard } from "./IssueCard";
 import { IssueModal } from "./IssueModal";
 import "../../app-v2.css";
@@ -125,6 +126,9 @@ export function ClientPortal({
   const [loading, setLoading] = useState(true);
   // Drives the refresh button's spinner / disabled state when manually refreshed.
   const [refreshing, setRefreshing] = useState(false);
+  // Admin-only board filter: limit the board to a single org's issues. Null
+  // (the default) shows every org's tickets.
+  const [orgFilter, setOrgFilter] = useState<number | null>(null);
   // The active board tab. Clients lead with what needs their approval; the
   // business leads with the work it's actively pushing forward.
   const [selectedTab, setSelectedTab] = useState<TabKey>(
@@ -228,9 +232,20 @@ export function ClientPortal({
     };
   }, [reload]);
 
+  // The board, narrowed to the selected org when the admin has filtered it.
+  const filteredIssues = useMemo(
+    () =>
+      orgFilter == null
+        ? issues
+        : issues.filter((i) => i.client_business_id === orgFilter),
+    [issues, orgFilter],
+  );
   // The open issues split into the three tab buckets, and the tabs that
   // actually have something to show (empty tabs are hidden).
-  const buckets = useMemo(() => groupIssues(issues), [issues]);
+  const buckets = useMemo(
+    () => groupIssues(filteredIssues),
+    [filteredIssues],
+  );
   const tabs = useMemo(
     () =>
       TAB_META.map((t) => ({
@@ -254,6 +269,16 @@ export function ClientPortal({
         ]),
       ),
     [clients],
+  );
+
+  // Org options for the admin board filter — "All organisations" (null) first,
+  // then one entry per org on the board.
+  const orgFilterOptions = useMemo(
+    () => [
+      { value: null, label: "All organisations" },
+      ...organisations.map((o) => ({ value: o.id, label: o.name })),
+    ],
+    [organisations],
   );
 
   // The live issue backing the modal, looked up fresh from state by id.
@@ -456,8 +481,10 @@ export function ClientPortal({
           </div>
         ) : (
           <div className="col gap-20 w-100 ">
-            {/* Tab bar — left-aligned buttons, one per non-empty bucket */}
-            <div className="row wrap gap-10 ">
+            {/* Tab bar — buttons (one per non-empty bucket) on the left, the
+                admin org filter pinned to the far right. */}
+            <div className="row wrap gap-10 between middle w-100">
+              <div className="row wrap gap-10 middle">
               {tabs.map((t) => (
                 <button
                   key={t.key}
@@ -490,6 +517,17 @@ export function ClientPortal({
                   </div>
                 </button>
               ))}
+              </div>
+              {isAdmin && (
+                <TypeInput
+                  options={orgFilterOptions}
+                  value={orgFilter}
+                  onChange={(val) => setOrgFilter(val ?? null)}
+                  onInputChange={() => {}}
+                  placeholder="All organisations"
+                  className="org-filter"
+                />
+              )}
             </div>
 
             {/* Tab body */}

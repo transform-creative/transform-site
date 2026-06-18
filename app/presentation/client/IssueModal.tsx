@@ -85,8 +85,9 @@ export function IssueModal({
   const displayIssue =
     issue ?? (!active ? frozenIssueRef.current : null);
   const isEdit = !!displayIssue;
-  // Admins logging a new issue choose which organisation it's for.
-  const showOrgPicker = !isEdit && !!organisations;
+  // Admins choose which organisation an issue is for — both when logging a new
+  // one and when correcting a misattributed existing one.
+  const showOrgPicker = !!organisations;
 
   const [issueType, setIssueType] = useState<IssueType>("bug");
   const [title, setTitle] = useState("");
@@ -125,19 +126,26 @@ export function IssueModal({
     setOrgPickerOpen(false);
     setCommentBody("");
 
-    // Default the create-mode org picker to the last-used org (if it's still one
-    // of this board's orgs), otherwise the first org.
+    // Seed the org picker: edit mode reflects the issue's current org; create
+    // mode defaults to the last-used org (if it's still one of this board's
+    // orgs), otherwise the first org.
     if (showOrgPicker && organisations) {
-      const remembered =
-        typeof window !== "undefined"
-          ? Number(window.localStorage.getItem(LAST_ORG_KEY))
-          : NaN;
-      const fallback = organisations[0]?.id ?? "";
-      setSelectedOrgId(
-        organisations.some((o) => o.id === remembered)
-          ? remembered
-          : fallback,
-      );
+      if (issue) {
+        setSelectedOrgId(
+          issue.client_business_id ?? organisations[0]?.id ?? "",
+        );
+      } else {
+        const remembered =
+          typeof window !== "undefined"
+            ? Number(window.localStorage.getItem(LAST_ORG_KEY))
+            : NaN;
+        const fallback = organisations[0]?.id ?? "";
+        setSelectedOrgId(
+          organisations.some((o) => o.id === remembered)
+            ? remembered
+            : fallback,
+        );
+      }
     }
   }, [issue?.id, active]);
 
@@ -149,6 +157,7 @@ export function IssueModal({
     description !== (issue?.description ?? "") ||
     moreInfo !== (issue?.more_info ?? "") ||
     severity !== ((issue?.severity as IssueSeverity) ?? "low") ||
+    (showOrgPicker && selectedOrgId !== (issue?.client_business_id ?? "")) ||
     (businessMode && skipAi !== (issue?.ai_status === "skipped"));
 
   const status = displayIssue
@@ -200,6 +209,10 @@ export function IssueModal({
           description,
           more_info: moreInfo,
           severity,
+          // Admins can re-attribute the issue to the correct org.
+          ...(showOrgPicker
+            ? { client_business_id: selectedOrgId as number }
+            : {}),
           ...aiPatch,
         });
         context.popAlert("Issue updated");
@@ -467,7 +480,7 @@ export function IssueModal({
                   <p>Sent back</p>
                 </div>
               )}
-              {!displayIssue.approved_at && (
+              {status === "awaiting_approval" && (
                 <div className="row middle gap-5">
                   <Icon
                     name="alert-circle-outline"
@@ -480,7 +493,7 @@ export function IssueModal({
             </div>
           )}
 
-          {/* Organisation picker — admin "log issue for" (create mode only) */}
+          {/* Organisation picker — admins set / correct the issue's org */}
           {showOrgPicker && (
             <div className="col gap-5 relative">
               <button
