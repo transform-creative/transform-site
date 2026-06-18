@@ -51,6 +51,73 @@ export function IssueCard({
   const commentCount = issue.issue_comments?.length ?? 0;
   const ai = aiStatusMeta(issue.ai_status);
   const typeMeta = issueTypeMeta(issue.issue_type);
+  const [copied, setCopied] = useState(false);
+
+  /**
+   * Build a Claude-ready prompt capturing everything needed to action this
+   * ticket — type, severity, the request itself, any extra context and the
+   * full comment thread in order — then leave a blank line for the admin to add
+   * their own instructions after pasting. Kept lean: empty fields are omitted.
+   */
+  function buildClaudePrompt() {
+    const isBug = issue.issue_type === "bug";
+    const lines: string[] = [];
+
+    lines.push(
+      isBug
+        ? "Fix the following bug reported by a client."
+        : "Implement the following change requested by a client.",
+    );
+    lines.push("");
+    lines.push(`## ${issue.title || "Untitled"}`);
+    lines.push(`- Type: ${typeMeta.label}`);
+    if (issue.severity) lines.push(`- Severity: ${issue.severity}`);
+    lines.push(`- Status: ${status.replace(/_/g, " ")}`);
+
+    if (issue.description?.trim()) {
+      lines.push("");
+      lines.push("## Description");
+      lines.push(issue.description.trim());
+    }
+
+    if (issue.more_info?.trim()) {
+      lines.push("");
+      lines.push("## Additional context");
+      lines.push(issue.more_info.trim());
+    }
+
+    const comments = issue.issue_comments ?? [];
+    if (comments.length > 0) {
+      lines.push("");
+      lines.push("## Comment thread (oldest first)");
+      [...comments]
+        .sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() -
+            new Date(b.created_at).getTime(),
+        )
+        .forEach((c) => {
+          if (c.body?.trim())
+            lines.push(`- ${timeAgo(c.created_at)}: ${c.body.trim()}`);
+        });
+    }
+
+    lines.push("");
+    lines.push("## Additional instructions");
+    lines.push("");
+
+    return lines.join("\n");
+  }
+
+  async function copyPrompt() {
+    try {
+      await navigator.clipboard.writeText(buildClaudePrompt());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      context.popAlert("Couldn't copy", "Please try again", true);
+    }
+  }
 
   // The business pushes an issue forward: start it, then mark it updated (also
   // used to re-submit something the client sent back).
@@ -202,12 +269,27 @@ export function IssueCard({
       )}
 
       <div className="between middle mt-5">
-        <div className="clickable" onClick={() => onOpen(false)}>
-          <Icon
-            name={typeMeta.icon}
-            size={28}
-            color={severityColor(issue.severity)}
-          />
+        <div className="row middle gap-10">
+          <div className="clickable" onClick={() => onOpen(false)}>
+            <Icon
+              name={typeMeta.icon}
+              size={28}
+              color={severityColor(issue.severity)}
+            />
+          </div>
+          {businessMode && (
+            <div
+              className="clickable"
+              onClick={copyPrompt}
+              title="Copy as a Claude prompt"
+            >
+              <Icon
+                name={copied ? "checkmark-circle" : "copy-outline"}
+                size={20}
+                color={copied ? "var(--accent)" : "var(--accent-lg)"}
+              />
+            </div>
+          )}
         </div>
         {businessAction === "start" && (
           <button
