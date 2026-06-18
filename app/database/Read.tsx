@@ -208,6 +208,29 @@ export async function getOrgNamesForBoard(
 }
 
 /*************************
+ * Read every organisation belonging to an agency board, for the admin "log
+ * issue" picker. Unlike getOrgNamesForBoard (which only surfaces orgs that
+ * already have an issue) this returns all of the board's orgs via the
+ * `agency_board_orgs` security-definer function (gated to admins of the board),
+ * so an admin can lodge the first issue for one.
+ * @param boardId The agency board's businesses.id (e.g. 129)
+ */
+export async function getBoardOrgs(
+  boardId: number
+): Promise<Pick<Business, "id" | "name">[]> {
+  const { data, error } = await supabase.rpc("agency_board_orgs", {
+    p_board_id: boardId,
+  });
+
+  if (error) {
+    await logError(error, ["getBoardOrgs", "Read"]);
+    throw error;
+  }
+
+  return (data ?? []) as Pick<Business, "id" | "name">[];
+}
+
+/*************************
  * Read a business by its id, for loading the admin's board.
  * @param businessId The businesses.id
  */

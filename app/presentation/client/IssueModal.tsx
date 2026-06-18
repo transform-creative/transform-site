@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import type {
+  Business,
   ClientIssue,
   IssueSeverity,
   IssueType,
-  Profile,
 } from "~/data/CustomTypes";
 import {
   deriveIssueStatus,
@@ -17,7 +17,6 @@ import {
   timeAgo,
 } from "~/business/commonBL";
 import { createIssue, createIssueComment } from "~/database/Create";
-import { getClientOrgBusinessId } from "~/database/Read";
 import { updateIssue } from "~/database/Update";
 import { Icon } from "../elements/Icon";
 import { LabelInput } from "../elements/LabelInput/LabelInput";
@@ -36,9 +35,10 @@ interface IssueModalProps {
   // shows on their org's shared board. Admins resolve the chosen client's org
   // instead (see handleSubmit). Null when the viewer has no org.
   clientBusinessId?: number | null;
-  // When present (admin/business board) the create form shows a client picker
-  // so the issue is attributed to a real client rather than the admin.
-  clients?: Pick<Profile, "id" | "first_name" | "last_name">[];
+  // When present (admin/business board) the create form shows an organisation
+  // picker so the issue is attributed to one of the board's orgs (its
+  // client_business_id) rather than an individual client.
+  organisations?: Pick<Business, "id" | "name">[];
   // Business board: drives the start → mark-updated workflow rather than the
   // client's approve / reject decision.
   businessMode?: boolean;
@@ -49,8 +49,8 @@ interface IssueModalProps {
   onChanged: () => void; // tell the portal to refetch
 }
 
-// Remembers the admin's last "log issue for" client across sessions.
-const LAST_CLIENT_KEY = "transform.lastIssueClientId";
+// Remembers the admin's last "log issue for" organisation across sessions.
+const LAST_ORG_KEY = "transform.lastIssueOrgId";
 
 /******************************
  * Create / edit an issue. The same component renders both modes: when `issue`
@@ -63,7 +63,7 @@ export function IssueModal({
   clientId,
   businessId,
   clientBusinessId = null,
-  clients,
+  organisations,
   businessMode = false,
   focusComments = false,
   defaultSeverity,
@@ -85,8 +85,8 @@ export function IssueModal({
   const displayIssue =
     issue ?? (!active ? frozenIssueRef.current : null);
   const isEdit = !!displayIssue;
-  // Admins logging a new issue choose which client it's for.
-  const showClientPicker = !isEdit && !!clients;
+  // Admins logging a new issue choose which organisation it's for.
+  const showOrgPicker = !isEdit && !!organisations;
 
   const [issueType, setIssueType] = useState<IssueType>("bug");
   const [title, setTitle] = useState("");
@@ -102,10 +102,10 @@ export function IssueModal({
   const [pickerCoords, setPickerCoords] = useState({ x: 0, y: 0 });
   const [submitting, setSubmitting] = useState(false);
 
-  // The client a new issue is logged for (admin only), defaulting to the last
-  // selection cached in localStorage.
-  const [selectedClientId, setSelectedClientId] = useState("");
-  const [clientPickerOpen, setClientPickerOpen] = useState(false);
+  // The organisation a new issue is logged for (admin only), defaulting to the
+  // last selection cached in localStorage.
+  const [selectedOrgId, setSelectedOrgId] = useState<number | "">("");
+  const [orgPickerOpen, setOrgPickerOpen] = useState(false);
 
   const [commentBody, setCommentBody] = useState("");
   const [commentSubmitting, setCommentSubmitting] = useState(false);
@@ -122,20 +122,20 @@ export function IssueModal({
     // Edit mode reflects the stored state; create mode defaults on for admins.
     setSkipAi(issue ? issue.ai_status === "skipped" : businessMode);
     setPickerOpen(false);
-    setClientPickerOpen(false);
+    setOrgPickerOpen(false);
     setCommentBody("");
 
-    // Default the create-mode client picker to the last-used client (if it's
-    // still one of this business's clients), otherwise the first client.
-    if (showClientPicker && clients) {
+    // Default the create-mode org picker to the last-used org (if it's still one
+    // of this board's orgs), otherwise the first org.
+    if (showOrgPicker && organisations) {
       const remembered =
         typeof window !== "undefined"
-          ? window.localStorage.getItem(LAST_CLIENT_KEY)
-          : null;
-      const fallback = clients[0]?.id ?? "";
-      setSelectedClientId(
-        clients.some((c) => c.id === remembered)
-          ? remembered!
+          ? Number(window.localStorage.getItem(LAST_ORG_KEY))
+          : NaN;
+      const fallback = organisations[0]?.id ?? "";
+      setSelectedOrgId(
+        organisations.some((o) => o.id === remembered)
+          ? remembered
           : fallback,
       );
     }
@@ -155,14 +155,10 @@ export function IssueModal({
     ? deriveIssueStatus(displayIssue)
     : "not_started";
   const meta = severityMeta(severity);
-  const selectedClient = clients?.find(
-    (c) => c.id === selectedClientId,
+  const selectedOrg = organisations?.find(
+    (o) => o.id === selectedOrgId,
   );
-  const selectedClientName = selectedClient
-    ? [selectedClient.first_name, selectedClient.last_name]
-        .filter(Boolean)
-        .join(" ")
-    : undefined;
+  const selectedOrgName = selectedOrg?.name ?? undefined;
 
   /** Create or save the issue from the form. */
   async function handleSubmit() {
@@ -175,14 +171,11 @@ export function IssueModal({
       return;
     }
 
-    // Admins attribute the issue to the chosen client; clients log it as themselves.
-    const createClientId = showClientPicker
-      ? selectedClientId
-      : clientId;
-    if (showClientPicker && !createClientId) {
+    // Admins must pick the organisation the issue belongs to.
+    if (showOrgPicker && !selectedOrgId) {
       context.popAlert(
-        "Pick a client",
-        "Choose who this issue is for",
+        "Pick an organisation",
+        "Choose which organisation this issue is for",
         true,
       );
       return;
@@ -213,14 +206,14 @@ export function IssueModal({
         onChanged();
         onClose();
       } else {
-        // The org the issue belongs to (drives the shared client board). When an
-        // admin logs for a client, resolve that client's org; otherwise it's the
-        // viewer's own org.
-        const resolvedClientBusinessId = showClientPicker
-          ? await getClientOrgBusinessId(createClientId)
+        // The org the issue belongs to (drives the shared client board). Admins
+        // pick it directly; clients log it against their own org. The reporter
+        // (client_id) is always the posting viewer.
+        const resolvedClientBusinessId = showOrgPicker
+          ? (selectedOrgId as number)
           : clientBusinessId;
         await createIssue({
-          client_id: createClientId,
+          client_id: clientId,
           business_id: businessId,
           client_business_id: resolvedClientBusinessId,
           issue_type: issueType,
@@ -234,10 +227,10 @@ export function IssueModal({
             ? { ai_status: "skipped", ai_error: "Skipped by admin" }
             : {}),
         });
-        if (showClientPicker && typeof window !== "undefined") {
+        if (showOrgPicker && typeof window !== "undefined") {
           window.localStorage.setItem(
-            LAST_CLIENT_KEY,
-            createClientId,
+            LAST_ORG_KEY,
+            String(selectedOrgId),
           );
         }
         context.popAlert("Issue logged", "We'll take a look shortly");
@@ -487,50 +480,46 @@ export function IssueModal({
             </div>
           )}
 
-          {/* Client picker — admin "log issue for" (create mode only) */}
-          {showClientPicker && (
+          {/* Organisation picker — admin "log issue for" (create mode only) */}
+          {showOrgPicker && (
             <div className="col gap-5 relative">
               <button
                 type="button"
                 className="row middle gap-10 severity-picker"
-                onClick={() => setClientPickerOpen((o) => !o)}
+                onClick={() => setOrgPickerOpen((o) => !o)}
               >
                 <Icon
-                  name="person-circle-outline"
+                  name="business-outline"
                   size={18}
                   color="var(--accent)"
                 />
                 <p>
                   <b>
-                    {selectedClientId
-                      ? selectedClientName || "Unnamed client"
-                      : "Select a client"}
+                    {selectedOrgId
+                      ? selectedOrgName || "Unnamed organisation"
+                      : "Select an organisation"}
                   </b>
                 </p>
               </button>
-              {clientPickerOpen && (
+              {orgPickerOpen && (
                 <div className="col boxed severity-list">
-                  {clients!.map((c) => (
+                  {organisations!.map((o) => (
                     <button
-                      key={c.id}
+                      key={o.id}
                       type="button"
                       className="row middle gap-10 severity-option"
                       onClick={() => {
-                        setSelectedClientId(c.id);
-                        setClientPickerOpen(false);
+                        setSelectedOrgId(o.id);
+                        setOrgPickerOpen(false);
                       }}
                     >
                       <Icon
-                        name="person-circle-outline"
+                        name="business-outline"
                         size={18}
                         color="var(--accent)"
                       />
                       <p>
-                        <b>
-                          {[c.first_name, c.last_name]
-                            .filter(Boolean)
-                            .join(" ") || "Unnamed client"}
-                        </b>
+                        <b>{o.name || "Unnamed organisation"}</b>
                       </p>
                     </button>
                   ))}

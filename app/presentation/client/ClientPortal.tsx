@@ -21,6 +21,7 @@ import {
   SEVERITY_COLUMN_ORDER,
 } from "~/business/commonBL";
 import {
+  getBoardOrgs,
   getBusinessById,
   getBusinessClients,
   getBusinessIssues,
@@ -116,6 +117,11 @@ export function ClientPortal({
   const [clients, setClients] = useState<
     Pick<Profile, "id" | "first_name" | "last_name">[]
   >([]);
+  // The board's organisations, loaded in admin mode for the "log issue" picker
+  // (an issue is attributed to an org, not an individual client).
+  const [organisations, setOrganisations] = useState<
+    Pick<Business, "id" | "name">[]
+  >([]);
   const [loading, setLoading] = useState(true);
   // Drives the refresh button's spinner / disabled state when manually refreshed.
   const [refreshing, setRefreshing] = useState(false);
@@ -158,17 +164,18 @@ export function ClientPortal({
       try {
         setLoading(true);
         if (isAdmin) {
-          const [issueData, clientList, orgNames] = await Promise.all(
-            [
+          const [issueData, clientList, orgNames, orgList] =
+            await Promise.all([
               getBusinessIssues(business!.id),
               getBusinessClients(business!.id),
               getOrgNamesForBoard(business!.id),
-            ],
-          );
+              getBoardOrgs(business!.id),
+            ]);
           if (!mounted.current) return;
           setIssues(issueData);
           setClients(clientList);
           setOrgNameById(orgNames);
+          setOrganisations(orgList);
         } else {
           const [clientData, issueData, memberList, orgBiz] =
             await Promise.all([
@@ -499,7 +506,7 @@ export function ClientPortal({
         clientId={clientId}
         businessId={businessId}
         clientBusinessId={orgBusinessId}
-        clients={isAdmin ? clients : undefined}
+        organisations={isAdmin ? organisations : undefined}
         businessMode={isAdmin}
         focusComments={modal?.focusComments}
         defaultSeverity={modal?.defaultSeverity}

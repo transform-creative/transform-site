@@ -896,6 +896,13 @@ export type Database = {
           name: string
         }[]
       }
+      agency_board_orgs: {
+        Args: { p_board_id: number }
+        Returns: {
+          id: number
+          name: string
+        }[]
+      }
       bytea_to_text: { Args: { data: string }; Returns: string }
       change_user_role: { Args: { input_role: string }; Returns: string }
       client_belongs_to_business: {
