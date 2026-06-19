@@ -32,8 +32,16 @@ const BasicMenu = ({
   const transitionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    document.body.style.overflow = active ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!active) return;
+    // Reserve the gutter the scrollbar leaves behind so hiding it doesn't shift
+    // the page content sideways.
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
   }, [active]);
 
   const handleEnter = () => {
@@ -83,6 +91,10 @@ const BasicMenu = ({
             style={{
               width: width,
               height: "auto",
+              // Pin the bottom edge so a menu whose content height changes (e.g.
+              // FeatureInfo stepping between features) grows upward from a fixed
+              // bottom instead of drifting down off-screen.
+              bottom: 0,
             }}
           >
             <div onClick={() => onClose()} className="row center middle m0" >

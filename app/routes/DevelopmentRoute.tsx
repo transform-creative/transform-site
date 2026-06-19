@@ -135,24 +135,7 @@ export default function DevelopmentRoute() {
         "'Percentage based' giving platforms make it easy to get started, but that ~4% fee adds up as you scale.",
         "We charge a modest fee, not a percentage of yFdonations, so you keep more of the money you raise.",
       ],
-      component: (
-        <div className="col middle ">
-          <button
-            className="row middle center gap-5 boxed"
-            onClick={() => {
-              const top =
-                (feeStructureRef.current?.getBoundingClientRect()
-                  .top ?? 0) +
-                window.scrollY -
-                100;
-              window.scrollTo({ top, behavior: "smooth" });
-            }}
-          >
-            <Icon name="arrow-down" />
-            Find out more about our pricing structure
-          </button>
-        </div>
-      ),
+    
     },
 
     {
@@ -167,13 +150,7 @@ export default function DevelopmentRoute() {
         "Your out of the box giving solution is generic - it can't support all of your amazing ideas. (We can).",
         "If you're sick of your admin team telling you 'it's not possible with the current system', let's chat.",
       ],
-      component: (
-        <ContactTab
-          headerText="Let's chat."
-          buttonText="Book a 'no obligations' chat."
-          showHeader={false}
-        />
-      ),
+   
     },
     {
       className: "center col middle",
@@ -187,13 +164,7 @@ export default function DevelopmentRoute() {
         "We know exactly how your users' data is stored and what's required to keep it safe.",
         "As your database grows you become a bigger target. Generic providers give you generic security. We take an active role in protecting you.",
       ],
-      component: (
-        <ContactTab
-          headerText="Let's chat."
-          buttonText="Book a 'no obligations' chat."
-          showHeader={false}
-        />
-      ),
+    
     },
     {
       className: "center col middle",
@@ -204,13 +175,7 @@ export default function DevelopmentRoute() {
         "Our local team is here to help you, (and your clients).",
         "No more waiting on hold... Send us a 'slack message' and have your problems fixed in minutes.",
       ],
-      component: (
-        <ContactTab
-          headerText="Let's chat."
-          buttonText="Book a 'no obligations' chat."
-          showHeader={false}
-        />
-      ),
+     
     },
     {
       className: "center col middle",
@@ -221,24 +186,7 @@ export default function DevelopmentRoute() {
         "You current platform doesn't provide granular control over loading speed and dynamic user experience. (We do).",
         "In the modern era, a site that loads slowly can be the difference between a user making a donation or giving up. We're here to make sure your users get where you want them to.",
       ],
-      component: (
-        <div className="col middle ">
-          <button
-            className="row middle center gap-5"
-            onClick={() => {
-              const top =
-                (examplesRef.current?.getBoundingClientRect().top ??
-                  0) +
-                window.scrollY -
-                100;
-              window.scrollTo({ top, behavior: "smooth" });
-            }}
-          >
-            <Icon name="arrow-down" />
-            See examples of our work
-          </button>
-        </div>
-      ),
+     
     },
   ];
 

@@ -4,6 +4,8 @@ import type { IoniconName } from "~/data/Ionicons";
 import gsap from "gsap";
 import FeatureInfo from "./FeatureInfo";
 import "../../app-v2.css";
+import { SharedContextProps } from "~/data/CommonTypes";
+import { useOutletContext } from "react-router";
 
 export interface Feature {
   className?: string;
@@ -19,6 +21,7 @@ interface Props {
 }
 
 export default function FeatureSelector({ features }: Props) {
+  const context:SharedContextProps = useOutletContext();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -91,6 +94,7 @@ export default function FeatureSelector({ features }: Props) {
 
   return (
     <div className="col gap-20 w-100">
+      <h2 className="textCenter">Build a custom platform that works with you</h2>
       {/* Search bar */}
       <div className="row center w-100">
         <div
@@ -131,7 +135,7 @@ export default function FeatureSelector({ features }: Props) {
             setOpenIndex(null);
           }}
         />
-        {categories.map((c) => (
+        {!context.inShrink && categories.map((c) => (
           <CategoryPill
             key={c.label}
             label={c.label}
@@ -159,17 +163,17 @@ export default function FeatureSelector({ features }: Props) {
                 if (e.key === "Enter" || e.key === " ") setOpenIndex(index);
               }}
             >
-              <div className="feature-icon-tile center middle">
+              <div className="feature-icon-tile center middle" >
                 <Icon
                   name={feature.icon.name}
                   size={22}
                   color="var(--bkg)"
                 />
               </div>
-              <b>{feature.text}</b>
-              <p className="feature-clamp m0">{feature.description[0]}</p>
-              <div className="row middle gap-5 feature-more">
-                More
+              <h3 style={{userSelect: "none"}} >{feature.text}</h3>
+              <p style={{userSelect: "none"}} className="feature-clamp m0">{feature.description[0]}</p>
+              <div style={{userSelect: "none"}} className="row middle gap-5 feature-more">
+                <h3>More</h3>
                 <Icon name="arrow-forward" size={14} color="var(--bkg)" />
               </div>
             </div>
@@ -181,12 +185,21 @@ export default function FeatureSelector({ features }: Props) {
 
       {/* Description popout */}
       <FeatureInfo
+        active={openIndex !== null}
         feature={selected}
         index={openIndex}
         total={filtered.length}
         onClose={() => setOpenIndex(null)}
-        onPrev={() => setOpenIndex((i) => (i !== null ? i - 1 : i))}
-        onNext={() => setOpenIndex((i) => (i !== null ? i + 1 : i))}
+        onPrev={() =>
+          setOpenIndex((i) => (i === null ? i : Math.max(0, i - 1)))
+        }
+        onNext={() =>
+          setOpenIndex((i) =>
+            i === null ? i : Math.min(filtered.length - 1, i + 1),
+          )
+        }
+        hasPrev={openIndex !== null && openIndex > 0}
+        hasNext={openIndex !== null && openIndex < filtered.length - 1}
       />
     </div>
   );
