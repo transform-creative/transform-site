@@ -129,6 +129,7 @@ export default function DevelopmentRoute() {
     {
       className: "center col middle",
       icon: { name: "card-outline", size: 50 },
+      category: "Pricing & ownership",
       text: "No exorbitant 'platform fee'",
       description: [
         "'Percentage based' giving platforms make it easy to get started, but that ~4% fee adds up as you scale.",
@@ -138,10 +139,6 @@ export default function DevelopmentRoute() {
         <div className="col middle ">
           <button
             className="row middle center gap-5 boxed"
-            style={{
-              color: "var(--accent)",
-              background: "var(--bkg)",
-            }}
             onClick={() => {
               const top =
                 (feeStructureRef.current?.getBoundingClientRect()
@@ -164,6 +161,7 @@ export default function DevelopmentRoute() {
         name: "sparkles-outline",
         size: 50,
       },
+      category: "Build & customise",
       text: "Your dream features",
       description: [
         "Your out of the box giving solution is generic - it can't support all of your amazing ideas. (We can).",
@@ -174,7 +172,6 @@ export default function DevelopmentRoute() {
           headerText="Let's chat."
           buttonText="Book a 'no obligations' chat."
           showHeader={false}
-          style={{ color: "var(--accent)", background: "var(--bkg)" }}
         />
       ),
     },
@@ -184,6 +181,7 @@ export default function DevelopmentRoute() {
         name: "lock-closed-outline",
         size: 50,
       },
+      category: "Security & access",
       text: "Security customised for you",
       description: [
         "We know exactly how your users' data is stored and what's required to keep it safe.",
@@ -194,13 +192,13 @@ export default function DevelopmentRoute() {
           headerText="Let's chat."
           buttonText="Book a 'no obligations' chat."
           showHeader={false}
-          style={{ color: "var(--accent)", background: "var(--bkg)" }}
         />
       ),
     },
     {
       className: "center col middle",
       icon: { name: "people-outline", size: 50 },
+      category: "Support & success",
       text: "Face to face support",
       description: [
         "Our local team is here to help you, (and your clients).",
@@ -211,13 +209,13 @@ export default function DevelopmentRoute() {
           headerText="Let's chat."
           buttonText="Book a 'no obligations' chat."
           showHeader={false}
-          style={{ color: "var(--accent)", background: "var(--bkg)" }}
         />
       ),
     },
     {
       className: "center col middle",
       icon: { name: "flash-outline", size: 50 },
+      category: "Performance & UX",
       text: "User focused optimisation",
       description: [
         "You current platform doesn't provide granular control over loading speed and dynamic user experience. (We do).",
@@ -227,10 +225,6 @@ export default function DevelopmentRoute() {
         <div className="col middle ">
           <button
             className="row middle center gap-5"
-            style={{
-              color: "var(--accent)",
-              background: "var(--bkg)",
-            }}
             onClick={() => {
               const top =
                 (examplesRef.current?.getBoundingClientRect().top ??
@@ -286,10 +280,9 @@ export default function DevelopmentRoute() {
             </div>
             <div className="col gap-20 start shrink-col">
               <h2 className="shrink-col">
-                We develop custom sites that <strong>
-                  reduce fundraising
-                  overheads
-                </strong> and turn donors into believers.
+                We develop custom sites that{" "}
+                <strong>reduce fundraising overheads</strong> and turn
+                donors into believers.
               </h2>
               <div className="row gap-10 shrink-col">
                 <button
@@ -316,12 +309,16 @@ export default function DevelopmentRoute() {
         <div
           className="w-75 mb-20 pb-20 col gap-20 middle center"
           ref={savingsRef}
-          style={{minHeight: '90vh'}}
+          style={{ minHeight: "90vh" }}
         >
           {" "}
-          <h2 className="textCenter accent mb-10 w-75" style={{color: "var(--txt)"}}>
-            Our sites redirect third party donation fees <strong>back to you</strong>,
-            allowing you to keep more of every dollar raised.
+          <h2
+            className="textCenter accent mb-10 w-75"
+            style={{ color: "var(--txt)" }}
+          >
+            Our sites redirect third party donation fees{" "}
+            <strong>back to you</strong>, allowing you to keep more of
+            every dollar raised.
           </h2>
           <SavingCalculator />
         </div>
@@ -338,7 +335,6 @@ export default function DevelopmentRoute() {
           <FeatureSelector features={buttons} />
         </div>
       </div>
-
 
       <div
         className="horizontal-line mediumFade"

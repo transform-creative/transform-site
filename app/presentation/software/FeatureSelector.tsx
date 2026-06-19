@@ -1,16 +1,17 @@
-import { useState, useRef, useLayoutEffect, useEffect, ReactElement } from "react";
+import { useState, useRef, useEffect, useMemo, ReactElement } from "react";
 import { Icon } from "~/presentation/elements/Icon";
 import type { IoniconName } from "~/data/Ionicons";
-import { useOutletContext } from "react-router";
-import { SharedContextProps } from "~/data/CommonTypes";
 import gsap from "gsap";
+import FeatureInfo from "./FeatureInfo";
+import "../../app-v2.css";
 
 export interface Feature {
   className?: string;
   icon: { name: IoniconName; size: number };
   text: string;
   description: string[];
-  component?: ReactElement
+  category: string;
+  component?: ReactElement;
 }
 
 interface Props {
@@ -18,162 +19,194 @@ interface Props {
 }
 
 export default function FeatureSelector({ features }: Props) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const buttonsContainerRef = useRef<HTMLDivElement>(null);
-  const [pillStyle, setPillStyle] = useState<{
-    left: number;
-    width: number;
-  }>({
-    left: 0,
-    width: 0,
-  });
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const hasInteracted = useRef(false);
-  const isFirstRender = useRef(true);
-  const prevIndexRef = useRef(0);
-  const context:SharedContextProps = useOutletContext();
+  const [search, setSearch] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!hasInteracted.current) return;
-    descriptionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [selectedIndex]);
+  const pillsRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
-  // Animate description on selection change — skip initial render
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (!descriptionRef.current) return;
-    const direction = selectedIndex > prevIndexRef.current ? 1 : -1;
-    prevIndexRef.current = selectedIndex;
-    if (context.inShrink) {
-      gsap.from(descriptionRef.current.children, {
-        opacity: 0,
-        y: -10,
-        stagger: 0.1,
-        ease: "power3",
-        duration: 0.5,
-      });
-    } else {
-      gsap.from(descriptionRef.current.children, {
-        opacity: 0,
-        x: direction * 40,
-        stagger: 0.1,
-        ease: "power3",
-        duration: 0.5,
-      });
-    }
-  }, [selectedIndex]);
+  // Unique categories in source order, each with its count.
+  const categories = useMemo(() => {
+    const seen = new Map<string, number>();
+    for (const f of features)
+      seen.set(f.category, (seen.get(f.category) ?? 0) + 1);
+    return Array.from(seen, ([label, count]) => ({ label, count }));
+  }, [features]);
 
-  // Animate buttons in when they enter the viewport
-  useEffect(() => {
-    const container = buttonsContainerRef.current;
-    if (!container) return;
-    const buttons = container.querySelectorAll("button");
-    if (!buttons.length) return;
+  // Features matching the active category + search term.
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return features.filter((f) => {
+      if (activeCategory && f.category !== activeCategory) return false;
+      if (!q) return true;
+      return (
+        f.text.toLowerCase().includes(q) ||
+        f.category.toLowerCase().includes(q) ||
+        f.description.some((d) => d.toLowerCase().includes(q))
+      );
+    });
+  }, [features, activeCategory, search]);
 
-    gsap.set(buttons, { opacity: 0, y: -10 });
+  const selected = openIndex !== null ? filtered[openIndex] : null;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          gsap.to(buttons, { opacity: 1, y: 0, stagger: 0.1, ease: "power3", duration: 0.6 });
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
+  // Stagger the category pills in when they scroll into view.
+  // useEffect(() => {
+  //   const container = pillsRef.current;
+  //   if (!container) return;
+  //   const pills = container.querySelectorAll("button");
+  //   if (!pills.length) return;
+  //   gsap.set(pills, { opacity: 0, y: -10 });
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       if (entries[0].isIntersecting) {
+  //         gsap.to(pills, {
+  //           opacity: 1,
+  //           y: 0,
+  //           stagger: 0.06,
+  //           ease: "power3",
+  //           duration: 0.5,
+  //         });
+  //         observer.disconnect();
+  //       }
+  //     },
+  //     { threshold: 0.1 },
+  //   );
+  //   observer.observe(container);
+  //   return () => observer.disconnect();
+  // }, []);
 
-  useLayoutEffect(() => {
-    const btn = buttonRefs.current[selectedIndex];
-    if (btn) {
-      setPillStyle({ left: btn.offsetLeft, width: btn.offsetWidth });
-    }
-  }, [selectedIndex]);
-
-  const selected = features[selectedIndex];
+  // // Re-animate the cards whenever the filtered set changes.
+  // useEffect(() => {
+  //   const grid = gridRef.current;
+  //   if (!grid) return;
+  //   gsap.from(grid.children, {
+  //     opacity: 0,
+  //     y: 12,
+  //     stagger: 0.05,
+  //     ease: "power3",
+  //     duration: 0.4,
+  //   });
+  // }, [activeCategory, search]);
 
   return (
     <div className="col gap-20 w-100">
-      <div style={{ position: "relative" }}>
-        <div className="row gap-10 center wrap" ref={buttonsContainerRef}>
-          {features.map((feature, index) => (
-            <button
-              key={index}
-              ref={(el) => {
-                buttonRefs.current[index] = el;
+      {/* Search bar */}
+      <div className="row center w-100">
+        <div
+          className="feature-search row middle gap-10"
+          style={{ maxWidth: 480, width: "100%" }}
+        >
+          <Icon name="search-outline" size={18} color="var(--bkg)" />
+          <input
+            className="feature-search-input"
+            type="text"
+            value={search}
+            placeholder="Search features…"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setOpenIndex(null);
+            }}
+          />
+          {search && (
+            <Icon
+              name="close-circle"
+              size={18}
+              color="var(--bkg)"
+              className="clickable"
+              onClick={() => setSearch("")}
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Category pills */}
+      <div className="row center wrap gap-10" ref={pillsRef}>
+        <CategoryPill
+          label="All"
+          count={features.length}
+          active={activeCategory === null}
+          onClick={() => {
+            setActiveCategory(null);
+            setOpenIndex(null);
+          }}
+        />
+        {categories.map((c) => (
+          <CategoryPill
+            key={c.label}
+            label={c.label}
+            count={c.count}
+            active={activeCategory === c.label}
+            onClick={() => {
+              setActiveCategory(c.label);
+              setOpenIndex(null);
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Card grid */}
+      {filtered.length ? (
+        <div className="grid-250" ref={gridRef}>
+          {filtered.map((feature, index) => (
+            <div
+              key={feature.text}
+              role="button"
+              tabIndex={0}
+              className="feature-card col gap-10 p-20"
+              onClick={() => setOpenIndex(index)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") setOpenIndex(index);
               }}
-              className={`gap-10 center col boxed middle ${feature.className ?? ""}`}
-              style={{
-                width: 150,
-                color:
-                  index === selectedIndex
-                    ? "var(--accent)"
-                    : 'var(--txt)',
-              }}
-              onClick={() => { hasInteracted.current = true; setSelectedIndex(index); }}
             >
-              <Icon
-                name={
-                  index === selectedIndex
-                    ? (feature.icon.name.split("-outline")[0]) as IoniconName
-                    : feature.icon.name
-                }
-                size={25}
-                color={
-                  index === selectedIndex
-                    ? "var(--bkg)"
-                    : undefined
-                }
-              />
-              {feature.text}
-            </button>
+              <div className="feature-icon-tile center middle">
+                <Icon
+                  name={feature.icon.name}
+                  size={22}
+                  color="var(--bkg)"
+                />
+              </div>
+              <b>{feature.text}</b>
+              <p className="feature-clamp m0">{feature.description[0]}</p>
+              <div className="row middle gap-5 feature-more">
+                More
+                <Icon name="arrow-forward" size={14} color="var(--bkg)" />
+              </div>
+            </div>
           ))}
         </div>
+      ) : (
+        <p className="center w-100">No features match your search.</p>
+      )}
 
-        {/* Sliding pill indicator */}
-       {context.inShrink || <div
-          style={{
-            position: "absolute",
-            bottom: -8,
-            left: pillStyle.left,
-            width: pillStyle.width,
-            height: 2,
-            backgroundColor: "var(--accent)",
-            borderRadius: 999,
-            transition:
-              "left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          }}
-        />}
-      </div>
-
-      {/* Description panel */}
-      <div
-        ref={descriptionRef}
-        key={selectedIndex}
-        className="col gap-10 center middle fade-sm w-100"
-        style={{ minHeight: 50, textAlign: "center" }}
-      >
-        <div className="w-75">
-          <div className="p-0 pb-20">
-            {selected.description.map((para, i) => (
-              <div key={i}>
-                {i === 0 ? (
-                  <h4 className="center p-20">{para}</h4>
-                ) : (
-                  <p className="center mb-20"> {para}</p>
-                )}
-              </div>
-            ))}
-          </div>
-          {selected.component || null}
-        </div>
-      </div>
+      {/* Description popout */}
+      <FeatureInfo
+        feature={selected}
+        index={openIndex}
+        total={filtered.length}
+        onClose={() => setOpenIndex(null)}
+        onPrev={() => setOpenIndex((i) => (i !== null ? i - 1 : i))}
+        onNext={() => setOpenIndex((i) => (i !== null ? i + 1 : i))}
+      />
     </div>
+  );
+}
+
+interface CategoryPillProps {
+  label: string;
+  count: number;
+  active: boolean;
+  onClick: () => void;
+}
+
+function CategoryPill({ label, count, active, onClick }: CategoryPillProps) {
+  return (
+    <button
+      className={`feature-pill row middle gap-5 ${active ? "active" : ""}`}
+      onClick={onClick}
+    >
+      {label}
+      <b className="pill-count">{count}</b>
+    </button>
   );
 }

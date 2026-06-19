@@ -222,5 +222,5 @@ Both are set in `.env.local` and exposed via `import.meta.env.*`.
 
 ## Key rules
 - Never use spans - use appropriate relevant tags instead
-- rely on app-v2.css for styling and only use inline style props unless absolutely neccessary. Even the prefer adding new entries to app-v2.css instead where a pattern is likely to be used again. Keep entries in the css file small (2-5 lines ideally) so they can generally be reused more than once
+- rely on app-v2.css for styling and only use inline style props unless absolutely neccessary. Prefer adding new entries to app-v2.css instead whenever a pattern is likely to be used again. Keep entries in the css file small (2-5 lines ideally) so they can generally be reused more than once and generic (no component specific css classes)
 - always import 'app-v2.css' and useOutletContext() in all new files
