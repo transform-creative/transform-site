@@ -9,7 +9,7 @@
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
 import type { Issue, IssueComment } from "~/data/CustomTypes";
-import type { TablesInsert } from "./supabase";
+import type { Tables, TablesInsert } from "./supabase";
 
 /*************************
  * Create a new issue (the "Log issue" button). The caller supplies at least
@@ -47,6 +47,27 @@ export async function createIssueComment(
 
   if (error) {
     await logError(error, ["createIssueComment", "Create"]);
+    throw error;
+  }
+
+  return data;
+}
+
+/*************************
+ * Store a public form submission. All form fields live in the `metadata` jsonb
+ * column; the caller sets `business_id` so the owning business can read it.
+ */
+export async function createResponse(
+  response: TablesInsert<"responses">
+): Promise<Tables<"responses">> {
+  const { data, error } = await supabase
+    .from("responses")
+    .insert(response)
+    .select()
+    .single();
+
+  if (error) {
+    await logError(error, ["createResponse", "Create"]);
     throw error;
   }
 

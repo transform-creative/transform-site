@@ -503,7 +503,7 @@ export type Database = {
           approved_at?: string | null
           business_id?: number | null
           client_business_id?: number | null
-          client_id: string
+          client_id?: string
           created_at?: string
           description?: string | null
           id?: number
@@ -883,6 +883,38 @@ export type Database = {
         }
         Relationships: []
       }
+      responses: {
+        Row: {
+          business_id: number | null
+          created_at: string
+          id: number
+          is_read: boolean | null
+          metadata: Json | null
+        }
+        Insert: {
+          business_id?: number | null
+          created_at?: string
+          id?: number
+          is_read?: boolean | null
+          metadata?: Json | null
+        }
+        Update: {
+          business_id?: number | null
+          created_at?: string
+          id?: number
+          is_read?: boolean | null
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responses_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -909,10 +941,7 @@ export type Database = {
         Args: { p_business_id: number; p_client_id: string }
         Returns: boolean
       }
-      client_org_business_id: {
-        Args: { p_client_id: string }
-        Returns: number
-      }
+      client_org_business_id: { Args: { p_client_id: string }; Returns: number }
       current_user_owns_business: {
         Args: { p_business_id: number }
         Returns: boolean

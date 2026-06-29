@@ -1,9 +1,13 @@
-import { useParams } from "react-router";
+import { useOutletContext, useParams } from "react-router";
 import { Route } from "../+types/root";
 import { Icon } from "~/presentation/elements/Icon";
 import { LabelInput } from "~/presentation/elements/LabelInput/LabelInput";
 import { useState } from "react";
 import { PillToggle } from "~/presentation/elements/PillToggle";
+import BasicMenu from "~/presentation/elements/BasicMenu";
+import { createResponse } from "~/database/Create";
+import type { SharedContextProps } from "~/data/CommonTypes";
+import "../app-v2.css";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "" }, { name: "description", content: "" }];
@@ -11,6 +15,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function FormRoute() {
   const formId = useParams().id;
+  const context: SharedContextProps = useOutletContext();
 
   const [formFor, setFormFor] = useState<string>("child");
   const [name, setName] = useState<string>();
@@ -18,6 +23,36 @@ export default function FormRoute() {
     useState<string>();
   const [confirmed, setConfirmed] = useState(false);
   const [over18, setOver18] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  async function handleSubmit() {
+    if (!(over18 && confirmed && (name || "").length > 3)) return;
+
+    setSubmitting(true);
+    try {
+      await createResponse({
+        business_id: 129,
+        metadata: {
+          formId,
+          formFor,
+          name,
+          dietaryRequirements,
+          confirmed,
+          over18,
+        },
+      });
+      setSubmitted(true);
+    } catch (e: any) {
+      context.popAlert(
+        "Something went wrong",
+        e?.message || "Please try again in a moment",
+        true
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   if (formId === "ys-extra-sign-up")
     return (
@@ -153,7 +188,9 @@ export default function FormRoute() {
                     </p>
                   </div>
                   <button
+                    onClick={handleSubmit}
                     disabled={
+                      submitting ||
                       !(
                         over18 &&
                         confirmed &&
@@ -181,6 +218,25 @@ export default function FormRoute() {
             </div>
           </div>
         </div>
+
+        <BasicMenu
+          active={submitted}
+          onClose={() => setSubmitted(false)}
+          width={400}
+          icon={{
+            name: "checkmark-circle",
+            color: "var(--accent)",
+            size: 60,
+          }}
+        >
+          <div className="col middle center gap-10 textCenter p-10">
+            <h2>Thanks!</h2>
+            <p>
+              You're all signed up. We'll be in touch with anything else
+              you need to know before the day.
+            </p>
+          </div>
+        </BasicMenu>
       </div>
     );
 }
