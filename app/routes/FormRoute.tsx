@@ -43,6 +43,8 @@ export default function FormRoute() {
               interviews and stories adapted from the{" "}
               <a
                 href="https://drive.google.com/file/d/1AlgAvcKdyGK17f_fMw_5SP7KZCTJvtPD/view?usp=sharing"
+                target="_blank"
+                rel="no-refferer"
                 style={{ color: "var(--accent)" }}
               >
                 Your story research report
