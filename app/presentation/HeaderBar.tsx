@@ -140,7 +140,7 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
   }
 
   return (
-    <div className={`${inShrink ? "col" : 'row'}`} style={{zIndex: 30, width: inShrink ? "300px" : "100%"}}>
+    <div className={`${inShrink ? "col" : 'row middle'}`} style={{zIndex: 30, width: inShrink ? "300px" : "100%"}}>
       {inShrink && <div style={{ height: 50 }} />}
       <button
         disabled={location.pathname == "/"}
@@ -203,7 +203,7 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
           textDecoration: "none",
           fontSize: textSize,
         }}
-        className="p2 row center accentButton middle"
+        className="row center middle accent"
       >
         Contact
       </button>

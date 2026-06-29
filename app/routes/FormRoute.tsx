@@ -36,10 +36,7 @@ export default function FormRoute() {
           <h2 className="textCenter">
             Become an extra on 'Your Story'
           </h2>
-          <div className="outline-secondary p-10 gap-10 row middle">
-            <Icon name="pizza" size={22} />
-            <h3>Free lunch provided</h3>
-          </div>
+        
           <div className="textCenter p-10 col gap-10 w-75">
             <p>
               'Your Story' is a 6 part video training series featuring
@@ -60,7 +57,10 @@ export default function FormRoute() {
         </div>
 
        
-
+ <div className="p-10 gap-10 row middle">
+            <Icon name="pizza" color="var(--accent)" size={22} />
+            <h3 style={{color: 'var(--accent)'}}>Free pizza lunch provided</h3>
+          </div>
         <div className="w-75 mb-20">
           <div className="row gap-20 shrink-col m-20 ">
             <div className="col w-50 shrink-hide">
@@ -69,6 +69,7 @@ export default function FormRoute() {
 
             <div className="col w-50 gap-10">
               <div className="col  gap-10">
+                <h5 style={{color: "var(--txt)"}}>Key details</h5>
                 <div className="boxed accent p-10 gap-10 row middle">
                   <Icon name="calendar" size={22} />
                   <h3>July 14, 9am - 12pm</h3>
@@ -82,6 +83,7 @@ export default function FormRoute() {
                   <Icon name="shirt" size={22} />
                   <h3>Sensible school casual clothes</h3>
                 </div>
+                 
 
                 <div className="boxed outline-accent p-10 h-100 col gap-10">
                   <div>
@@ -163,13 +165,14 @@ export default function FormRoute() {
                   </button>
                   <a
                     role="button"
-                    className="outline-secondary w-100 mt-10 row middle center gap-10"
+                    className="outline-secondary w-100 row middle center gap-10"
                     style={{
                       background: "none",
                       color: "var(--txt)",
                     }}
+                    href="mailto:hello@transformcreative.com.au?subject=Your Story filming"
                   >
-                    <Icon name="mail-open" size={18} /> Contact us
+                    <Icon name="mail-open" size={18} /> hello@transformcreative.com.au
                   </a>
                 </div>
               </div>
