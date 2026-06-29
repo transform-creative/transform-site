@@ -13,5 +13,6 @@ export default [
     route("/auth", "routes/AuthenticationRoute.tsx"),
   route("/client", "routes/ClientIndexRoute.tsx"),
   route("/client/:id", "routes/ClientRoute.tsx"),
+  route("/forms/:id", "routes/FormRoute.tsx"),
   route("", "routes/ErrorBoundary.tsx"),
 ] satisfies RouteConfig;

@@ -402,7 +402,7 @@ Padding
 }
 
 .r-default {
-  border-radius: var(--border) !important;
+  border-radius: var(--borderRadius) !important;
 }
 
 .r-lg {
@@ -859,4 +859,16 @@ h5.center {
   border-radius: 50%;
   background: var(--bkg);
   border: 2px solid var(--accent);
+}
+
+.pill {
+  border-radius: var(--border);
+  position: absolute;
+  height: 100%;
+  background: var(--accent);
+  top: 0;
+  z-index: -1;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.3s ease;
 }

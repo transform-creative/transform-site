@@ -352,7 +352,7 @@ export function IssueModal({
       width={context.inShrink ? "95%" : isEdit ? 820 : 420}
       disableClickOff
     >
-      <div className="row gap-20 wrap issue-modal">
+      <div className="row gap-20 wrap">
         {/* Left panel — the form */}
         <div className="col gap-10 issue-modal-form">
           <div className="between middle">

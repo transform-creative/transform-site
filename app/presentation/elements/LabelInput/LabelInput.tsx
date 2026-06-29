@@ -88,7 +88,7 @@ export function LabelInput ({
         {!inlineLabel && (
           <div className="mt-5 pt-5 mb-5">
             <label
-              className="ml-5 bold"
+              className="bold"
               htmlFor={id || name}
               style={{
                 color: `${error ? errorColor : style?.color || "var(--txt)"}`,
@@ -107,7 +107,7 @@ export function LabelInput ({
                 ref={inputRef as Ref<HTMLTextAreaElement>}
                 id={id || name}
                 name={name}
-                className={`p-10 m-0 w-100 labelInput fade-sm ${selected && "labelInputSelected"
+                className={`p-10 r-default m-0 w-100 labelInput fade-sm ${selected && "labelInputSelected"
                   } ${outline ? "outline-secondary" : ""} ${className}`}
                 placeholder={placeholder || ""}
                 role="labelInput"
@@ -144,7 +144,7 @@ export function LabelInput ({
                 name={name}
                 step={step}
                 ref={inputRef as Ref<HTMLInputElement>}
-                className={`p-10 m-0 w-100 labelInput fade-sm ${selected && "labelInputSelected"
+                className={`p-10 r-default m-0 w-100 labelInput fade-sm ${selected && "labelInputSelected"
                   } ${outline ? "outline" : ""} ${className}`}
                 placeholder={placeholder || ""}
                 role="labelInput"
