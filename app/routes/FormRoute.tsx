@@ -114,7 +114,7 @@ export default function FormRoute() {
                 <h5 style={{color: "var(--txt)"}}>Key details</h5>
                 <div className="boxed accent p-10 gap-10 row middle">
                   <Icon name="calendar" size={22} />
-                  <h3>July 14, 9am - 12pm</h3>
+                  <h3>July 15, 9am - 12pm</h3>
                 </div>
                 <div className="boxed outline-secondary p-10 gap-10 row middle">
                   <Icon name="location" size={22} />
