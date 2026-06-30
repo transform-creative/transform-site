@@ -77,26 +77,31 @@ export function LabelInput ({
     wrapperRef.current?.blur();
   }
 
+  // Use a native <label> wrapping the control so a tap anywhere in the field
+  // focuses the input on the first gesture. In-app browsers (Messenger / IG /
+  // FB) block programmatic .focus(), so the onClick handleFocus hack alone
+  // doesn't focus the box there. Keep a <div> for the react-select branch so
+  // its dropdown isn't affected by label containment.
+  const FieldWrapper: any = options ? "div" : "label";
+
   return (
     <div className="w-100 r-default"  >
-      <div
-        className={`${selected && ""
-          } ${className}`}
+      <FieldWrapper
+        className={`${className ?? ""}`}
         onClick={() => handleFocus()}
         role={disabled ? "disabled" : "none"}
+        style={options ? undefined : { display: "block", cursor: "text" }}
       >
         {!inlineLabel && (
           <div className="mt-5 pt-5 mb-5">
-            <label
+            <p
               className="bold"
-              htmlFor={id || name}
               style={{
                 color: `${error ? errorColor : style?.color || "var(--txt)"}`,
-               
               }}
             >
               {name}
-            </label>
+            </p>
           </div>
         )}
         <div className="row " >
@@ -165,7 +170,7 @@ export function LabelInput ({
             )}
           </div>
         </div>
-      </div>
+      </FieldWrapper>
       {error && (
         <div className="row middle gap-5">
           <Icon name="alert-circle-outline" color={errorColor} />
