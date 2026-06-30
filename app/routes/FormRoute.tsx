@@ -20,6 +20,7 @@ export default function FormRoute() {
 
   const [formFor, setFormFor] = useState<string>("child");
   const [name, setName] = useState<string>();
+  const [email, setEmail] = useState<string>();
   const [dietaryRequirements, setDietaryRequirements] =
     useState<string>();
   const [confirmed, setConfirmed] = useState(false);
@@ -38,6 +39,7 @@ export default function FormRoute() {
           formId,
           formFor,
           name,
+          email,
           dietaryRequirements,
           confirmed,
           over18,
@@ -46,6 +48,7 @@ export default function FormRoute() {
       setSubmitted(true);
       setFormFor("child");
       setName("");
+      setEmail("");
       setDietaryRequirements("");
       setConfirmed(false);
       setOver18(false);
@@ -150,6 +153,15 @@ export default function FormRoute() {
                     style={{ height: "1.1rem", zIndex: 20 }}
                     value={name || ""}
                     onChange={(e) => setName(e.target.value)}
+                  />
+                  <LabelInput
+                    name="Contact email"
+                    type="email"
+                    placeholder="john@example.com"
+                    autoComplete="email"
+                    style={{ height: "1.1rem", zIndex: 20 }}
+                    value={email || ""}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                   <LabelInput
                     name="Dietary Requirements"
