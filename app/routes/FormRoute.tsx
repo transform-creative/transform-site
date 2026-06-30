@@ -8,6 +8,7 @@ import BasicMenu from "~/presentation/elements/BasicMenu";
 import { createResponse } from "~/database/Create";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import "../app-v2.css";
+import { CONTACT } from "~/data/Objects";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "" }, { name: "description", content: "" }];
@@ -51,7 +52,7 @@ export default function FormRoute() {
     } catch (e: any) {
       context.popAlert(
         "Something went wrong",
-        e?.message || "Please try again in a moment",
+      `Contact ${CONTACT.email}`,
         true
       );
     } finally {

@@ -59,17 +59,15 @@ export async function createIssueComment(
  */
 export async function createResponse(
   response: TablesInsert<"responses">
-): Promise<Tables<"responses">> {
+): Promise<boolean> {
   const { data, error } = await supabase
     .from("responses")
-    .insert(response)
-    .select()
-    .single();
+    .insert(response);
 
   if (error) {
     await logError(error, ["createResponse", "Create"]);
     throw error;
   }
 
-  return data;
+  return true;
 }
