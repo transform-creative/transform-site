@@ -146,7 +146,7 @@ export default function FormRoute() {
                     name="Name"
                     placeholder="John Smith"
                     autoComplete="name"
-                    style={{ height: "1.1rem" }}
+                    style={{ height: "1.1rem", zIndex: 20 }}
                     value={name || ""}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -154,7 +154,7 @@ export default function FormRoute() {
                     name="Dietary Requirements"
                     autoComplete="Dietary Requirements"
                     value={dietaryRequirements || ""}
-                    style={{ height: "1.1rem" }}
+                    style={{ height: "1.1rem", zIndex: 20 }}
                     placeholder="None"
                     onChange={(e) =>
                       setDietaryRequirements(e.target.value)
