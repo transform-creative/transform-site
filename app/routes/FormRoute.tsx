@@ -43,6 +43,11 @@ export default function FormRoute() {
         },
       });
       setSubmitted(true);
+      setFormFor("child");
+      setName("");
+      setDietaryRequirements("");
+      setConfirmed(false);
+      setOver18(false);
     } catch (e: any) {
       context.popAlert(
         "Something went wrong",
@@ -68,12 +73,12 @@ export default function FormRoute() {
           />
         </div>
         <div className="col gap-10 middle w-75 ">
-          <h2 className="textCenter">
+          <h2 className="textCenter ml-20 mr-20">
             Become an extra on 'Your Story'
           </h2>
         
-          <div className="textCenter p-10 col gap-10 w-75">
-            <p>
+          <div className="textCenter p-10 col gap-10 w-75 ">
+            <p className=" ml-20 mr-20">
               'Your Story' is a 6 part video training series featuring
               interviews and stories adapted from the{" "}
               <a
@@ -86,7 +91,7 @@ export default function FormRoute() {
               </a>
               .
             </p>
-            <p>
+            <p className=" ml-20 mr-20">
               We need 20 young people to help us bring a school scene
               to life! Would you join us?
             </p>
@@ -165,6 +170,7 @@ export default function FormRoute() {
                     />
                     <p
                       className="clickable"
+                      style={{textAlign: "start"}}
                       onClick={() => setConfirmed(!confirmed)}
                     >
                       I acknowledge the <b>9am start time</b>,{" "}
