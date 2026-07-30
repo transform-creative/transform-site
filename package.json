@@ -17,6 +17,7 @@
     "@react-router/serve": "^8.3.0",
     "@reacticons/ionicons": "^7.1.0",
     "@supabase/supabase-js": "^2.101.1",
+    "@vercel/analytics": "^2.0.1",
     "gsap": "^3.13.0",
     "isbot": "^5.1.27",
     "ogl": "^1.0.11",
