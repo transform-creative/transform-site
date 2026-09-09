@@ -216,6 +216,11 @@ p.clickable:hover {
   width: 100%;
 }
 
+/* Padding counts inside the declared width, so a w-100 child can't overflow */
+.border-box {
+  box-sizing: border-box;
+}
+
 .w-fit {
   width: fit-content;
 }
@@ -241,6 +246,20 @@ p.clickable:hover {
 
 .clip {
   overflow: hidden;
+}
+
+/* Fills its positioned ancestor — stacks a poster or overlay onto media */
+.absolute-fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* Surface shown in place of media that couldn't load */
+.media-fallback {
+  background: #0000001f;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 20px;
 }
 
 /* Backdrop blur over media, strongest in the centre, feathered out to the edges */

@@ -13,7 +13,6 @@ import { SharedContextProps } from "~/data/CommonTypes";
 import { useOutletContext, useSearchParams } from "react-router";
 import { ContactTab } from "~/presentation/landing/ContactTab";
 import { EndorsementSection } from "~/presentation/landing/EndorsementSection";
-import ReactPlayer from "react-player";
 import { SavingCalculator } from "~/presentation/software/SavingCalculator";
 import { CONTACT, FEATURES, PROJECTS } from "~/data/Objects";
 import { buildMeta, canonical, SITE_URL } from "~/business/seoBL";
@@ -24,6 +23,11 @@ import { Icon } from "~/presentation/elements/Icon";
 import { Carousel } from "~/presentation/elements/Carousel";
 import { EndorsementCard } from "~/presentation/elements/EndorsementCard";
 import WorkedWith from "~/presentation/landing/WorkedWith";
+import { VideoPlayer } from "~/presentation/elements/VideoPlayer";
+
+/** Storage object name is misspelled ("fundrasing") — that is the real key. */
+const HERO_VIDEO =
+  "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/fundrasing_ad_1_subs_720.mp4";
 
 const TITLE =
   "Nonprofit Website Development Adelaide | Transform Creative";
@@ -111,19 +115,6 @@ export default function DevelopmentRoute() {
       100;
     window.scrollTo({ top, behavior: "smooth" });
   }, [searchParams]);
-
-  // React player vars. It doesn't autoplay — it starts muted only so the
-  // first frame is never blocked, and the first manual play unmutes it,
-  // which the browser allows because that play came from a user gesture.
-  const reactPlayer = useRef(null);
-  const [playerPlay, setPlayerPlay] = useState(false);
-  const [playerMuted, setPlayerMuted] = useState(true);
-
-  const togglePlay = () => {
-    if (playerPlay) return setPlayerPlay(false);
-    setPlayerMuted(false);
-    setPlayerPlay(true);
-  };
 
   useGSAP(() => {
     gsap.registerPlugin(SplitText, ScrollTrigger);
@@ -249,36 +240,16 @@ export default function DevelopmentRoute() {
               style={{ background: "var(--accent)" }}
               className=" w-75 boxed outline-accent col middle gap-10"
             >
-              <div className="m-10">
-                <div className="media-16-9 clip r-default relative">
-                  {!playerPlay && (
-                    <div className="overlay-center">
-                      <button
-                        className="bkg-none fade-sm"
-                        aria-label="Play video"
-                        onClick={togglePlay}
-                      >
-                        <Icon
-                          name="play"
-                          size={48}
-                          color="#ffffff"
-                          className="glyph-shadow"
-                        />
-                      </button>
-                    </div>
-                  )}
-                  <ReactPlayer
-                    src="https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/fundrasing_ad_1_subs_720.mp4"
-                    ref={reactPlayer}
-                    onClick={togglePlay}
-                    className="media-cover r-default"
-                    width="100%"
-                    height="100%"
-                    muted={playerMuted}
-                    loop
-                    playing={playerPlay}
-                  />
-                </div>
+              {/* w-100 + padding (not margins) so the media box has a width
+                  of its own — otherwise `col middle` shrink-wraps it to the
+                  video's intrinsic size and it has none until one loads. */}
+              <div className="w-100 p-10 border-box">
+                <VideoPlayer
+                  src={HERO_VIDEO}
+                  className="r-default"
+                  label="explainer video"
+                  loop
+                />
               </div>
               <p
                 className="textCenter mb-10"
