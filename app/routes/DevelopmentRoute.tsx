@@ -25,9 +25,12 @@ import { EndorsementCard } from "~/presentation/elements/EndorsementCard";
 import WorkedWith from "~/presentation/landing/WorkedWith";
 import { VideoPlayer } from "~/presentation/elements/VideoPlayer";
 
+const TRANSFORM_STORAGE =
+  "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform";
+
 /** Storage object name is misspelled ("fundrasing") — that is the real key. */
-const HERO_VIDEO =
-  "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/fundrasing_ad_1_subs_720.mp4";
+const HERO_VIDEO = `${TRANSFORM_STORAGE}/fundrasing_ad_1_subs_720.mp4`;
+const HERO_POSTER = `${TRANSFORM_STORAGE}/software-video-poster.jpg`;
 
 const TITLE =
   "Nonprofit Website Development Adelaide | Transform Creative";
@@ -46,7 +49,13 @@ export function meta() {
   });
 }
 
-export const links = () => [canonical("/development")];
+/* The poster is applied to the media element client-side (ReactPlayer won't
+   forward it), so it is absent from the prerendered HTML. Preloading it here
+   puts it in that markup and lets the browser start fetching before hydration. */
+export const links = () => [
+  canonical("/development"),
+  { rel: "preload", as: "image", href: HERO_POSTER },
+];
 
 const serviceSchema = {
   "@context": "https://schema.org",
@@ -246,6 +255,7 @@ export default function DevelopmentRoute() {
               <div className="w-100 p-10 border-box">
                 <VideoPlayer
                   src={HERO_VIDEO}
+                  poster={HERO_POSTER}
                   className="r-default"
                   label="explainer video"
                   loop

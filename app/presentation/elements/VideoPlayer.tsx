@@ -8,7 +8,8 @@ import "../../app-v2.css";
 export interface VideoPlayerProps {
   /** Direct media URL. Must keep a plain `.mp4`/`.webm`/… ending — see note below. */
   src: string;
-  /** Still shown before the first frame decodes, and whenever loading fails. */
+  /** Frame shown until the video decodes one of its own, and if loading fails.
+   *  Safe to point at a URL that may not exist — a missing poster shows nothing. */
   poster?: string;
   /** Starts muted playback as soon as the first frame is ready (ambient video). */
   autoPlay?: boolean;
@@ -97,6 +98,12 @@ export function VideoPlayer({
     setPlaying(autoPlay);
     setGrace(0);
 
+    // ReactPlayer forwards a fixed allow-list of props to the <video> and
+    // `poster` is not among them, so it has to be set on the element. The
+    // native attribute is also the safest home for it: unlike an <img>, a
+    // poster that 404s renders nothing at all rather than a broken image.
+    if (poster) video.poster = poster;
+
     const succeed = () => setLoadState("ready");
     const fail = () => setLoadState("failed");
 
@@ -115,7 +122,7 @@ export function VideoPlayer({
       video.removeEventListener("error", fail);
       video.removeEventListener("loadedmetadata", primeFirstFrame);
     };
-  }, [video, src, autoPlay, primeFirstFrame]);
+  }, [video, src, poster, autoPlay, primeFirstFrame]);
 
   /**
    * A request that hangs never fires `error`, so the element would sit blank
@@ -161,6 +168,14 @@ export function VideoPlayer({
       }
     }
   };
+
+  // With a poster the box already looks like a video, so it gets its play
+  // button immediately — clicking before the media is ready just queues the
+  // play. Without one there is nothing to click until a frame exists.
+  const showPlayButton =
+    interactive &&
+    !playing &&
+    (loadState === "ready" || (loadState === "waiting" && !!poster));
 
   if (loadState === "failed") {
     return (
@@ -215,16 +230,6 @@ export function VideoPlayer({
 
   return (
     <div className={`media-16-9 w-100 clip relative ${className}`}>
-      {/* Poster underlay — the media element sits on top and hides it once a
-          frame decodes, so the container is never bare. */}
-      {poster && (
-        <img
-          src={poster}
-          alt=""
-          aria-hidden
-          className="media-cover absolute-fill"
-        />
-      )}
       <ReactPlayer
         key={attempt}
         ref={setVideo}
@@ -241,14 +246,14 @@ export function VideoPlayer({
         aria-label={label}
         onClick={interactive ? togglePlay : undefined}
       />
-      {loadState === "waiting" && (
+      {loadState === "waiting" && !poster && (
         <div className="overlay-center">
           <p className="fade-sm" style={{ color: "var(--accent-sm)" }}>
             Loading…
           </p>
         </div>
       )}
-      {interactive && loadState === "ready" && !playing && (
+      {showPlayButton && (
         <div className="overlay-center">
           <button
             className="bkg-none fade-sm"
