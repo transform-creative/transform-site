@@ -10,6 +10,29 @@ export const tabColors = {
 
 export const PROJECTS: Project[] = [
   {
+    id: 20,
+    type: "software",
+    organisation: "Ping-pong A thon",
+    name: "Ping-pong-a-thon website",
+    description: [
+      "We created this leaderboard and rally tracking application to help increase engagement in the ping-pong-a-thon.",
+      "The application allows users to log their rallies, and show users when a high score has been achieved!",
+      "Custom-built on Stripe + Supabase.",
+      // {{TODO: Isaac to confirm — Ping Pong-a-thon $ raised, participants,
+      // uptime. Do NOT populate until supplied. The "$3000" figure on the
+      // King's ping-pong-a-thon *media* project is not a verified platform
+      // metric and must not be reused as one.}}
+    ],
+    video: "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_words_video.mp4",
+    images: [
+    "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_main.jpg",
+    "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_2.jpg",
+     "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_3.jpg",
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_4.jpg"
+    ],
+    //endorsement: {name: "David Goode", text: "it's great"}
+  },
+  {
     id: 102,
     organisation: "BaptistCare",
     name: "Breaking Free Program",
@@ -228,27 +251,7 @@ export const PROJECTS: Project[] = [
     link: "https://www.crossover.org.au/offering?section=promote",
   },
 
-  {
-    id: 20,
-    type: "software",
-    organisation: "King's Baptist",
-    name: "Ping-pong-a-thon leaderboard",
-    description: [
-      "We created this leaderboard and rally tracking application to help increase engagement in the ping-pong-a-thon.",
-      "The application allows users to log their rallies, and show users when a high score has been achieved!",
-      "Custom-built on Stripe + Supabase.",
-      // {{TODO: Isaac to confirm — Ping Pong-a-thon $ raised, participants,
-      // uptime. Do NOT populate until supplied. The "$3000" figure on the
-      // King's ping-pong-a-thon *media* project is not a verified platform
-      // metric and must not be reused as one.}}
-    ],
-    images: [
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/pong-4.png",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/pong-highscore-min.png",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/pong-2.png",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/pong-3.png",
-    ],
-  },
+  
   {
     id: 0,
     organisation: "Crossover",
