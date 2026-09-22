@@ -15,20 +15,22 @@ export const PROJECTS: Project[] = [
     organisation: "Ping-pong A thon",
     name: "Ping-pong-a-thon website",
     description: [
-      "We created this leaderboard and rally tracking application to help increase engagement in the ping-pong-a-thon.",
-      "The application allows users to log their rallies, and show users when a high score has been achieved!",
-      "Custom-built on Stripe + Supabase.",
-      // {{TODO: Isaac to confirm — Ping Pong-a-thon $ raised, participants,
-      // uptime. Do NOT populate until supplied. The "$3000" figure on the
-      // King's ping-pong-a-thon *media* project is not a verified platform
-      // metric and must not be reused as one.}}
+      "Ping Pong-a-thon run table tennis events around Australia which raise money to help prevent slavery around the world. We built the platform that runs the whole thing — from sign-ups through to the dollars landing where they should.",
+      "Their previous system was trying to bootstrap a generic platform into this complex platform, so we made them something shaped around the way their campaign actually runs.",
+      "At the centre of it is a proper events page — a home for the whole thing, where teams and participants can see what's on and get their own fundraising page going in a couple of minutes.",
+      "Then there are the leaderboards. For a peer-to-peer event, a bit of friendly competition is half the magic, so we made the totals live — teams and individuals climbing the board in real time, which has a lovely way of nudging everyone to raise a little more.",
+      "Underneath it all is simple, secure giving. Donations run through Stripe, the flow's quick and clean for the donor, and setting up to give or to fundraise takes moments.",
+      "The nice side effect of going custom: they're saving roughly 4% on per-donation fees, and they've finally got clear, usable data on what each campaign actually achieved — instead of digging through endless exports.",
+      "Best part? They own the lot. We build it, we run it, and we keep improving it from just down the road here in Adelaide.",
+      "If your organisation runs events or appeals and you're starting to outgrow the off-the-shelf stuff, this is exactly the sort of thing we love getting stuck into.",
     ],
-    video: "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_words_video.mp4",
+    video:
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_words_video.mp4",
     images: [
-    "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_main.jpg",
-    "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_2.jpg",
-     "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_3.jpg",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_4.jpg"
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_main.jpg",
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_2.jpg",
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_3.jpg",
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/pong_img_4.jpg",
     ],
     //endorsement: {name: "David Goode", text: "it's great"}
   },
@@ -251,7 +253,6 @@ export const PROJECTS: Project[] = [
     link: "https://www.crossover.org.au/offering?section=promote",
   },
 
-  
   {
     id: 0,
     organisation: "Crossover",

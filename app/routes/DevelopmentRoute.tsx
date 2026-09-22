@@ -323,25 +323,30 @@ export default function DevelopmentRoute() {
           </div>
         </div>
       </div>
+    
       <div
         className="horizontal-line mediumFade "
         style={{ marginTop: 50, marginBottom: 0 }}
       />
+       
       <div
         className="col middle w-100"
         ref={examplesRef}
         style={{ overflow: "clip" }}
       >
+          <div className="col middle center m-10 ">
+          <WorkedWith />
+        </div>
         <h2
           className="textCenter w-75"
-          style={{ margin: "50px 0 40px 0", color: "var(--txt)" }}
+          style={{ margin: "0px 0 40px 0", color: "var(--txt)" }}
         >
           We've created with some of Australia's most innovative{" "}
           <b style={{ fontWeight: 600, color: "var(--accent)" }}>
             non-profits
           </b>{" "}
         </h2>
-
+       
         <SoftwareProjects />
         <div className="col middle center m-20">
           <Carousel
@@ -363,9 +368,6 @@ export default function DevelopmentRoute() {
               />
             ))}
           </Carousel>
-        </div>
-        <div className="col middle center m-10 ">
-          <WorkedWith />
         </div>
       </div>
 

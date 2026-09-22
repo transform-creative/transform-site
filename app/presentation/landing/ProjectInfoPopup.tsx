@@ -95,22 +95,11 @@ export function ProjectInfoPopup({
             >
               {project?.name}
             </h4>
+            <h3>{project?.organisation || ""}</h3>
           </div>
         </div>
-
-        {/* Description prose */}
-        <div style={{ maxWidth: 680, width: "100%" }}>
-          {project?.description.map((d, i) => (
-            <p
-              key={i}
-              style={{ fontSize: "14pt", lineHeight: 1.7 }}
-              className="mb2 textCenter"
-            >
-              {d}
-            </p>
-          ))}
-        </div>
         <div className="horizontal-line fade-md" />
+
         {project?.video && (
           <button
             className="row gap-10 middle bkg fade-md"
@@ -155,7 +144,9 @@ export function ProjectInfoPopup({
             <div
               className="boxed"
               style={{
-                boxShadow: playerMuted ? undefined : "0 0 0px 2px var(--accent)",
+                boxShadow: playerMuted
+                  ? undefined
+                  : "0 0 0px 2px var(--accent)",
                 maxWidth: context.inShrink ? 800 : "60%",
                 width: "100%",
                 overflow: "hidden",
@@ -200,7 +191,19 @@ export function ProjectInfoPopup({
         {context.inShrink && (
           <div className="horizontal-line fade-md" />
         )}
-
+        {/* Description prose */}
+        <div style={{ maxWidth: 1200, width: "100%" }}>
+          {project?.description.map((d, i) => (
+            <p
+              key={i}
+              style={{ fontSize: "14pt", lineHeight: 1.7 }}
+              className="mb2 textCenter"
+            >
+              {d}
+            </p>
+          ))}
+        </div>
+        <div className="horizontal-line fade-md" />
         {/* Image gallery */}
         {project?.images && project.images.length > 0 && (
           <div
