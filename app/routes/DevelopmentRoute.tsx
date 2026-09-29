@@ -301,40 +301,16 @@ export default function DevelopmentRoute() {
           </div>
         </div>
       </div>
-      <div
-        className="horizontal-line mediumFade "
-        style={{ top: -50, marginTop: 50, marginBottom: -20 }}
+         <div
+        className="horizontal-line mediumFade mt-20 mb-20 ot02"
+        style={{ top: 0 }}
       />
-      {/* w-100 (not margins) so this column has a definite width — otherwise it
-          shrink-wraps the grid and the whole panel resizes per category */}
-      <div className="m-20">
-        <div className="w-100 col middle">
-          <div
-            className="w-75 center boxed accent"
-            ref={featureSectionRef}
-          >
-            <div className="m-20">
-              <FeatureSelector
-                features={FEATURES}
-                ref={featureSelector}
-                onOpenChange={setFeaturesOpen}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    
-      <div
-        className="horizontal-line mediumFade "
-        style={{ marginTop: 50, marginBottom: 0 }}
-      />
-       
-      <div
+        <div
         className="col middle w-100"
         ref={examplesRef}
         style={{ overflow: "clip" }}
       >
-          <div className="col middle center m-10 ">
+        <div className="col middle center m-10 ">
           <WorkedWith />
         </div>
         <h2
@@ -346,7 +322,7 @@ export default function DevelopmentRoute() {
             non-profits
           </b>{" "}
         </h2>
-       
+
         <SoftwareProjects />
         <div className="col middle center m-20">
           <Carousel
@@ -371,10 +347,36 @@ export default function DevelopmentRoute() {
         </div>
       </div>
 
+   
       <div
-        className="horizontal-line mediumFade mt-20 mb-20 ot02"
-        style={{ top: 0 }}
+        className="horizontal-line mediumFade "
+        style={{ top: -50, marginTop: 50, marginBottom: -20 }}
       />
+      {/* w-100 (not margins) so this column has a definite width — otherwise it
+          shrink-wraps the grid and the whole panel resizes per category */}
+      <div className="m-20">
+        <div className="w-100 col middle">
+          <div
+            className="w-75 center boxed accent"
+            ref={featureSectionRef}
+          >
+            <div className="m-20">
+              <FeatureSelector
+                features={FEATURES}
+                ref={featureSelector}
+                onOpenChange={setFeaturesOpen}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="horizontal-line mediumFade "
+        style={{ marginTop: 50, marginBottom: 0 }}
+      />
+
+    
 
       <div className="w-100 col middle m-20">
         <HowItWorks />

@@ -34,24 +34,7 @@ export const PROJECTS: Project[] = [
     ],
     //endorsement: {name: "David Goode", text: "it's great"}
   },
-  {
-    id: 102,
-    organisation: "BaptistCare",
-    name: "Breaking Free Program",
-    video:
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Breaking_Free.mp4",
-    images: [
-      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-1.png`,
-      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-2.png`,
-      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-3.png`,
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-4.png",
-    ],
-    type: "media",
-    description: [
-      "This video was played in churches across South Australia in an effort to support the Breaking Free prison advocacy program.",
-    ],
-    link: "https://breaking-free.raiselysite.com/",
-  },
+ 
   {
     id: 105,
     organisation: "Crossover",
@@ -139,6 +122,24 @@ export const PROJECTS: Project[] = [
       "So when they asked Transform Creative to help them put together a short video to show an insight into what it's like volunteering at the cricket, we couldn't wait to help!",
     ],
     link: "https://redfrogs.com.au/",
+  },
+   {
+    id: 102,
+    organisation: "BaptistCare",
+    name: "Breaking Free Program",
+    video:
+      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Breaking_Free.mp4",
+    images: [
+      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-1.png`,
+      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-2.png`,
+      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-3.png`,
+      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BreakingFree-4.png",
+    ],
+    type: "media",
+    description: [
+      "This video was played in churches across South Australia in an effort to support the Breaking Free prison advocacy program.",
+    ],
+    link: "https://breaking-free.raiselysite.com/",
   },
   {
     id: 103,
@@ -294,23 +295,6 @@ export const PROJECTS: Project[] = [
       text: "Transform Creative is simply our go-to for all our videography needs. We work to tight timelines and a very tight budget - and sometimes get ourselves in a tight spot with a need for quality content of just a little brainstorming. Isaac gets all that and is usually at least one step ahead. The final product's never failed to be well above our expectations",
     },
   },
-
-  {
-    id: 3,
-    type: "software",
-    name: "FreeFlex app",
-    link: "https://www.freeflex.com.au",
-    images: [
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/FF-landing.png",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/FF-dash.png",
-      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/2.jpg`,
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/1.jpg",
-    ],
-    description: [
-      "This one is a bit of a personal project for us!",
-      "FreeFlex is a Freelancer's admin dream, where they can organise projects, keep track of budget and stay on top of clients.",
-    ],
-  },
   {
     id: 4,
     type: "media",
@@ -370,6 +354,8 @@ export const PROJECTS: Project[] = [
       "The course went on to sell out completely!",
     ],
   },
+  
+
   {
     id: 11,
     type: "software",
@@ -404,6 +390,24 @@ export const PROJECTS: Project[] = [
       "Their ping-pong-a-thon went on to raise $3000!",
     ],
   },
+   {
+    id: 2,
+    name: "RBC Alpha promo",
+    type: "media",
+    organisation: "Rostrevor Baptist Church",
+    video:
+      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Alpha%20RBC.mp4",
+    link: "https://www.rbc.org.au/wordpress/",
+    images: [
+      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/RBC-alpha-interview-1-min.png`,
+      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/RBC-alpha-interview-2-min.png",
+      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/RBC-alpha-interview-3-min.png",
+    ],
+    description: [
+      "For their 2025 alpha launch, Rostrevor Baptist church decided to create a relaxed, interview style welcome video.",
+      "The video is designed to help people who have never attended an alpha course feel welcomed, and know exactly what to expect!",
+    ],
+  },
   {
     id: 10,
     type: "media",
@@ -424,23 +428,63 @@ export const PROJECTS: Project[] = [
     ],
     link: "https://www.crossover.org.au/",
   },
-
-  {
-    id: 2,
-    name: "RBC Alpha promo",
+{
+    id: 1011,
+    name: "DBS Promo",
     type: "media",
-    organisation: "Rostrevor Baptist Church",
+    organisation: "The Global Harvest",
     video:
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Alpha%20RBC.mp4",
-    link: "https://www.rbc.org.au/wordpress/",
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/harvest.mp4",
+    link: "https://theglobalharvest.com/",
     images: [
-      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/RBC-alpha-interview-1-min.png`,
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/RBC-alpha-interview-2-min.png",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/RBC-alpha-interview-3-min.png",
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/thmb_harvest.jpg",
+    ],
+    description: [],
+  },
+  {
+    id: 1012,
+    name: "Sonder strategic plan launch",
+    type: "media",
+    organisation: "Sonder",
+    video:
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/sonder_saegran.mp4",
+    link: "https://sonder.net.au/about-us/#sonder-2030",
+    images: [
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/thmb_saegran.jpg",
     ],
     description: [
-      "For their 2025 alpha launch, Rostrevor Baptist church decided to create a relaxed, interview style welcome video.",
-      "The video is designed to help people who have never attended an alpha course feel welcomed, and know exactly what to expect!",
+      "We worked with Sonder to create this short, informative video for the launch of their 2030 vision.",
+    ],
+  },
+  {
+    id: 1013,
+    name: "Nunga Action Plan",
+    type: "media",
+    organisation: "Baptist Care",
+    video:
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/nungal_action.mp4",
+    link: "https://baptistcaresa.org.au/westcare-centre/baptistcare-in-sa-launches-nunga-action-plan/",
+    images: [
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/thmb_nunga.jpg",
+    ],
+    description: [
+      "Baptist Care wanted the launch of their all important 'nunga action plan' documented. So we worked with them to create this video.",
+    ],
+  },
+  {
+    id: 1014,
+    name: "Your story series",
+    type: "media",
+    organisation: "Access The Story",
+    video:
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/your_story.mp4",
+    link: "https://www.convergeoceania.com/yourstory",
+    images: [
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/thmb_your_story.jpg",
+    ],
+    description: [
+      "Converge oceania conducted world leading research into how they disciple young people, and they came to us to put it together into a highly accessible, participatory training series.",
+      "We worked with the Converge team to create scripts, film the episodes and bring it all together.",
     ],
   },
 ];
