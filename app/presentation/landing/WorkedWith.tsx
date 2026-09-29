@@ -48,7 +48,7 @@ export default function WorkedWith() {
       id="images-main"
     >
       <div className={`${scrollerCss}`}>
-        <Carousel interval={1} autoplay loop resistance={20000}>
+        <Carousel interval={1} autoplay loop resistance={50000}>
           {galleryProjects.map((img, idx) => (
             <div key={`${img.id} - ${idx}`}>
               <img

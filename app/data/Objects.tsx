@@ -627,6 +627,10 @@ export const WORKED_WITH_LOGOS: {
     image:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/worked_with_onerehab.png",
   },
+  {
+    name: "Sonder",
+    image: "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/sonder_logo.png"
+  }
 ];
 
 export const FEATURES: Feature[] = [
