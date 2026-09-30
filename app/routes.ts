@@ -15,5 +15,6 @@ export default [
   route("/client", "routes/ClientIndexRoute.tsx"),
   route("/client/:id", "routes/ClientRoute.tsx"),
   route("/forms/:id", "routes/FormRoute.tsx"),
+  route("/radar", "routes/RadarRoute.tsx"),
   route("", "routes/ErrorBoundary.tsx"),
 ] satisfies RouteConfig;

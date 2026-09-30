@@ -65,3 +65,23 @@ export type IssueStatus =
  * resolves each issue's reporting client name in JS from its client list.
  */
 export type ClientIssue = Issue & { issue_comments: IssueComment[] };
+
+/** One charity in one monthly ACNC snapshot (the `orgs` table, loaded by the ACNC radar job) */
+export type Org = Database["public"]["Tables"]["orgs"]["Row"];
+/** Latest-month fit org + what changed since last month (the `org_radar` view) */
+export type OrgRadarRow = Database["public"]["Views"]["org_radar"]["Row"];
+/**
+ * Radar segment. `jenny` = software buyer, `phil` = video-series buyer,
+ * `both` = both (best leads), `phil_review` = religious charity with no financials.
+ */
+export type OrgSegment = "jenny" | "phil" | "both" | "phil_review";
+/** One radar triage decision (append-only; latest per ABN is current) */
+export type OrgDecision = Database["public"]["Tables"]["org_decisions"]["Row"];
+export type OrgStatus = "new" | "pursuing" | "snoozed" | "not_fit" | "never" | "client";
+export type DecisionReason =
+  | "numbers_off"
+  | "pass_through"
+  | "bad_timing"
+  | "in_house"
+  | "relationship"
+  | "other";

@@ -8,7 +8,7 @@
 
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
-import type { Issue, IssueComment } from "~/data/CustomTypes";
+import type { Issue, IssueComment, OrgDecision } from "~/data/CustomTypes";
 import type { Tables, TablesInsert } from "./supabase";
 
 /*************************
@@ -70,4 +70,24 @@ export async function createResponse(
   }
 
   return true;
+}
+
+/*************************
+ * Record radar triage decisions (one org from the Decide menu, or the
+ * Notion picks as Pursuing). Append-only: the newest row per ABN wins.
+ */
+export async function createOrgDecisions(
+  decisions: TablesInsert<"org_decisions">[]
+): Promise<OrgDecision[]> {
+  const { data, error } = await supabase
+    .from("org_decisions")
+    .insert(decisions)
+    .select();
+
+  if (error) {
+    await logError(error, ["createOrgDecisions", "Create"]);
+    throw error;
+  }
+
+  return data;
 }

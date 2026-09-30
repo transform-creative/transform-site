@@ -1150,3 +1150,175 @@ h5.center {
     display: none;
   }
 }
+
+/************************************
+************ Data display ***********
+*************************************/
+/* Chart series colours (validated for colour-blind separation on --bkg) */
+:root {
+  --viz-1: #2c6329;
+  --viz-2: #d4843a;
+  --viz-track: #19191914;
+}
+:root [data-theme="dark"] {
+  --viz-1: #2e702a;
+  --viz-2: #c6844a;
+  --viz-track: #ffffff14;
+}
+
+/* Small labelled number block (KPI, stat) */
+.stat-tile {
+  background: #4369401f;
+  border-radius: var(--borderRadius);
+  padding: 14px;
+}
+
+/* Compact status/label chip */
+.badge {
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  width: fit-content;
+}
+.badge-accent {
+  background: var(--accent);
+  color: var(--bkg);
+}
+.badge-soft {
+  background: #4369402e;
+  color: var(--txt);
+}
+.badge-warn {
+  background: #c7843833;
+  color: var(--txt);
+}
+.badge-outline {
+  border: 1px solid var(--accent-lg);
+  color: var(--txt);
+}
+
+/* Horizontal share bar: segments sit inside a neutral track, 2px gaps */
+.bar-track {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  width: 100%;
+  background: var(--viz-track);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Colour key square beside a label */
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Stacked list item separated by a hairline */
+.list-row {
+  border-top: 1px solid #19191926;
+  padding: 14px 0;
+}
+
+/* Aligned figures in tables and stat blocks */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Secondary text */
+.muted {
+  color: var(--accent-lg);
+}
+
+/* Single-line text that clips with an ellipsis */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Scroll region inside a fixed-height container */
+.scroll-y {
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Plain data table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.data-table th,
+.data-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #19191926;
+  text-align: right;
+}
+.data-table th:first-child,
+.data-table td:first-child {
+  text-align: left;
+}
+
+/* Compact grid for small stat blocks */
+.grid-110 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+/* Button that reads as inline text (names, links in lists) */
+.text-button {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  text-align: left;
+}
+
+/* Small caps-style field label above a value */
+.field-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-lg);
+}
+
+/* Compact checkbox (overrides the global full-width input sizing) */
+input[type="checkbox"].checkbox {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+/* Readable inline link on light surfaces (the global `a` colour is --bkg) */
+a.link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Small toggle chip (pick one of a few); .active = chosen */
+button.chip {
+  font-size: var(--text-sm);
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: none;
+  border: 1px solid var(--accent-lg);
+  color: var(--txt);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+button.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bkg);
+}
+button.chip.active:hover,
+button.chip.active:hover * {
+  color: var(--bkg);
+}

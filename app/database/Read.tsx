@@ -4,6 +4,9 @@ import type {
   Business,
   BusinessRole,
   ClientIssue,
+  Org,
+  OrgRadarRow,
+  OrgDecision,
   Profile,
 } from "~/data/CustomTypes";
 
@@ -298,4 +301,107 @@ export async function getBusinessIssues(
   }
 
   return (data ?? []) as ClientIssue[];
+}
+
+/*************************
+ * Read the ACNC radar: every fit org (jenny / phil / both / phil_review) in the
+ * latest monthly snapshot, with what changed since the previous snapshot.
+ * Pages through PostgREST's 1,000-row cap (~3K rows, flat as history grows).
+ * RLS limits this to Transform Creative admins.
+ */
+export async function getRadarOrgs(): Promise<OrgRadarRow[]> {
+  const PAGE = 1000;
+  const rows: OrgRadarRow[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("org_radar")
+      .select("*")
+      .order("abn")
+      .range(from, from + PAGE - 1);
+
+    if (error) {
+      await logError(error, ["getRadarOrgs", "Read"]);
+      throw error;
+    }
+    rows.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  return rows;
+}
+
+/*************************
+ * Every radar triage decision, oldest first. Small (a handful a week), so the
+ * page loads it all and works out each org's current status client-side.
+ */
+export async function getOrgDecisions(): Promise<OrgDecision[]> {
+  const PAGE = 1000;
+  const rows: OrgDecision[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from("org_decisions")
+      .select("*")
+      .order("decided_at")
+      .range(from, from + PAGE - 1);
+
+    if (error) {
+      await logError(error, ["getOrgDecisions", "Read"]);
+      throw error;
+    }
+    rows.push(...(data ?? []));
+    if (!data || data.length < PAGE) break;
+  }
+  return rows;
+}
+
+/*************************
+ * Search any charity (fit or not) in one snapshot by name, other name or ABN.
+ * @param query Free text, or an ABN (spaces allowed)
+ * @param snapshotMonth The snapshot to search (YYYY-MM-01), normally the latest
+ */
+export async function searchOrgs(
+  query: string,
+  snapshotMonth: string
+): Promise<Org[]> {
+  const digits = query.replace(/\s/g, "");
+  let request = supabase
+    .from("orgs")
+    .select("*")
+    .eq("snapshot_month", snapshotMonth)
+    .limit(25);
+
+  if (/^\d{9,11}$/.test(digits)) {
+    request = request.eq("abn", digits.padStart(11, "0"));
+  } else {
+    // Strip characters that would break the PostgREST or() filter syntax
+    const term = query.replace(/[,()*%\\]/g, " ").trim();
+    if (!term) return [];
+    request = request
+      .or(`name.ilike.*${term}*,other_names.ilike.*${term}*`)
+      .order("revenue_total", { ascending: false, nullsFirst: false });
+  }
+
+  const { data, error } = await request;
+  if (error) {
+    await logError(error, ["searchOrgs", "Read"]);
+    throw error;
+  }
+  return data ?? [];
+}
+
+/*************************
+ * Read every monthly snapshot of one charity, oldest first (its story over time).
+ * @param abn The charity's 11-digit ABN
+ */
+export async function getOrgHistory(abn: string): Promise<Org[]> {
+  const { data, error } = await supabase
+    .from("orgs")
+    .select("*")
+    .eq("abn", abn)
+    .order("snapshot_month", { ascending: true });
+
+  if (error) {
+    await logError(error, ["getOrgHistory", "Read"]);
+    throw error;
+  }
+  return data ?? [];
 }

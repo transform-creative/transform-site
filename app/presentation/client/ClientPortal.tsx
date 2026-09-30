@@ -32,6 +32,7 @@ import {
   getProfile,
 } from "~/database/Read";
 import { supabaseSignOut } from "~/database/Auth";
+import { TRANSFORM_BUSINESS_ID } from "~/business/radarBL";
 import { Icon } from "../elements/Icon";
 import TypeInput from "../elements/TypeInput";
 import { IssueCard } from "./IssueCard";
@@ -435,6 +436,15 @@ export function ClientPortal({
                 </button>
               </div>
               <div className="row middle gap-10">
+                {business?.id === TRANSFORM_BUSINESS_ID && (
+                  <button
+                    className="row middle outline-secondary gap-5"
+                    onClick={() => context.navigate("/radar")}
+                  >
+                    <Icon name="radio-outline" color="var(--accent)" />
+                    Radar
+                  </button>
+                )}
                 <button
                   className="row middle outline-secondary"
                   onClick={handleRefresh}

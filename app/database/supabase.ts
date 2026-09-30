@@ -649,6 +649,222 @@ export type Database = {
           },
         ]
       }
+      org_decisions: {
+        Row: {
+          abn: string
+          decided_at: string
+          decided_by: string | null
+          decided_month: string | null
+          id: number
+          name: string | null
+          note: string | null
+          reason: string | null
+          revenue_at_decision: number | null
+          segment_at_decision: string | null
+          snooze_until: string | null
+          status: string
+        }
+        Insert: {
+          abn: string
+          decided_at?: string
+          decided_by?: string | null
+          decided_month?: string | null
+          id?: never
+          name?: string | null
+          note?: string | null
+          reason?: string | null
+          revenue_at_decision?: number | null
+          segment_at_decision?: string | null
+          snooze_until?: string | null
+          status: string
+        }
+        Update: {
+          abn?: string
+          decided_at?: string
+          decided_by?: string | null
+          decided_month?: string | null
+          id?: never
+          name?: string | null
+          note?: string | null
+          reason?: string | null
+          revenue_at_decision?: number | null
+          segment_at_decision?: string | null
+          snooze_until?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      orgs: {
+        Row: {
+          abn: string
+          advancing_education: boolean | null
+          advancing_health: boolean | null
+          advancing_religion: boolean | null
+          advancing_welfare: boolean | null
+          ais_period_end: string | null
+          anniversary_label: string | null
+          anniversary_year: number | null
+          basic_religious_charity: boolean | null
+          benefits_children: boolean | null
+          benefits_youth: boolean | null
+          charity_size: string | null
+          consolidated_report: boolean | null
+          created_at: string
+          donations_bequests: number | null
+          donations_bequests_prev: number | null
+          donations_growth: number | null
+          donations_share: number | null
+          established_date: string | null
+          established_year: number | null
+          excluded: boolean | null
+          excluded_reason: string | null
+          financial_year_end: string | null
+          fte: number | null
+          fundraising_online: boolean | null
+          fundraising_sa: boolean | null
+          fy_end_month: number | null
+          gov_share: number | null
+          grants_made: number | null
+          grants_share: number | null
+          how_purposes_pursued: string | null
+          hpc: boolean | null
+          jenny_fit: boolean | null
+          name: string
+          net_surplus: number | null
+          operates_in_sa: boolean | null
+          other_names: string | null
+          pass_through: boolean | null
+          pbi: boolean | null
+          phil_fit: boolean | null
+          phil_review: boolean | null
+          postcode: string | null
+          responsible_persons_count: number | null
+          revenue_gov: number | null
+          revenue_growth: number | null
+          revenue_total: number | null
+          revenue_total_prev: number | null
+          segment: string | null
+          snapshot_month: string
+          state: string | null
+          total_expenses: number | null
+          town: string | null
+          volunteers: number | null
+          website: string | null
+        }
+        Insert: {
+          abn: string
+          advancing_education?: boolean | null
+          advancing_health?: boolean | null
+          advancing_religion?: boolean | null
+          advancing_welfare?: boolean | null
+          ais_period_end?: string | null
+          anniversary_label?: string | null
+          anniversary_year?: number | null
+          basic_religious_charity?: boolean | null
+          benefits_children?: boolean | null
+          benefits_youth?: boolean | null
+          charity_size?: string | null
+          consolidated_report?: boolean | null
+          created_at?: string
+          donations_bequests?: number | null
+          donations_bequests_prev?: number | null
+          donations_growth?: number | null
+          donations_share?: number | null
+          established_date?: string | null
+          established_year?: number | null
+          excluded?: boolean | null
+          excluded_reason?: string | null
+          financial_year_end?: string | null
+          fte?: number | null
+          fundraising_online?: boolean | null
+          fundraising_sa?: boolean | null
+          fy_end_month?: number | null
+          gov_share?: number | null
+          grants_made?: number | null
+          grants_share?: number | null
+          how_purposes_pursued?: string | null
+          hpc?: boolean | null
+          jenny_fit?: boolean | null
+          name: string
+          net_surplus?: number | null
+          operates_in_sa?: boolean | null
+          other_names?: string | null
+          pass_through?: boolean | null
+          pbi?: boolean | null
+          phil_fit?: boolean | null
+          phil_review?: boolean | null
+          postcode?: string | null
+          responsible_persons_count?: number | null
+          revenue_gov?: number | null
+          revenue_growth?: number | null
+          revenue_total?: number | null
+          revenue_total_prev?: number | null
+          segment?: string | null
+          snapshot_month: string
+          state?: string | null
+          total_expenses?: number | null
+          town?: string | null
+          volunteers?: number | null
+          website?: string | null
+        }
+        Update: {
+          abn?: string
+          advancing_education?: boolean | null
+          advancing_health?: boolean | null
+          advancing_religion?: boolean | null
+          advancing_welfare?: boolean | null
+          ais_period_end?: string | null
+          anniversary_label?: string | null
+          anniversary_year?: number | null
+          basic_religious_charity?: boolean | null
+          benefits_children?: boolean | null
+          benefits_youth?: boolean | null
+          charity_size?: string | null
+          consolidated_report?: boolean | null
+          created_at?: string
+          donations_bequests?: number | null
+          donations_bequests_prev?: number | null
+          donations_growth?: number | null
+          donations_share?: number | null
+          established_date?: string | null
+          established_year?: number | null
+          excluded?: boolean | null
+          excluded_reason?: string | null
+          financial_year_end?: string | null
+          fte?: number | null
+          fundraising_online?: boolean | null
+          fundraising_sa?: boolean | null
+          fy_end_month?: number | null
+          gov_share?: number | null
+          grants_made?: number | null
+          grants_share?: number | null
+          how_purposes_pursued?: string | null
+          hpc?: boolean | null
+          jenny_fit?: boolean | null
+          name?: string
+          net_surplus?: number | null
+          operates_in_sa?: boolean | null
+          other_names?: string | null
+          pass_through?: boolean | null
+          pbi?: boolean | null
+          phil_fit?: boolean | null
+          phil_review?: boolean | null
+          postcode?: string | null
+          responsible_persons_count?: number | null
+          revenue_gov?: number | null
+          revenue_growth?: number | null
+          revenue_total?: number | null
+          revenue_total_prev?: number | null
+          segment?: string | null
+          snapshot_month?: string
+          state?: string | null
+          total_expenses?: number | null
+          town?: string | null
+          volunteers?: number | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           created_at: string
@@ -917,7 +1133,131 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      org_changes: {
+        Row: {
+          abn: string | null
+          board_size_change: number | null
+          donations_change: number | null
+          name: string | null
+          name_before: string | null
+          name_changed: boolean | null
+          new_financials_lodged: boolean | null
+          new_in_snapshot: boolean | null
+          revenue_change: number | null
+          segment: string | null
+          segment_before: string | null
+          segment_changed: boolean | null
+          size_before: string | null
+          size_changed: boolean | null
+          snapshot_month: string | null
+          state: string | null
+          website_before: string | null
+          website_changed: boolean | null
+        }
+        Relationships: []
+      }
+      org_radar: {
+        Row: {
+          abn: string | null
+          advancing_education: boolean | null
+          advancing_religion: boolean | null
+          ais_period_end: string | null
+          anniversary_label: string | null
+          anniversary_year: number | null
+          basic_religious_charity: boolean | null
+          board_size_change: number | null
+          charity_size: string | null
+          donations_bequests: number | null
+          donations_bequests_prev: number | null
+          donations_growth: number | null
+          donations_share: number | null
+          established_year: number | null
+          fte: number | null
+          fundraising_online: boolean | null
+          fy_end_month: number | null
+          gov_share: number | null
+          grants_made: number | null
+          grants_share: number | null
+          has_prev: boolean | null
+          loaded_at: string | null
+          name: string | null
+          name_before: string | null
+          name_changed: boolean | null
+          net_surplus: number | null
+          new_financials_lodged: boolean | null
+          new_in_snapshot: boolean | null
+          operates_in_sa: boolean | null
+          other_names: string | null
+          pass_through: boolean | null
+          postcode: string | null
+          responsible_persons_count: number | null
+          revenue_gov: number | null
+          revenue_growth: number | null
+          revenue_total: number | null
+          revenue_total_prev: number | null
+          segment: string | null
+          segment_before: string | null
+          size_before: string | null
+          size_changed: boolean | null
+          snapshot_month: string | null
+          state: string | null
+          total_expenses: number | null
+          town: string | null
+          volunteers: number | null
+          website: string | null
+          website_before: string | null
+          website_changed: boolean | null
+        }
+        Relationships: []
+      }
+      sa_shortlist: {
+        Row: {
+          abn: string | null
+          anniversary_label: string | null
+          anniversary_year: number | null
+          donations_bequests: number | null
+          donations_growth: number | null
+          fte: number | null
+          fundraising_online: boolean | null
+          fy_end_month: number | null
+          name: string | null
+          pass_through: boolean | null
+          revenue_total: number | null
+          segment: string | null
+          website: string | null
+        }
+        Insert: {
+          abn?: string | null
+          anniversary_label?: string | null
+          anniversary_year?: number | null
+          donations_bequests?: number | null
+          donations_growth?: number | null
+          fte?: number | null
+          fundraising_online?: boolean | null
+          fy_end_month?: number | null
+          name?: string | null
+          pass_through?: boolean | null
+          revenue_total?: number | null
+          segment?: string | null
+          website?: string | null
+        }
+        Update: {
+          abn?: string | null
+          anniversary_label?: string | null
+          anniversary_year?: number | null
+          donations_bequests?: number | null
+          donations_growth?: number | null
+          fte?: number | null
+          fundraising_online?: boolean | null
+          fy_end_month?: number | null
+          name?: string | null
+          pass_through?: boolean | null
+          revenue_total?: number | null
+          segment?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       add_recurring_expense: { Args: never; Returns: string }
@@ -1242,12 +1582,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1271,11 +1611,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1296,11 +1636,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1321,11 +1661,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1338,11 +1678,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
