@@ -29,22 +29,28 @@ OUT = Path("data")
 
 
 def package(name: str):
-    r = requests.get(f"{API}/package_show", params={"id": name}, headers=HEADERS, timeout=60)
-    if r.status_code == 404:
+    r = requests.get(f"{API}/package_show", params={"id": name}, headers=HEADERS, timeout=60,
+                     allow_redirects=False)
+    # A missing dataset comes back as a 404, or (seen Sept 2026) a bare 302 HTML page with no Location.
+    if r.status_code in (301, 302, 303, 307, 308, 404):
         return None
     r.raise_for_status()
+    if "json" not in r.headers.get("Content-Type", ""):
+        return None
     body = r.json()
     return body["result"] if body.get("success") else None
 
 
 def best_resource(pkg: dict) -> str:
-    resources = pkg.get("resources", [])
+    # AIS datasets also carry _programs and _group_members files; we want the main one.
+    resources = [res for res in pkg.get("resources", [])
+                 if not any(s in (res.get("url") or "").lower() for s in ("program", "group_member"))]
     for fmt in FORMAT_PREFERENCE:
         for res in resources:
             if (res.get("format") or "").lower() == fmt and res.get("url"):
                 return res["url"]
     sys.exit(f"No CSV/XLSX resource in dataset {pkg.get('name')}: "
-             f"{[(r.get('name'), r.get('format')) for r in resources]}")
+             f"{[(r.get('name'), r.get('format')) for r in pkg.get('resources', [])]}")
 
 
 def latest_ais_urls() -> list:
