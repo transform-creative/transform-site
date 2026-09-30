@@ -1,6 +1,7 @@
 import { Feature } from "~/presentation/software/FeatureSelector";
 import { HowItWorksStep } from "~/presentation/software/HowItWorks";
 import { Project } from "./CommonTypes";
+import type { IoniconName } from "./Ionicons";
 
 export const tabColors = {
   design: "var(--thirdColor)",
@@ -900,5 +901,31 @@ export const HOW_IT_WORKS: HowItWorksStep[] = [
       "Because you own it, those improvements are yours — they're never held back for a higher pricing tier.",
     ],
     note: "Your platform, improving on your terms.",
+  },
+];
+
+/** The three beats of the "How we work" section on /media. */
+export const MEDIA_HOW_WE_WORK: {
+  icon: IoniconName;
+  title: string;
+  description: string;
+}[] = [
+  {
+    icon: "ear-outline",
+    title: "We listen first",
+    description:
+      "Before a camera comes out, we learn your story, your people and the ones you're trying to reach.",
+  },
+  {
+    icon: "compass-outline",
+    title: "We shape it around your goal",
+    description:
+      "An appeal, a launch, a training series. Every shot and every cut is built around what you need the video to achieve.",
+  },
+  {
+    icon: "people-outline",
+    title: "We stick around",
+    description:
+      "Cut-downs for social, advice on getting it seen, and a hand with the next project when you're ready for it.",
   },
 ];

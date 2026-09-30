@@ -27,6 +27,6 @@ export default {
    * vercel.json's catch-all rewrite must point at.
    */
   prerender: isProductionBuild
-    ? ["/", "/home", "/portfolio", "/contact", "/development"]
+    ? ["/", "/home", "/portfolio", "/contact", "/development", "/media"]
     : undefined,
 } satisfies Config;

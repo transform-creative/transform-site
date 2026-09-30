@@ -236,6 +236,13 @@ p.clickable:hover {
   overflow: hidden;
 }
 
+/* Cropped 4:5 portrait surface (headshots, vertical stills) */
+.media-4-5 {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+
 /* Media that fills its box on both axes, cropping the overflowing side */
 .media-cover,
 .media-cover video {
