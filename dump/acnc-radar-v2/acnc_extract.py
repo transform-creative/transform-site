@@ -145,7 +145,13 @@ def extract_register(path: str) -> pd.DataFrame:
         "benefits_youth": flag(pick(r, "Youth")),
     })
     out = out.dropna(subset=["abn"]).drop_duplicates("abn", keep="last")
-    print(f"  {len(out):,} charities")
+    # A few hundred charities have their name withheld on the public register - fall back to an
+    # other name, else drop them (orgs.name is NOT NULL, and there's no one to contact anyway).
+    blank = out["name"].isna() | (out["name"].astype(str).str.strip() == "")
+    out.loc[blank, "name"] = out.loc[blank, "other_names"]
+    nameless = out["name"].isna() | (out["name"].astype(str).str.strip() == "")
+    out = out[~nameless]
+    print(f"  {len(out):,} charities (dropped {int(nameless.sum()):,} with no published name)")
     return out
 
 

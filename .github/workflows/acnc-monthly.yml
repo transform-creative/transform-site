@@ -32,6 +32,7 @@ jobs:
     defaults:
       run:
         working-directory: dump/acnc-radar-v2
+        shell: bash  # explicit bash adds pipefail, so a failing script before `| tee` fails the step
     steps:
       - uses: actions/checkout@v4
 
