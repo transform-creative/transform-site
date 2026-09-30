@@ -10,6 +10,7 @@ export default [
   route("/portfolio", "routes/MediaRoute.tsx"),
   route("/contact", "routes/ContactRoute.tsx"),
   route("/development", "routes/DevelopmentRoute.tsx"),
+  route("/media", "routes/MediaServicesRoute.tsx"),
     route("/auth", "routes/AuthenticationRoute.tsx"),
   route("/client", "routes/ClientIndexRoute.tsx"),
   route("/client/:id", "routes/ClientRoute.tsx"),

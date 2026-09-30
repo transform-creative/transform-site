@@ -37,6 +37,7 @@ export function FooterBar({}: FooterBarProps) {
           <button onClick={() => navigate("/development")}>
             Software
           </button>
+          <button onClick={() => navigate("/media")}>Video</button>
           <button onClick={() => navigate("/portfolio")}>
             Portfolio
           </button>

@@ -180,6 +180,22 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
       >
         Portfolio
       </button>
+      <button
+        disabled={location.pathname == "/media"}
+        style={{
+          fontSize: textSize,
+          color: `${
+            location.pathname == "/media" ? "var(--accent)" : ""
+          }`,
+          opacity: 1,
+        }}
+        onClick={() => {
+          navigate("/media");
+          onClose();
+        }}
+      >
+        Video
+      </button>
         <button
         disabled={location.pathname == "/development"}
         style={{
