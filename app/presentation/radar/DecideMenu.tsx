@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { DecisionReason, OrgDecision, OrgStatus } from "~/data/CustomTypes";
+import type { DecisionReason, OrgDecision, OrgOwner, OrgStatus } from "~/data/CustomTypes";
 import { createOrgDecisions } from "~/database/Create";
 import {
   REASONS,
@@ -13,11 +13,13 @@ import {
   decisionLabel,
   fmtDate,
   needsReason,
+  segmentOf,
   snoozeUntil,
   type SnoozeOption,
 } from "~/business/radarBL";
 import BasicMenu from "../elements/BasicMenu";
 import { Icon } from "../elements/Icon";
+import { OwnerTags } from "./OwnerTags";
 import "../../app-v2.css";
 
 /** The org being decided on (a radar row, or any org from search) */
@@ -163,21 +165,31 @@ export function DecisionForm({ target, status, month, onSaved }: FormProps) {
 interface MenuProps {
   target: DecideTarget | null;
   status: OrgStatus;
+  /** The org's manual Jenny / Phil tag, if any */
+  owner: OrgOwner | undefined;
   month: string | null;
   onClose: () => void;
   onSaved: (rows: OrgDecision[]) => void;
+  onOwnerChange: (abn: string, owner: OrgOwner | null) => void;
 }
 
 /******************************
  * DecisionForm in a bottom menu, for deciding straight from the list.
  */
-export function DecideMenu({ target, status, month, onClose, onSaved }: MenuProps) {
+export function DecideMenu({ target, status, owner, month, onClose, onSaved, onOwnerChange }: MenuProps) {
   const context: SharedContextProps = useOutletContext();
   return (
     <BasicMenu active={!!target} onClose={onClose} width={context.inShrink ? "95%" : 560}>
       {target && (
         <div className="col gap-10">
           <h3>{target.name}</h3>
+          <OwnerTags
+            abn={target.abn}
+            name={target.name}
+            autoSegment={segmentOf({ segment: target.segment ?? null })}
+            owner={owner}
+            onChange={onOwnerChange}
+          />
           <DecisionForm
             key={target.abn}
             target={target}

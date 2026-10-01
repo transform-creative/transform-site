@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { OrgDecision, OrgRadarRow, OrgSegment, OrgStatus } from "~/data/CustomTypes";
-import { getOrgDecisions, getRadarOrgs } from "~/database/Read";
+import type { OrgDecision, OrgOwner, OrgRadarRow, OrgSegment, OrgStatus } from "~/data/CustomTypes";
+import { getOrgDecisions, getOrgOwners, getRadarOrgs } from "~/database/Read";
 import { createOrgDecisions } from "~/database/Create";
 import {
   DEFAULT_TIP_LEAK,
@@ -17,12 +17,16 @@ import {
   downloadFile,
   fmtDate,
   inSA,
+  matchesSegment,
   notionSnippet,
+  ownerSegment,
+  ownersByAbn,
   scoreOrgs,
   snapshotFreshness,
   sortOrgs,
   toCsv,
   triage,
+  withOwners,
   withTriage,
   type ScoredOrg,
   type SortDir,
@@ -65,6 +69,7 @@ export function Radar() {
   const context: SharedContextProps = useOutletContext();
   const [rows, setRows] = useState<OrgRadarRow[]>([]);
   const [decisions, setDecisions] = useState<OrgDecision[]>([]);
+  const [owners, setOwners] = useState<OrgOwner[]>([]);
   const [loading, setLoading] = useState(true);
   const [scope, setScope] = useState<Scope>("sa");
   const [status, setStatus] = useState<OrgStatus>("new");
@@ -81,11 +86,12 @@ export function Radar() {
 
   useEffect(() => {
     let active = true;
-    Promise.all([getRadarOrgs(), getOrgDecisions()])
-      .then(([r, d]) => {
+    Promise.all([getRadarOrgs(), getOrgDecisions(), getOrgOwners()])
+      .then(([r, d, o]) => {
         if (!active) return;
         setRows(r);
         setDecisions(d);
+        setOwners(o);
       })
       .catch(() => active && context.popAlert("Could not load the radar", "Please try again", true))
       .finally(() => active && setLoading(false));
@@ -96,7 +102,11 @@ export function Radar() {
 
   const scored = useMemo(() => scoreOrgs(rows), [rows]);
   const decisionMap = useMemo(() => decisionsByAbn(decisions), [decisions]);
-  const triaged = useMemo(() => withTriage(scored, decisionMap), [scored, decisionMap]);
+  const ownerMap = useMemo(() => ownersByAbn(owners), [owners]);
+  const triaged = useMemo(
+    () => withTriage(withOwners(scored, ownerMap), decisionMap),
+    [scored, ownerMap, decisionMap]
+  );
   const byAbn = useMemo(() => new Map(triaged.map((o) => [o.row.abn!, o])), [triaged]);
   const latestMonth = rows[0]?.snapshot_month ?? null;
   const loadedAt = rows.reduce<string | null>(
@@ -111,7 +121,7 @@ export function Radar() {
       triaged.filter(
         (o) =>
           (scope === "national" || inSA(o.row)) &&
-          (segment === "all" || o.segment === segment) &&
+          matchesSegment(o.segment, segment) &&
           !(hidePassThrough && o.row.pass_through)
       ),
     [triaged, scope, segment, hidePassThrough]
@@ -134,16 +144,25 @@ export function Radar() {
     [inStatus, view, sortKey, sortDir, assumptions]
   );
 
-  // Clients outside the fit segments aren't in the radar data; list them by saved name
-  const offRadarClients = useMemo(
+  // Clients outside the fit segments aren't in the radar data; list them by saved
+  // name. Only a manual tag can put them under Jenny / Phil.
+  const allOffRadarClients = useMemo(
     () =>
-      status !== "client"
-        ? []
-        : [...decisionMap.values()]
-            .map((h) => h[0])
-            .filter((d) => d.status === "client" && !byAbn.has(d.abn)),
-    [status, decisionMap, byAbn]
+      [...decisionMap.values()]
+        .map((h) => h[0])
+        .filter(
+          (d) =>
+            d.status === "client" &&
+            !byAbn.has(d.abn) &&
+            matchesSegment(ownerSegment(ownerMap.get(d.abn)), segment)
+        ),
+    [decisionMap, byAbn, ownerMap, segment]
   );
+  const offRadarClients = status === "client" ? allOffRadarClients : [];
+
+  function setOwner(abn: string, owner: OrgOwner | null) {
+    setOwners((prev) => [...prev.filter((o) => o.abn !== abn), ...(owner ? [owner] : [])]);
+  }
 
   useEffect(() => setLimit(PAGE_SIZE), [scope, status, view, segment, hidePassThrough, sortKey, sortDir]);
 
@@ -258,7 +277,7 @@ export function Radar() {
               onChange={setStatus}
               options={STATUSES.map((s) => ({
                 value: s,
-                label: `${STATUS_META[s].tab} (${statusCounts[s] + (s === "client" ? offRadarClientCount(decisionMap, byAbn) : 0)})`,
+                label: `${STATUS_META[s].tab} (${statusCounts[s] + (s === "client" ? allOffRadarClients.length : 0)})`,
               }))}
             />
 
@@ -374,16 +393,27 @@ export function Radar() {
                     Show more ({list.length - limit} left)
                   </button>
                 )}
-                {offRadarClients.map((d) => (
-                  <article key={d.abn} className="list-row row between middle gap-10">
-                    <button className="text-button" onClick={() => setOpenAbn(d.abn)}>
-                      <h3>{d.name ?? d.abn}</h3>
-                    </button>
-                    <small className="text-sm muted">
-                      Not in the fit segments · {decisionLabel(d)} since {fmtDate(d.decided_at)}
-                    </small>
-                  </article>
-                ))}
+                {offRadarClients.map((d) => {
+                  const tag = ownerSegment(ownerMap.get(d.abn));
+                  return (
+                    <article key={d.abn} className="list-row row between middle gap-10">
+                      <div className="row middle gap-10">
+                        <button className="text-button" onClick={() => setOpenAbn(d.abn)}>
+                          <h3>{d.name ?? d.abn}</h3>
+                        </button>
+                        {tag && (
+                          <small className={`badge ${SEGMENT_META[tag].badge} row middle gap-5`} title="Set by hand">
+                            <Icon name="pin-outline" size={12} />
+                            {SEGMENT_META[tag].label}
+                          </small>
+                        )}
+                      </div>
+                      <small className="text-sm muted">
+                        Not in the fit segments · {decisionLabel(d)} since {fmtDate(d.decided_at)}
+                      </small>
+                    </article>
+                  );
+                })}
               </section>
             )}
           </>
@@ -396,26 +426,24 @@ export function Radar() {
         assumptions={assumptions}
         decisions={openAbn ? decisionMap.get(openAbn) ?? [] : []}
         triage={openScored?.triage ?? triage(null, openAbn ? decisionMap.get(openAbn) : undefined)}
+        owner={openAbn ? ownerMap.get(openAbn) : undefined}
         month={latestMonth}
         onClose={() => setOpenAbn(null)}
         onCopy={(o) => copyForNotion([o])}
         onDecided={addDecisions}
+        onOwnerChange={setOwner}
       />
 
       <DecideMenu
         target={decideTarget}
         status={deciding?.triage?.status ?? "new"}
+        owner={deciding ? ownerMap.get(deciding.row.abn!) : undefined}
         month={latestMonth}
         onClose={() => setDeciding(null)}
         onSaved={addDecisions}
+        onOwnerChange={setOwner}
       />
     </div>
   );
 }
 
-/** Clients whose org isn't on the radar (outside the fit segments) */
-function offRadarClientCount(map: Map<string, OrgDecision[]>, byAbn: Map<string, ScoredOrg>): number {
-  let n = 0;
-  for (const [latest] of map.values()) if (latest.status === "client" && !byAbn.has(latest.abn)) n++;
-  return n;
-}

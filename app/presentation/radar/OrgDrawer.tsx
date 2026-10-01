@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router";
 import type { SharedContextProps } from "~/data/CommonTypes";
-import type { Org, OrgDecision } from "~/data/CustomTypes";
+import type { Org, OrgDecision, OrgOwner } from "~/data/CustomTypes";
 import { getOrgHistory } from "~/database/Read";
 import {
   SEGMENT_META,
   STATUS_META,
   acncUrl,
   decisionLabel,
+  effectiveSegment,
   fmtDate,
   fmtCount,
   fmtGrowth,
@@ -28,6 +29,7 @@ import {
   type Triage,
 } from "~/business/radarBL";
 import { DecisionForm } from "./DecideMenu";
+import { OwnerTags } from "./OwnerTags";
 import BasicMenu from "../elements/BasicMenu";
 import { Icon } from "../elements/Icon";
 import { MoneySparkline } from "./MoneySparkline";
@@ -42,11 +44,14 @@ interface Props {
   /** This org's decisions, newest first */
   decisions: OrgDecision[];
   triage: Triage;
+  /** The org's manual Jenny / Phil tag, if any */
+  owner: OrgOwner | undefined;
   /** The latest snapshot month (the baseline for waking) */
   month: string | null;
   onClose: () => void;
   onCopy: (org: ScoredOrg) => void;
   onDecided: (rows: OrgDecision[]) => void;
+  onOwnerChange: (abn: string, owner: OrgOwner | null) => void;
 }
 
 /******************************
@@ -59,10 +64,12 @@ export function OrgDrawer({
   assumptions,
   decisions,
   triage,
+  owner,
   month,
   onClose,
   onCopy,
   onDecided,
+  onOwnerChange,
 }: Props) {
   const context: SharedContextProps = useOutletContext();
   const [history, setHistory] = useState<Org[] | null>(null);
@@ -90,7 +97,14 @@ export function OrgDrawer({
       {!org && <p className="center w-100 text-sm">Loading…</p>}
       {org && (
         <div className="col gap-20">
-          <Header org={org} scored={scored} onCopy={onCopy} />
+          <Header org={org} scored={scored} owner={owner} onCopy={onCopy} />
+          <OwnerTags
+            abn={org.abn}
+            name={org.name}
+            autoSegment={segmentOf(org)}
+            owner={owner}
+            onChange={onOwnerChange}
+          />
           <Decision
             org={org}
             decisions={decisions}
@@ -99,7 +113,7 @@ export function OrgDrawer({
             onDecided={onDecided}
           />
           <WhyNow org={org} scored={scored} />
-          <KeyNumbers org={org} assumptions={assumptions} />
+          <KeyNumbers org={org} owner={owner} assumptions={assumptions} />
           <section className="col gap-10">
             <p className="field-label">Money over time</p>
             <MoneySparkline points={moneyOverTime(history!)} />
@@ -115,15 +129,27 @@ export function OrgDrawer({
   );
 }
 
-function Header({ org, scored, onCopy }: { org: Org; scored?: ScoredOrg; onCopy: (o: ScoredOrg) => void }) {
-  const seg = segmentOf(org);
+interface HeaderProps {
+  org: Org;
+  scored?: ScoredOrg;
+  owner: OrgOwner | undefined;
+  onCopy: (o: ScoredOrg) => void;
+}
+
+function Header({ org, scored, owner, onCopy }: HeaderProps) {
+  const seg = effectiveSegment(org, owner);
   const site = websiteUrl(org.website);
   return (
     <header className="col gap-10">
       <h3 style={{ fontSize: "1.6rem", lineHeight: 1.2 }}>{org.name}</h3>
       {org.other_names && <small className="text-sm muted">Also known as {org.other_names}</small>}
       <div className="row wrap middle gap-5">
-        {seg && <small className={`badge ${SEGMENT_META[seg].badge}`}>{SEGMENT_META[seg].label}</small>}
+        {seg && (
+          <small className={`badge ${SEGMENT_META[seg].badge} row middle gap-5`} title={owner ? "Set by hand" : "Automatic"}>
+            {owner && <Icon name="pin-outline" size={12} />}
+            {SEGMENT_META[seg].label}
+          </small>
+        )}
         {org.charity_size && <small className="badge badge-outline">{org.charity_size}</small>}
         {org.pass_through && (
           <small className="badge badge-warn row middle gap-5">
@@ -249,9 +275,10 @@ function WhyNow({ org, scored }: { org: Org; scored?: ScoredOrg }) {
   );
 }
 
-function KeyNumbers({ org, assumptions }: { org: Org; assumptions: TipLeakAssumptions }) {
+function KeyNumbers({ org, owner, assumptions }: { org: Org; owner: OrgOwner | undefined; assumptions: TipLeakAssumptions }) {
   const stale = isStaleFinancials(org.ais_period_end);
-  const leak = isJenny(org) ? tipLeak(org, assumptions) : null;
+  const jenny = isJenny({ segment: effectiveSegment(org, owner) });
+  const leak = jenny ? tipLeak(org, assumptions) : null;
   const stats: [string, string, boolean?][] = [
     ["Revenue", fmtMoney(org.revenue_total)],
     ["Donations", fmtMoney(org.donations_bequests)],
@@ -266,7 +293,7 @@ function KeyNumbers({ org, assumptions }: { org: Org; assumptions: TipLeakAssump
     ["Board size", fmtCount(org.responsible_persons_count)],
     ["Established", org.established_year ? `${org.established_year}${org.anniversary_label ? ` · ${org.anniversary_label} in ${org.anniversary_year}` : ""}` : "–"],
   ];
-  if (isJenny(org)) stats.push(["Tip leak (what-if)", leak == null ? "Not online" : `~${fmtMoney(leak)}/yr`]);
+  if (jenny) stats.push(["Tip leak (what-if)", leak == null ? "Not online" : `~${fmtMoney(leak)}/yr`]);
 
   return (
     <section className="col gap-10">

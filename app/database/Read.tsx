@@ -7,6 +7,7 @@ import type {
   Org,
   OrgRadarRow,
   OrgDecision,
+  OrgOwner,
   Profile,
 } from "~/data/CustomTypes";
 
@@ -351,6 +352,20 @@ export async function getOrgDecisions(): Promise<OrgDecision[]> {
     if (!data || data.length < PAGE) break;
   }
   return rows;
+}
+
+/*************************
+ * Every manual Jenny / Phil tag (one row per tagged ABN). Small, so it all loads.
+ */
+export async function getOrgOwners(): Promise<OrgOwner[]> {
+  const { data, error } = await supabase.from("org_owners").select("*");
+
+  if (error) {
+    await logError(error, ["getOrgOwners", "Read"]);
+    throw error;
+  }
+
+  return data ?? [];
 }
 
 /*************************

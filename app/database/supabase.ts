@@ -694,6 +694,33 @@ export type Database = {
         }
         Relationships: []
       }
+      org_owners: {
+        Row: {
+          abn: string
+          jenny: boolean
+          name: string | null
+          phil: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          abn: string
+          jenny?: boolean
+          name?: string | null
+          phil?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          abn?: string
+          jenny?: boolean
+          name?: string | null
+          phil?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       orgs: {
         Row: {
           abn: string

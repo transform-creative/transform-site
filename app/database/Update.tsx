@@ -8,8 +8,8 @@
 
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
-import type { Issue } from "~/data/CustomTypes";
-import type { TablesUpdate } from "./supabase";
+import type { Issue, OrgOwner } from "~/data/CustomTypes";
+import type { TablesInsert, TablesUpdate } from "./supabase";
 
 /*************************
  * Update an issue with an arbitrary patch and return the saved row. Covers the
@@ -30,6 +30,26 @@ export async function updateIssue(
 
   if (error) {
     await logError(error, ["updateIssue", "Update"]);
+    throw error;
+  }
+
+  return data;
+}
+
+/*************************
+ * Set an org's manual Jenny / Phil tag (insert or replace by ABN).
+ */
+export async function upsertOrgOwner(
+  owner: TablesInsert<"org_owners">
+): Promise<OrgOwner> {
+  const { data, error } = await supabase
+    .from("org_owners")
+    .upsert({ ...owner, updated_at: new Date().toISOString() })
+    .select()
+    .single();
+
+  if (error) {
+    await logError(error, ["upsertOrgOwner", "Update"]);
     throw error;
   }
 

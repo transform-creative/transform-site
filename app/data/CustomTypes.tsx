@@ -78,6 +78,8 @@ export type OrgSegment = "jenny" | "phil" | "both" | "phil_review";
 /** One radar triage decision (append-only; latest per ABN is current) */
 export type OrgDecision = Database["public"]["Tables"]["org_decisions"]["Row"];
 export type OrgStatus = "new" | "pursuing" | "snoozed" | "not_fit" | "never" | "client";
+/** Manual Jenny / Phil tag for an org; overrides the automatic segment when present */
+export type OrgOwner = Database["public"]["Tables"]["org_owners"]["Row"];
 export type DecisionReason =
   | "numbers_off"
   | "pass_through"

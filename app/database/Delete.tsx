@@ -10,4 +10,17 @@
  * on error after logging.
  */
 
-export {};
+import { supabase } from "./SupabaseClient";
+import { logError } from "./Auth";
+
+/*************************
+ * Clear an org's manual Jenny / Phil tag, putting it back on the automatic segment.
+ */
+export async function deleteOrgOwner(abn: string): Promise<void> {
+  const { error } = await supabase.from("org_owners").delete().eq("abn", abn);
+
+  if (error) {
+    await logError(error, ["deleteOrgOwner", "Delete"]);
+    throw error;
+  }
+}

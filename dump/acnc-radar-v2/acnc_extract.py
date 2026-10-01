@@ -112,6 +112,15 @@ def to_date(s: pd.Series) -> pd.Series:
     return out.fillna(other)
 
 
+def fix_pre1900_new_year(s: pd.Series) -> pd.Series:
+    """Pre-1900 establishment dates on 31 Dec are 1 Jan slipped back a day (a timezone shift on
+    dates before Australian standard time, 1895), which also puts the year one too early.
+    Post-1900 31 Decs are left alone - those are real."""
+    slipped = (s.dt.year < 1900) & (s.dt.month == 12) & (s.dt.day == 31)
+    print(f"  Shifted {int(slipped.sum()):,} pre-1900 31 Dec establishment dates to 1 Jan")
+    return s.where(~slipped, s + pd.Timedelta(days=1))
+
+
 def safe_div(a: pd.Series, b: pd.Series) -> pd.Series:
     return (a / b.where(b > 0)).round(3)
 
@@ -132,7 +141,7 @@ def extract_register(path: str) -> pd.DataFrame:
         "postcode": pick(r, "Postcode"),
         "operates_in_sa": flag(pick(r, "Operates_in_SA")),
         "charity_size": pick(r, "Charity_Size"),
-        "established_date": to_date(pick(r, "Date_Organisation_Established")),
+        "established_date": fix_pre1900_new_year(to_date(pick(r, "Date_Organisation_Established"))),
         "financial_year_end": pick(r, "Financial_Year_End"),
         "responsible_persons_count": to_num(pick(r, "Number_of_Responsible_Persons")).round().astype("Int64"),
         "pbi": flag(pick(r, "PBI")),

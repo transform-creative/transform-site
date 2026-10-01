@@ -41,7 +41,8 @@ export function OrgRow({ org, assumptions, picked, onTogglePick, onOpen, onDecid
   const seg = SEGMENT_META[segment];
   const site = websiteUrl(row.website);
   const stale = isStaleFinancials(row.ais_period_end);
-  const leak = isJenny(row) ? tipLeak(row, assumptions) : null;
+  const jenny = isJenny(org);
+  const leak = jenny ? tipLeak(row, assumptions) : null;
 
   return (
     <article className={`list-row row gap-20 ${context.inShrink ? "col" : ""}`}>
@@ -77,7 +78,13 @@ export function OrgRow({ org, assumptions, picked, onTogglePick, onOpen, onDecid
               {decision ? decisionLabel(decision) : STATUS_META[triage.status].label}
             </small>
           )}
-          <small className={`badge ${seg.badge}`}>{seg.label}</small>
+          <small
+            className={`badge ${seg.badge} row middle gap-5`}
+            title={org.tagged ? `Set by hand (auto: ${SEGMENT_META[org.autoSegment].label})` : "Automatic"}
+          >
+            {org.tagged && <Icon name="pin-outline" size={12} />}
+            {seg.label}
+          </small>
           {row.pass_through && (
             <small
               className="badge badge-warn row middle gap-5"
@@ -156,7 +163,7 @@ export function OrgRow({ org, assumptions, picked, onTogglePick, onOpen, onDecid
             }
             warn={stale}
           />
-          {isJenny(row) && (
+          {jenny && (
             <Stat
               label="Tip leak (what-if)"
               value={leak == null ? "–" : `~${fmtMoney(leak)}/yr`}

@@ -3,6 +3,7 @@ import type {
   DecisionReason,
   Org,
   OrgDecision,
+  OrgOwner,
   OrgRadarRow,
   OrgSegment,
   OrgStatus,
@@ -90,6 +91,56 @@ export function segmentOf(row: { segment: string | null }): OrgSegment | null {
 /** Jenny-type orgs (incl. Both) get the tip-leak hook */
 export function isJenny(row: { segment: string | null }): boolean {
   return row.segment === "jenny" || row.segment === "both";
+}
+
+/** Does an org's segment show under a segment filter? Jenny and Phil include Both. */
+export function matchesSegment(segment: OrgSegment | null, filter: OrgSegment | "all"): boolean {
+  if (filter === "all") return true;
+  if (segment === filter) return true;
+  return segment === "both" && (filter === "jenny" || filter === "phil");
+}
+
+// ---------------------------------------------------------------------------
+// Manual Jenny / Phil tags (org_owners): override the automatic segment
+// ---------------------------------------------------------------------------
+export type Owner = "jenny" | "phil";
+export const OWNERS: Owner[] = ["jenny", "phil"];
+
+/** The segment a manual tag sets, or null when untagged */
+export function ownerSegment(owner: Pick<OrgOwner, "jenny" | "phil"> | null | undefined): OrgSegment | null {
+  if (!owner) return null;
+  if (owner.jenny && owner.phil) return "both";
+  if (owner.jenny) return "jenny";
+  if (owner.phil) return "phil";
+  return null;
+}
+
+/** Who an org belongs to, from its (effective) segment. Needs a look = nobody yet. */
+export function ownersOf(segment: OrgSegment | null): Record<Owner, boolean> {
+  return {
+    jenny: segment === "jenny" || segment === "both",
+    phil: segment === "phil" || segment === "both",
+  };
+}
+
+/** Manual tag wins; otherwise the automatic segment */
+export function effectiveSegment(
+  row: { segment: string | null },
+  owner: OrgOwner | null | undefined
+): OrgSegment | null {
+  return ownerSegment(owner) ?? segmentOf(row);
+}
+
+export function ownersByAbn(owners: OrgOwner[]): Map<string, OrgOwner> {
+  return new Map(owners.map((o) => [o.abn, o]));
+}
+
+/** Apply manual tags to the scored list (keeps the automatic segment alongside) */
+export function withOwners(orgs: ScoredOrg[], byAbn: Map<string, OrgOwner>): ScoredOrg[] {
+  return orgs.map((o) => {
+    const tag = ownerSegment(byAbn.get(o.row.abn!));
+    return tag ? { ...o, segment: tag, tagged: true } : o;
+  });
 }
 
 /** SA = based in SA, or registered as operating in SA */
@@ -285,7 +336,12 @@ function capitalise(s: string): string {
 /** A radar row with its signals worked out once */
 export interface ScoredOrg {
   row: OrgRadarRow;
+  /** Effective segment: the manual tag if set, else the automatic one */
   segment: OrgSegment;
+  /** The automatic classification, whatever the tag says */
+  autoSegment: OrgSegment;
+  /** True when a manual Jenny / Phil tag set the segment */
+  tagged: boolean;
   signals: WarmSignal[];
   warmth: number;
   /** Triage status, once decisions are merged in (see withTriage) */
@@ -300,6 +356,8 @@ export function scoreOrgs(rows: OrgRadarRow[], today = new Date()): ScoredOrg[] 
       return {
         row,
         segment: segmentOf(row)!,
+        autoSegment: segmentOf(row)!,
+        tagged: false,
         signals,
         warmth: signals.reduce((sum, s) => sum + s.weight, 0),
       };
@@ -404,7 +462,7 @@ function csvCell(v: unknown): string {
 export function toCsv(orgs: ScoredOrg[], a: TipLeakAssumptions): string {
   const leakHeader = `tip_leak_whatif (${Math.round(a.onlineShare * 100)}% online x ${+(a.tipRate * 100).toFixed(1)}% tip)`;
   const header = [
-    "name", "abn", "segment", "reason", "signals", "town", "state", "website",
+    "name", "abn", "segment", "segment_source", "reason", "signals", "town", "state", "website",
     "revenue", "donations", "donations_share", "gov_share", "revenue_growth",
     "donations_growth", "fte", "volunteers", "fundraising_online", "financials",
     "pass_through", "fy_end_month", "anniversary", leakHeader, "acnc",
@@ -413,6 +471,7 @@ export function toCsv(orgs: ScoredOrg[], a: TipLeakAssumptions): string {
   const lines = orgs.map(({ row, signals, segment, triage, ...rest }) =>
     [
       row.name, row.abn, SEGMENT_META[segment].label,
+      rest.tagged ? "manual" : "auto",
       reasonLine({ row, signals, segment, ...rest }),
       signals.map((s) => s.detail).join("; "),
       row.town, row.state, row.website,
@@ -420,7 +479,7 @@ export function toCsv(orgs: ScoredOrg[], a: TipLeakAssumptions): string {
       row.revenue_growth, row.donations_growth, row.fte, row.volunteers,
       row.fundraising_online, fyLabel(row.ais_period_end), row.pass_through,
       monthName(row.fy_end_month), row.anniversary_label ? `${row.anniversary_label} ${row.anniversary_year}` : "",
-      isJenny(row) ? Math.round(tipLeak(row, a) ?? 0) || "" : "",
+      isJenny({ segment }) ? Math.round(tipLeak(row, a) ?? 0) || "" : "",
       acncUrl(row.abn),
       triage ? STATUS_META[triage.status].label : "",
       triage?.current?.reason ? REASON_META[triage.current.reason as DecisionReason] : "",
@@ -541,7 +600,7 @@ function sortValue(o: ScoredOrg, key: SortKey, a: TipLeakAssumptions): number | 
     case "volunteers": return r.volunteers;
     case "online": return r.fundraising_online == null ? null : r.fundraising_online ? 1 : 0;
     case "financials": return r.ais_period_end;
-    case "tip_leak": return isJenny(r) ? tipLeak(r, a) : null;
+    case "tip_leak": return isJenny(o) ? tipLeak(r, a) : null;
     case "name": return r.name?.toLowerCase() ?? null;
     default: return null;
   }
