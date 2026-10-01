@@ -56,6 +56,10 @@ export function Carousel({
   centerFocused = false,
   mode = 'slide',
 }: ResourceLaneProps) {
+  const context: SharedContextProps = useOutletContext();
+  // Arrows sit on top of the cards once the track narrows, so taps near a
+  // card's edge hit the button instead — swiping covers it on small screens
+  const useArrows = showArrows && !context.inShrink;
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const tweenRef = useRef<gsap.core.Timeline | null>(null);
@@ -465,7 +469,7 @@ export function Carousel({
           width: "100%",
         }}
       >
-        {showArrows && (loop || selectedIndex !== 0) && (
+        {useArrows && (loop || selectedIndex !== 0) && (
           <button
             onClick={() => {
               stoppedRef.current = false;
@@ -523,7 +527,7 @@ export function Carousel({
           })}
         </div>
 
-        {showArrows &&
+        {useArrows &&
           (loop || selectedIndex !== items.length - 1) && (
             <button
               onClick={() => { stoppedRef.current = false; scrollToIndex(selectedIndex + 1, snapDuration); }}
