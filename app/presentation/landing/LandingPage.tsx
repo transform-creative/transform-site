@@ -286,7 +286,7 @@ export function LandingPage({}: LandingPageProps) {
                         cta="Film with us"
             icon="film-outline"
             title="Video"
-            subtitle="We're experts in creating videos that help charities and christian organisations raise money and awareness."
+            subtitle="helping charities and christian organisations raise money and awareness."
             videoSrc="https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/2026%20reel-LQ.mp4"
             onClick={() => navigate("/portfolio?type=media")}
           />

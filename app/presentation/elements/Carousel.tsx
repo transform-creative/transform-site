@@ -30,6 +30,7 @@ export interface ResourceLaneProps {
   loop?: boolean;
   startIndex?: number;
   resistance?: number;
+  snapDuration?: number;
   snapOffset?: number;
   centerFocused?: boolean;
   mode?: 'slide' | 'fade';
@@ -50,6 +51,7 @@ export function Carousel({
   loop = true,
   startIndex = 0,
   resistance = 6000,
+  snapDuration = 0.25,
   snapOffset = 10,
   centerFocused = false,
   mode = 'slide',
@@ -159,7 +161,7 @@ export function Carousel({
               });
           },
           onThrowComplete: (e) => {
-            scrollToIndex(getTargetIndex() || 0);
+            scrollToIndex(getTargetIndex() || 0, snapDuration);
           },
           onRelease: function () {
             gsap.set(this.target, { zIndex: 1 });
@@ -281,9 +283,11 @@ export function Carousel({
   }
 
   /***************************************
-   * Scroll to a spefic element on the carousel
+   * Scroll to a spefic element on the carousel.
+   * `duration` defaults to the carousel's speed — arrow/dot taps pass
+   * snapDuration so the move lands quickly.
    */
-  function scrollToIndex(index: number) {
+  function scrollToIndex(index: number, duration: number = speed) {
     if (mode === 'fade') {
       if (loop === false) index = Math.max(0, Math.min(index, items.length - 1));
       else if (index < 0) index = items.length - 1;
@@ -313,7 +317,7 @@ export function Carousel({
           tl.to(trackRef.current, {
             x: 0,
             xPercent: -centeredPercent(cloneDomIndex) * 100,
-            duration: speed,
+            duration,
             ease: "power2.out",
           }).set(trackRef.current, {
             x: 0,
@@ -332,8 +336,8 @@ export function Carousel({
       gsap.to(trackRef.current, {
         x: 0,
         xPercent: -centeredPercent(index + cloneOffset) * 100,
-        duration: speed,
-        ease: "back.out",
+        duration,
+        ease: "power2.out",
       });
       setSelectedIndex(index);
       selectedIndexRef.current = index;
@@ -381,8 +385,8 @@ export function Carousel({
     gsap.to(trackRef.current, {
       x: 0,
       xPercent: -finalPercent * 100,
-      duration: speed,
-      ease: "back.out",
+      duration,
+      ease: "power2.out",
     });
 
     setSelectedIndex(index);
@@ -434,7 +438,7 @@ export function Carousel({
           {items.map((_, i) => (
             <button
               key={i}
-              onClick={() => { stoppedRef.current = false; scrollToIndex(i); }}
+              onClick={() => { stoppedRef.current = false; scrollToIndex(i, snapDuration); }}
               style={{
                 width: 15,
                 height: 15,
@@ -465,7 +469,7 @@ export function Carousel({
           <button
             onClick={() => {
               stoppedRef.current = false;
-              scrollToIndex(selectedIndex - 1);
+              scrollToIndex(selectedIndex - 1, snapDuration);
             }}
             className=""
             style={{
@@ -522,7 +526,7 @@ export function Carousel({
         {showArrows &&
           (loop || selectedIndex !== items.length - 1) && (
             <button
-              onClick={() => { stoppedRef.current = false; scrollToIndex(selectedIndex + 1); }}
+              onClick={() => { stoppedRef.current = false; scrollToIndex(selectedIndex + 1, snapDuration); }}
               style={{
                    background: "#ffffff77",
               backdropFilter: "blur(2px)",
@@ -549,7 +553,7 @@ export function Carousel({
           {items.map((_, i) => (
             <button
               key={i}
-              onClick={() => { stoppedRef.current = false; scrollToIndex(i); }}
+              onClick={() => { stoppedRef.current = false; scrollToIndex(i, snapDuration); }}
               style={{
                 width: 15,
                 height: 15,
