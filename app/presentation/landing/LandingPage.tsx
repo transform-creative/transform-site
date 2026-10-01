@@ -206,11 +206,13 @@ export function LandingPage({}: LandingPageProps) {
         COLOR="#2d3625"
       />
 
+      {/* No padding here — the carousel below runs edge to edge, so the
+          padding lives on the hero block instead */}
       <div
-        className="mt-20 p-20"
+        className="mt-20"
         style={{ position: "relative", top: -20, minHeight: "30vh" }}
       >
-        <div className="col middle center" style={{margin: "5vh 0 5vh 0"}}>
+        <div className="col middle center p-20" style={{margin: "5vh 0 5vh 0"}}>
           <div
             className="col w-100 middle center"
             style={{

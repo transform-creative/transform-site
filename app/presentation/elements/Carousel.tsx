@@ -104,21 +104,17 @@ export function Carousel({
       };
 
   useEffect(() => {
-    requestAnimationFrame(() => {
+    // Two frames: card widths aren't final in the first one, and a width
+    // measured too early parks the track on a gap instead of a card
+    requestAnimationFrame(() => requestAnimationFrame(() => {
       // Instantly position to starting index — no entry animation
-      if (mode !== 'fade' && trackRef.current) {
-        const safeStart = Math.max(0, startIndex);
-        gsap.set(trackRef.current, {
-          x: 0,
-          xPercent: -centeredPercent(safeStart + cloneOffset) * 100,
-        });
-      }
+      settleToSelected();
       if (mode === 'fade') {
         itemRefs.current.forEach((el, i) => {
           if (el) gsap.set(el, { opacity: i === startIndex ? 1 : 0 });
         });
       }
-    });
+    }));
 
     // Controls the loop if autoplaying
 
@@ -136,6 +132,38 @@ export function Carousel({
 
     return () => {
       clearInterval(int);
+    };
+  }, []);
+
+  /******************************
+   * Re-centre whenever the measured layout moves the snap points.
+   * The track's offset is a percentage of its own width, so a card that
+   * settles to a different size (media loading, fonts, the shrink
+   * breakpoint flipping) or a window resize leaves the old offset pointing
+   * between two cards.
+   */
+  useEffect(() => {
+    const track = trackRef.current;
+    const container = containerRef.current;
+    if (mode === "fade" || !track || !container) return;
+
+    let frame = 0;
+    const resettle = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(settleToSelected);
+    };
+
+    const observer = new ResizeObserver(resettle);
+    observer.observe(track);
+    observer.observe(container);
+    // `load` doesn't bubble — catch the cards' images/videos on the way down
+    track.addEventListener("load", resettle, true);
+    document.fonts.ready.then(resettle);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      track.removeEventListener("load", resettle, true);
     };
   }, []);
 
@@ -285,22 +313,44 @@ export function Carousel({
   function centeredPercent(domIndex: number): number {
     const raw = domIndex / domCount;
     const track = trackRef.current;
-    const item = track?.children[domIndex] as HTMLElement | undefined;
-    if (!track || !item) return raw;
+    if (!track) return raw;
 
     const trackRect = track.getBoundingClientRect();
-    const itemRect = item.getBoundingClientRect();
     if (!trackRect.width) return raw;
 
+    // Fall back to evenly sized cards when the item itself can't be measured,
+    // so the offset still centres rather than silently left-aligning
+    const item = track.children[domIndex] as HTMLElement | undefined;
+    const itemRect = item?.getBoundingClientRect();
+    const itemWidth = itemRect?.width || trackRect.width / domCount;
     // Distance from the track's start to this item, unaffected by the
     // transform currently applied to the track (both move together)
-    const itemStart = itemRect.x - trackRect.x;
+    const itemStart = itemRect
+      ? itemRect.x - trackRect.x
+      : raw * trackRect.width;
     if (!centerFocused) return itemStart / trackRect.width;
 
     const cw = containerRef.current?.getBoundingClientRect().width || 0;
-    const offset = cw / 2 - itemRect.width / 2;
+    const offset = cw / 2 - itemWidth / 2;
     const max = (trackRect.width - cw) / trackRect.width;
     return Math.max(0, Math.min((itemStart - offset) / trackRect.width, max));
+  }
+
+  /***************************************
+   * Jump the track to the selected item's snap point with no animation.
+   * Shares centeredPercent with scrollToIndex so the resting position is
+   * identical whether it was reached by settling or by navigating.
+   */
+  function settleToSelected() {
+    const track = trackRef.current;
+    if (mode === "fade" || !track) return;
+    if (Draggable.get(track)?.isDragging) return;
+    snapTweenRef.current?.kill();
+    gsap.set(track, {
+      x: 0,
+      xPercent:
+        -centeredPercent(selectedIndexRef.current + cloneOffset) * 100,
+    });
   }
 
   /***************************************
