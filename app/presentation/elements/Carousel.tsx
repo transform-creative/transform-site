@@ -203,6 +203,11 @@ export function Carousel({
           // Taps wobble a few px on a touchscreen; 2px (the default) reads
           // them as drags and Draggable then suppresses the click
           minimumMovement: 6,
+          // Don't start a drag from a button/link/input. Draggable
+          // preventDefault()s the press it handles, and on touch that stops
+          // the browser ever synthesising the click — so the arrows, dots and
+          // any control inside a card need a press it keeps its hands off.
+          dragClickables: false,
           // Stops Draggable writing an incrementing inline z-index on press
           zIndexBoost: false,
           onThrowUpdate: function () {

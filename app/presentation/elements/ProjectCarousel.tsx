@@ -49,6 +49,9 @@ export function ProjectCarousel({
    * Open a project's info popup and reflect it in the URL
    */
   function openProject(project: Project) {
+    // Touch fires both pointerup and click, and a second setSearchParams for
+    // the same project would cost an extra press of the back button
+    if (viewProjectActive && selectedProject?.id == project.id) return;
     setSelectedProject(project);
     setViewProjectActive(true);
     const next = new URLSearchParams(searchParams);
@@ -195,12 +198,18 @@ export function ProjectCarousel({
                   />
                 </>
               )}
-              {/* Touch has no hover overlay to tap, and Draggable swallows the
-                  synthesised click on a plain card — a real button is exempt */}
+              {/* Touch has no hover overlay to tap, so the only way into a
+                  project is this button. pointerup as well as click: a
+                  suppressed click is the one thing a drag layer can't give
+                  back, and openProject guards against running twice. */}
               {context.inShrink && (
                 <button
                   className="overlay-corner glass-button p-10"
                   aria-label={`View ${project.name}`}
+                  onPointerUp={(e) => {
+                    e.stopPropagation();
+                    openProject(project);
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     openProject(project);

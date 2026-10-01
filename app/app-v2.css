@@ -840,11 +840,14 @@ h5.center {
   z-index: 30;
 }
 
-/* Translucent control that stays legible over whatever media sits behind it */
+/* Translucent control that stays legible over whatever media sits behind it.
+   manipulation drops the touch delay browsers add while watching for a
+   double-tap zoom, so a single tap fires straight away. */
 .glass-button {
   background: #ffffffcc;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+  touch-action: manipulation;
 }
 
 /* Shadow that follows the shape of a glyph rather than its box */
