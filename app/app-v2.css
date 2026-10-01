@@ -832,6 +832,21 @@ h5.center {
   pointer-events: auto;
 }
 
+/* Control pinned to the top-right of a media box — pair with .relative */
+.overlay-corner {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 30;
+}
+
+/* Translucent control that stays legible over whatever media sits behind it */
+.glass-button {
+  background: #ffffffcc;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
 /* Shadow that follows the shape of a glyph rather than its box */
 .glyph-shadow {
   filter: drop-shadow(0 2px 8px #111111aa);

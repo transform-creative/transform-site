@@ -543,10 +543,8 @@ export function Carousel({
               stoppedRef.current = false;
               scrollToIndex(selectedIndex - 1, snapDuration);
             }}
-            className=""
+            className="glass-button"
             style={{
-              background: "#ffffff77",
-              backdropFilter: "blur(2px)",
               left: 10,
               zIndex: 10,
               position: "absolute",
@@ -599,9 +597,8 @@ export function Carousel({
           (loop || selectedIndex !== items.length - 1) && (
             <button
               onClick={() => { stoppedRef.current = false; scrollToIndex(selectedIndex + 1, snapDuration); }}
+              className="glass-button"
               style={{
-                   background: "#ffffff77",
-              backdropFilter: "blur(2px)",
                 right: 10,
                 zIndex: 10,
                 position: "absolute",

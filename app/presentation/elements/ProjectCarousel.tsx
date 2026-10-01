@@ -195,6 +195,24 @@ export function ProjectCarousel({
                   />
                 </>
               )}
+              {/* Touch has no hover overlay to tap, and Draggable swallows the
+                  synthesised click on a plain card — a real button is exempt */}
+              {context.inShrink && (
+                <button
+                  className="overlay-corner glass-button p-10"
+                  aria-label={`View ${project.name}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openProject(project);
+                  }}
+                >
+                  <Icon
+                    name="information-circle-outline"
+                    size={22}
+                    color="var(--accent)"
+                  />
+                </button>
+              )}
             </div>
           );
         })}
