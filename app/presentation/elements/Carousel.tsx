@@ -63,6 +63,10 @@ export function Carousel({
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const tweenRef = useRef<gsap.core.Timeline | null>(null);
+  // The in-flight snap/nav tween, so a press can stop it dead
+  const snapTweenRef = useRef<gsap.core.Tween | gsap.core.Timeline | null>(
+    null,
+  );
   const [selectedIndex, setSelectedIndex] = useState<number>(
     startIndex < 0 ? 0 : startIndex,
   );
@@ -157,6 +161,22 @@ export function Carousel({
           type: "x",
           inertia: true,
           throwResistance: resistance,
+          // Draggable only kills the `x` half of the snap tween on press, so
+          // kill it ourselves — otherwise xPercent keeps animating under the
+          // finger and the tap lands on a different element than it started on
+          onPressInit: () => {
+            snapTweenRef.current?.kill();
+          },
+          // A tap that interrupts the snap leaves the track mid-slide
+          // (Draggable only resumes it when given `snap` or `bounds`)
+          onClick: () => {
+            scrollToIndex(getTargetIndex() || 0, snapDuration);
+          },
+          // Taps wobble a few px on a touchscreen; 2px (the default) reads
+          // them as drags and Draggable then suppresses the click
+          minimumMovement: 6,
+          // Stops Draggable writing an incrementing inline z-index on press
+          zIndexBoost: false,
           onThrowUpdate: function () {
             if (isPastEnd() && this.tween?.timeScale() === 1)
               gsap.to(this.tween, {
@@ -166,9 +186,6 @@ export function Carousel({
           },
           onThrowComplete: (e) => {
             scrollToIndex(getTargetIndex() || 0, snapDuration);
-          },
-          onRelease: function () {
-            gsap.set(this.target, { zIndex: 1 });
           },
           onDragStart: (e) => {
             onDragStart && onDragStart();
@@ -318,6 +335,7 @@ export function Carousel({
         if (cloneDomIndex >= 0 && cloneDomIndex < domCount) {
           // Animate to the clone that mirrors the target, then silently jump to the real item
           const tl = gsap.timeline();
+          snapTweenRef.current = tl;
           tl.to(trackRef.current, {
             x: 0,
             xPercent: -centeredPercent(cloneDomIndex) * 100,
@@ -337,7 +355,7 @@ export function Carousel({
         return;
       }
       // Normal navigation within real items (middle third of DOM)
-      gsap.to(trackRef.current, {
+      snapTweenRef.current = gsap.to(trackRef.current, {
         x: 0,
         xPercent: -centeredPercent(index + cloneOffset) * 100,
         duration,
@@ -386,7 +404,7 @@ export function Carousel({
       );
     }
 
-    gsap.to(trackRef.current, {
+    snapTweenRef.current = gsap.to(trackRef.current, {
       x: 0,
       xPercent: -finalPercent * 100,
       duration,
