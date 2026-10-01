@@ -316,28 +316,6 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
-    id: 5,
-    type: "media",
-    name: "Baptist Care",
-    organisation: "Baptist Care",
-
-    link: "https://tumbelinfarm.org.au/",
-    images: [
-      `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/tumb-farm-3-min.png`,
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/tumb-farm-2-min.png",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/tumb-farm-4-min.png",
-      "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/t-farm-1-min.jpg",
-    ],
-    description: [
-      "We interviewed a client of Baptist Care, to help the organisation raise money to put up a new shed on their property.",
-      "The video was played live at several events to encourage people to donate towards the project.",
-    ],
-    endorsement: {
-      name: "Tobin",
-      text: "Isaac’s storytelling is outstanding. He takes the time to truly understand what matters, executes effortlessly, and produces a final product that beautifully captures the impact of our programs.",
-    },
-  },
-  {
     id: 6,
     type: "media",
     organisation: "King's Baptist",
