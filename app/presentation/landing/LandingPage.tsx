@@ -18,6 +18,7 @@ import { AnimatedDots } from "../elements/AnimatedDots";
 import { EndorsementSection } from "./EndorsementSection";
 import { GradualBlur } from "../elements/GradualBlur";
 import { SplashCursor } from "../elements/SplashCursor";
+import { DEFAULT_POSTER } from "../elements/VideoPlayer";
 import "../../app-v2.css";
 
 export interface LandingPageProps {}
@@ -63,10 +64,15 @@ function FeatureCard({
 
   return (
     <article id={id} className="boxed accent col flex-card  outline-accent p-5">
+      {/* Placeholder painted behind the video, so the card isn't an empty
+          box before the first frame arrives */}
       <div
         ref={cardRef}
-        className="media-16-9"
-        style={{ borderRadius: 3 }}
+        className="media-16-9 bg-cover"
+        style={{
+          borderRadius: 3,
+          backgroundImage: `url(${DEFAULT_POSTER})`,
+        }}
       >
         <ReactPlayer
           src={videoSrc}

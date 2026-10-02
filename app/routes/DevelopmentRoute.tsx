@@ -179,9 +179,12 @@ export default function DevelopmentRoute() {
       />
       <div className="center col middle w-100">
         {/* shrink-p-10 = the 10px mobile gutter, as padding on the section
-            rather than margins on the children that go w-100 below 1200px */}
+            rather than margins on the children that go w-100 below 1200px.
+            w-100 gives the section a width of its own — shrink-wrapped, it
+            grew when the video's intrinsic size arrived, and the w-75 video
+            box (sized off it) jumped bigger as the video loaded in. */}
         <div
-          className="col middle center shrink-p-10"
+          className="col middle center shrink-p-10 w-100 border-box"
           style={{ minHeight: "90vh" }}
         >
           <div className="col gap-20 middle w-100">
@@ -199,7 +202,7 @@ export default function DevelopmentRoute() {
                 ,
               </h1>
               <h1
-                className="textCenter w-100"
+                className="textCenter w-100 mb-20"
                 style={{ color: "var(--txt)", letterSpacing: -1.5 }}
               >
                 Maximise your mission.
@@ -216,7 +219,7 @@ export default function DevelopmentRoute() {
                 <b style={{ fontWeight: 600 }}>to your cause</b>.
               </p> */}
             </div>
-            <div className="w-50">
+            <div className="w-50 mb-20">
               <div className="row gap-10 shrink-col">
                 <button
                   className="accent row center gap-5 middle w-50"

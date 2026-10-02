@@ -255,6 +255,12 @@ p.clickable:hover {
   overflow: hidden;
 }
 
+/* Background image that fills its box, cropping the overflowing side */
+.bg-cover {
+  background-size: cover;
+  background-position: center;
+}
+
 /* Surface shown in place of media that couldn't load */
 .media-fallback {
   background: #0000001f;
