@@ -1343,3 +1343,70 @@ button.chip.active:hover,
 button.chip.active:hover * {
   color: var(--bkg);
 }
+
+/* Starts collapsed; GSAP tweens height/opacity open (QuestionDropdown) */
+.gsap-collapsed {
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+}
+
+.no-shrink {
+  flex-shrink: 0;
+}
+
+/* Keeps the line breaks in copy written with \n */
+.pre-line {
+  white-space: pre-line;
+}
+
+/* Inline word on an accent block, e.g. "<Common> questions" */
+.highlight-accent {
+  background: var(--accent);
+  color: var(--bkg);
+  padding: 2px 4px;
+}
+
+/* − / + buttons of a Stepper */
+.stepper-btn {
+  background: none;
+  border: none;
+  padding: 6px 10px;
+}
+
+/* Dashed slot standing in for media that hasn't been supplied yet */
+.placeholder-box {
+  border: 1.5px dashed var(--accent-lg);
+  border-radius: var(--borderRadius);
+  padding: 20px;
+}
+
+/* Greyed-out row that can't be changed */
+.disabled-row {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Full-width bar pinned to the bottom of the screen (mobile CTAs) */
+.sticky-bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  transition: opacity 0.3s;
+}
+
+/* Phone-shaped frame for small UI mock-ups */
+.phone-frame {
+  width: 200px;
+  border: 6px solid var(--txt);
+  border-radius: 24px;
+  padding: 14px 10px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}

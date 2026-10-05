@@ -4,6 +4,7 @@
 
 import type { Session } from "@supabase/supabase-js";
 import { NavigateFunction } from "react-router";
+import type { IoniconName } from "./Ionicons";
 
 export type PopAlertFn = (
   header: string,
@@ -59,4 +60,30 @@ export interface Project {
   description: string[],
   link?:string;
   endorsement?: {name: string, text: string} 
+}
+
+/** One of the three church comms jobs (/church sections 2 + 3 share these) */
+export interface ChurchJob {
+  /** Plan builder group this job prices into */
+  id: "photo" | "content" | "website";
+  icon: IoniconName;
+  color: string;
+  /** Section 2: the problem */
+  jobTitle: string;
+  jobBody: string;
+  /** Section 3: what we do about it */
+  serviceTitle: string;
+  serviceTagline: string;
+  serviceBody: string[];
+}
+
+export interface ChurchWeekStep {
+  day: string;
+  icon: IoniconName;
+  body: string;
+}
+
+export interface BoardQuestion {
+  question: string;
+  answer: string;
 }

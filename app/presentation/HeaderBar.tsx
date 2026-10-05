@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { SharedContextProps } from "~/data/CommonTypes";
 import { supabaseSignOut } from "~/database/Auth";
+import { scrollToId } from "~/business/commonBL";
 import "../app-v2.css"
 
 export interface HeaderBarProps {
@@ -215,16 +216,33 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
         Websites
       </button>
       <div className="div20" />
-      <button
-        onClick={() => navigate("/contact")}
-        style={{
-          textDecoration: "none",
-          fontSize: textSize,
-        }}
-        className="row center middle accent"
-      >
-        Contact
-      </button>
+      {/* /church swaps Contact for its own page CTA into the plan builder */}
+      {location.pathname == "/church" ? (
+        <button
+          onClick={() => {
+            onClose();
+            scrollToId("plan");
+          }}
+          style={{
+            textDecoration: "none",
+            fontSize: textSize,
+          }}
+          className="row center middle accent"
+        >
+          Build your plan
+        </button>
+      ) : (
+        <button
+          onClick={() => navigate("/contact")}
+          style={{
+            textDecoration: "none",
+            fontSize: textSize,
+          }}
+          className="row center middle accent"
+        >
+          Contact
+        </button>
+      )}
       <div className="div10" />
       {isSignedIn ? (
         <>

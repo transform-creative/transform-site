@@ -236,3 +236,14 @@ export function timeAgo(date: string | Date | null): string {
 
   return "just now";
 }
+
+/*******************************
+ * Smooth-scroll to an element by id, leaving room for the sticky header.
+ */
+export function scrollToId(id: string, headerOffset = 100) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const top =
+    el.getBoundingClientRect().top + window.scrollY - headerOffset;
+  window.scrollTo({ top, behavior: "smooth" });
+}

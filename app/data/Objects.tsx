@@ -1,6 +1,15 @@
 import { Feature } from "~/presentation/software/FeatureSelector";
 import { HowItWorksStep } from "~/presentation/software/HowItWorks";
-import { Project } from "./CommonTypes";
+import type {
+  BoardQuestion,
+  ChurchJob,
+  ChurchWeekStep,
+  Project,
+} from "./CommonTypes";
+import type {
+  FAQQuestion,
+  FAQSection,
+} from "~/presentation/elements/FrequentlyAskedQuestions";
 import type { IoniconName } from "./Ionicons";
 
 export const tabColors = {
@@ -905,5 +914,212 @@ export const MEDIA_HOW_WE_WORK: {
     title: "We stick around",
     description:
       "Cut-downs for social, advice on getting it seen, and a hand with the next project when you're ready for it.",
+  },
+];
+
+/* ── /church — Church Creative Partner ─────────────────────────────────── */
+
+/** TODO: overview video file (90 sec, captions on) and a poster frame from a
+ *  real Sunday. Left null until they exist — the hero shows a placeholder. */
+export const CHURCH_HERO_VIDEO: string | null = null;
+export const CHURCH_HERO_POSTER: string | null = null;
+
+export const CHURCH_TRUST_POINTS = [
+  "Works with Elvanto and Planning Center",
+  "Nothing theological goes out without your yes",
+  "Local to Adelaide",
+];
+
+/** The three jobs — same order, icon and colour in sections 2 and 3. */
+export const CHURCH_JOBS: ChurchJob[] = [
+  {
+    id: "photo",
+    icon: "camera-outline",
+    color: tabColors.media,
+    jobTitle: "Capturing it well",
+    jobBody:
+      "Good photos and video take skills, gear and time. On a Sunday morning, whoever has all three is usually busy running something else.",
+    serviceTitle: "Photo + video",
+    serviceTagline: "Your Sundays, captured properly",
+    serviceBody: [
+      "Pro photo and video on your key Sundays (2–6 shoots a year), plus your sermon audio set up properly so every message can become clips.",
+      "Easter, Christmas and launch Sundays covered.",
+    ],
+  },
+  {
+    id: "content",
+    icon: "megaphone-outline",
+    color: tabColors.design,
+    jobTitle: "Getting it out there, with a plan",
+    jobBody:
+      "Posting is easy. Knowing what to share, and how it helps your local community hear about Jesus, takes a clear strategy and time most teams don't have spare.",
+    serviceTitle: "Content",
+    serviceTagline: "Your week's content, done",
+    serviceBody: [
+      "Each quarter we build an invite plan around the series and events you've already got planned. Then each week we turn your sermon into reels, posts, slides, the weekly email and a follow-up pack for small group leaders, plus a monthly brochure if you want one.",
+      "You check it by Thursday, and nothing theological goes out without your pastor's yes.",
+    ],
+  },
+  {
+    id: "website",
+    icon: "globe-outline",
+    color: tabColors.software,
+    jobTitle: "Keeping the website current",
+    jobBody:
+      "Keeping sermons, events and new-visitor info up to date takes the right setup and someone's time each week. Without both the site goes stale, and it's often the first place a newcomer looks.",
+    serviceTitle: "Website",
+    serviceTagline:
+      "A sermon hub and visitor page that keep themselves current",
+    serviceBody: [
+      "Hosted on your own subdomain and linked to Elvanto or Planning Center. Each week's sermon goes up automatically.",
+      "New visitors land straight in your follow-up with the right tags, so the automations you already have kick in.",
+      "We never touch your current site: one menu link, one DNS record.",
+    ],
+  },
+];
+
+/** Outputs fanned out from the sermon in the content diagram */
+export const CHURCH_SERMON_OUTPUTS: { label: string; icon: IoniconName }[] =
+  [
+    { label: "Reels", icon: "film-outline" },
+    { label: "Posts", icon: "images-outline" },
+    { label: "Slides", icon: "easel-outline" },
+    { label: "Email", icon: "mail-outline" },
+    { label: "Small group pack", icon: "people-outline" },
+    { label: "Brochure", icon: "newspaper-outline" },
+    { label: "Podcast", icon: "headset-outline" },
+    { label: "Sermon hub", icon: "globe-outline" },
+  ];
+
+export const CHURCH_WEEK: ChurchWeekStep[] = [
+  {
+    day: "Sunday",
+    icon: "mic-outline",
+    body: "Your sermon records straight from the desk (we set it up once), and we film on your shoot Sundays.",
+  },
+  {
+    day: "Mon–Tue",
+    icon: "document-text-outline",
+    body: "We make the week from your sermon and your Elvanto or Planning Center service plan.",
+  },
+  {
+    day: "Thursday",
+    icon: "checkmark-circle-outline",
+    body: "You check. Promos go out unless you flag them. Anything theological waits for your yes.",
+  },
+  {
+    day: "All week",
+    icon: "calendar-outline",
+    body: "Posts go out, the email lands, slides are ready for Sunday and the sermon hub updates itself.",
+  },
+];
+
+/** Also printed in the plan PDF — keep in sync with
+ *  supabase/functions/_shared/church-plan-pdf.ts (BOARD_QA). */
+export const BOARD_QA: BoardQuestion[] = [
+  {
+    question: "How does it compare to hiring?",
+    answer:
+      "A typical plan is about $19K a year ex GST. A two-day-a-week comms coordinator is roughly $30K with super, and one person rarely covers shooting, editing and web work as well.",
+  },
+  {
+    question: "What are we signing up to?",
+    // TODO: exit terms
+    answer: "Monthly, on a 12-month term.",
+  },
+  {
+    question: "What do we keep if we stop?",
+    // TODO: confirm what happens to the hosted pages if a church leaves
+    answer:
+      "Your photos, video, templates, podcast feed and Google Business Profile are yours, and visitor details already live in your Elvanto or PCO.",
+  },
+  {
+    question: "Who's filming in our building?",
+    // TODO: confirm the shooter's Working With Children Check
+    answer:
+      "Our shooter holds a Working With Children Check and follows your church's photography policy.",
+  },
+  {
+    question: "What data do you hold?",
+    answer:
+      "Plan a visit only asks for name, contact details, service and group size. No children's details, and it goes straight into your system.",
+  },
+  {
+    question: "Who controls what's said?",
+    answer:
+      "Promos publish unless you flag them by Thursday. Anything theological needs a yes from your pastor.",
+  },
+];
+
+export const CHURCH_FOOTNOTE = {
+  text: "*Illustrative pricing, ex GST, monthly on a 12-month term. Hours are based on what this took at Kings Baptist. Coordinator cost uses an average Australian comms coordinator salary of about $68K plus 12% super",
+  sourceLabel: "Payscale, 2026",
+  sourceUrl:
+    "https://www.payscale.com/research/AU/Job=Communications_Coordinator/Salary",
+};
+
+/** TODO: swap for a founding-church line if launching before Christmas. */
+export const CHURCH_CAPACITY_LINE =
+  "We take on a few new churches each quarter.";
+
+/** TODO: confirm picks — real King's Baptist outputs from PROJECTS
+ *  (sermon slides, Alpha Marriage promos, print designs). */
+export const CHURCH_EXAMPLE_PROJECT_IDS = [12, 6, 18];
+
+export const CHURCH_FAQ_SECTIONS: FAQSection[] = [
+  { id: "church", title: "Common" },
+];
+
+/** Unanswered questions are only shown in dev until they have an answer. */
+export const CHURCH_FAQ: FAQQuestion[] = [
+  {
+    section: "church",
+    question: "Do you use AI?",
+    answer:
+      "Yes, for the grunt work: first drafts of captions and slide layouts from your sermon and service plan. A real person shapes every piece, and your pastor signs off on anything theological.",
+  },
+  {
+    section: "church",
+    question: "We're not on Elvanto or Planning Center.",
+    answer:
+      "Let's chat. Most of this still works; plan a visit is the bit that needs one of the two.",
+  },
+  {
+    section: "church",
+    question: "What if we miss Thursday?",
+    answer:
+      "Promos go out as planned and anything theological waits. Late sermon changes go into your editable slide template.",
+  },
+  {
+    section: "church",
+    question: "What about Easter and Christmas?",
+    answer:
+      "Big days use two shoot credits, and we can film two churches on each. Everyone else gets a promo shoot the week before.",
+  },
+  {
+    section: "church",
+    question: "Do you film kids?",
+    answer:
+      "Only in line with your photography policy and consent process.",
+  },
+  {
+    section: "church",
+    question: "Our volunteers already do some of this.",
+    // TODO: answer
+    answer: "TODO: volunteers answer",
+    visible: import.meta.env.DEV,
+  },
+  {
+    section: "church",
+    question: "How long until we're up and running?",
+    // TODO: onboarding time
+    answer: "TODO: onboarding time",
+    visible: import.meta.env.DEV,
+  },
+  {
+    section: "church",
+    question: "Is this for big churches only?",
+    answer:
+      "It's built for churches of 300–500, and the smallest plan starts at $450/mo.",
   },
 ];

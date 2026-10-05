@@ -11,6 +11,7 @@ export default [
   route("/contact", "routes/ContactRoute.tsx"),
   route("/development", "routes/DevelopmentRoute.tsx"),
   route("/media", "routes/MediaServicesRoute.tsx"),
+  route("/church", "routes/ChurchRoute.tsx"),
     route("/auth", "routes/AuthenticationRoute.tsx"),
   route("/client", "routes/ClientIndexRoute.tsx"),
   route("/client/:id", "routes/ClientRoute.tsx"),

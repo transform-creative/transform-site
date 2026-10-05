@@ -1,0 +1,7 @@
+{
+  "lock": true,
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "check": "deno check index.ts"
+  }
+}
