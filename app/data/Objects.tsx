@@ -3,6 +3,7 @@ import { HowItWorksStep } from "~/presentation/software/HowItWorks";
 import type {
   BoardQuestion,
   ChurchJob,
+  ChurchService,
   ChurchWeekStep,
   Project,
 } from "./CommonTypes";
@@ -919,10 +920,14 @@ export const MEDIA_HOW_WE_WORK: {
 
 /* ── /church — Church Creative Partner ─────────────────────────────────── */
 
-/** TODO: overview video file (90 sec, captions on) and a poster frame from a
- *  real Sunday. Left null until they exist — the hero shows a placeholder. */
+/** Real Sunday photos, numbered 1–10 in the `transform/images` bucket */
+const churchPic = (n: number) =>
+  `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/churchpics_${n}.jpg`;
+
+/** TODO: overview video file (90 sec, captions on). Left null until it
+ *  exists — the hero shows a placeholder. */
 export const CHURCH_HERO_VIDEO: string | null = null;
-export const CHURCH_HERO_POSTER: string | null = null;
+export const CHURCH_HERO_POSTER: string | null = churchPic(8);
 
 export const CHURCH_TRUST_POINTS = [
   "Works with Elvanto and Planning Center",
@@ -936,9 +941,11 @@ export const CHURCH_JOBS: ChurchJob[] = [
     id: "photo",
     icon: "camera-outline",
     color: tabColors.media,
-    jobTitle: "Capturing it well",
+    jobTitle: "Capture your community well",
     jobBody:
-      "Good photos and video take skills, gear and time. On a Sunday morning, whoever has all three is usually busy running something else.",
+      "Because on a Sunday morning, whoever has the skills, time and gear is usually busy running 10 other teams.",
+    jobHighlight: "skills, time and gear",
+    jobImage: churchPic(1),
     serviceTitle: "Photo + video",
     serviceTagline: "Your Sundays, captured properly",
     serviceBody: [
@@ -950,9 +957,11 @@ export const CHURCH_JOBS: ChurchJob[] = [
     id: "content",
     icon: "megaphone-outline",
     color: tabColors.design,
-    jobTitle: "Getting it out there, with a plan",
+    jobTitle: "Get it out there, with a plan",
     jobBody:
-      "Posting is easy. Knowing what to share, and how it helps your local community hear about Jesus, takes a clear strategy and time most teams don't have spare.",
+      "Because curating social media accounts that actually reflect the life of your church needs a clear strategy.",
+    jobHighlight: "a clear strategy",
+    jobImage: churchPic(5),
     serviceTitle: "Content",
     serviceTagline: "Your week's content, done",
     serviceBody: [
@@ -964,9 +973,11 @@ export const CHURCH_JOBS: ChurchJob[] = [
     id: "website",
     icon: "globe-outline",
     color: tabColors.software,
-    jobTitle: "Keeping the website current",
+    jobTitle: "Keep your website current",
     jobBody:
-      "Keeping sermons, events and new-visitor info up to date takes the right setup and someone's time each week. Without both the site goes stale, and it's often the first place a newcomer looks.",
+      "Because each time a new sermon, event or form is rushed onto your site, it gets slightly more broken.",
+    jobHighlight: "slightly more broken",
+    jobImage: churchPic(4),
     serviceTitle: "Website",
     serviceTagline:
       "A sermon hub and visitor page that keep themselves current",
@@ -975,6 +986,63 @@ export const CHURCH_JOBS: ChurchJob[] = [
       "New visitors land straight in your follow-up with the right tags, so the automations you already have kick in.",
       "We never touch your current site: one menu link, one DNS record.",
     ],
+  },
+];
+
+/** "We help churches by..." tabs. TODO: real copy. */
+export const CHURCH_SERVICES: ChurchService[] = [
+  {
+    id: "plan",
+    verb: "Creating",
+    rest: "your digital plan",
+    body: "We meet with you quarterly to discuss who you are as a congregation, and how we can create a digital presence that truly reflects you and connects with your community.",
+    highlights: ["quarterly", "truly reflects you"],
+    image: churchPic(9),
+  },
+  {
+    id: "capture",
+    verb: "Capturing",
+    rest: "your Sunday",
+    body: "Placeholder: we film and photograph your service, so you have real moments from real Sundays to share all week.",
+    highlights: ["real moments"],
+    group: "photo",
+    image: churchPic(3),
+  },
+  {
+    id: "posting",
+    verb: "Posting",
+    rest: "for you",
+    body: "Placeholder: we turn each sermon into the week's reels and posts, and schedule them so your feed stays alive.",
+    highlights: ["schedule them"],
+    group: "content",
+    image: churchPic(6),
+  },
+  {
+    id: "slides",
+    verb: "Creating",
+    rest: "notices & sermon slides",
+    body: "Placeholder: notices and sermon slides designed and ready to go before Sunday, in your church's look.",
+    highlights: ["ready to go"],
+    group: "content",
+    image: churchPic(10),
+  },
+  {
+    id: "podcast",
+    verb: "Uploading",
+    rest: "your podcast",
+    body: "Placeholder: each week's sermon edited and published to your podcast feed, without anyone in the office lifting a finger.",
+    highlights: ["published"],
+    group: "content",
+    image: churchPic(7),
+  },
+  {
+    id: "website",
+    verb: "Updating",
+    rest: "your website",
+    body: "Placeholder: sermons, events and visitor info kept current on your site, so newcomers find what they need.",
+    highlights: ["kept current"],
+    group: "website",
+    image: churchPic(2),
   },
 ];
 

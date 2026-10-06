@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -12,7 +12,7 @@ import {
   CHURCH_HERO_POSTER,
   CHURCH_HERO_VIDEO,
   CHURCH_JOBS,
-  CHURCH_TRUST_POINTS,
+  CHURCH_SERVICES,
   CHURCH_WEEK,
   PROJECTS,
 } from "~/data/Objects";
@@ -26,7 +26,7 @@ import { defaultPlan, priceOf } from "~/business/churchPlanBL";
 import { scrollToId } from "~/business/commonBL";
 import { buildMeta, canonical, SITE_URL } from "~/business/seoBL";
 import { Icon } from "~/presentation/elements/Icon";
-import { VideoPlayer } from "~/presentation/elements/VideoPlayer";
+import { DEFAULT_POSTER } from "~/presentation/elements/VideoPlayer";
 import {
   FrequentlyAskedQuestions,
   faqJsonLd,
@@ -39,7 +39,8 @@ import {
 import { BoardPopup } from "~/presentation/church/BoardPopup";
 import { PlanEmailForm } from "~/presentation/church/PlanEmailForm";
 import { BookChatButton } from "~/presentation/church/BookChatButton";
-import { HubFlow, SermonSpokes } from "~/presentation/church/ChurchDiagrams";
+import { ProblemTabs } from "~/presentation/church/ProblemTabs";
+import { ServiceTabs } from "~/presentation/church/ServiceTabs";
 
 const TITLE = "Church Comms, Done For You | Transform Creative";
 const DESCRIPTION =
@@ -81,6 +82,10 @@ const serviceSchema = {
 
 const PLAN_ID = "plan";
 
+// TODO: swap for real Sunday footage (set CHURCH_HERO_VIDEO). No stock footage.
+const HERO_PLACEHOLDER_VIDEO =
+  "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/2026%20reel-LQ.mp4";
+
 export default function ChurchRoute() {
   const context: SharedContextProps = useOutletContext();
   const builder = useRef<PlanBuilderHandle>(null);
@@ -89,20 +94,41 @@ export default function ChurchRoute() {
   const [boardOpen, setBoardOpen] = useState(false);
   const [emailSource, setEmailSource] = useState<ChurchCtaSource>();
   const [pastPlanTop, setPastPlanTop] = useState(false);
+  // The header's sticky wrapper reserves more height than its visible bar.
+  // Measure both so the hero can start flush under the bar, not the wrapper.
+  const [navBarHeight, setNavBarHeight] = useState(120);
+  const [navGap, setNavGap] = useState(0);
 
   const price = priceOf(plan);
+
+  useLayoutEffect(() => {
+    const wrapper = document.getElementById("header-menu");
+    const bar = wrapper?.firstElementChild as HTMLElement | null;
+    if (!wrapper || !bar) return;
+    const measure = () => {
+      setNavBarHeight(bar.offsetHeight);
+      setNavGap(Math.max(0, wrapper.offsetHeight - bar.offsetHeight));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(wrapper);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, []);
 
   // The mobile price bar rides in once the plan builder is on screen, and
   // steps out of the way as the page bottoms out so the footer is readable.
   useEffect(() => {
     const onScroll = () => {
       const planTop =
-        document.getElementById(PLAN_ID)?.getBoundingClientRect().top ??
-        Infinity;
+        document.getElementById(PLAN_ID)?.getBoundingClientRect()
+          .top ?? Infinity;
       const fromBottom =
         document.documentElement.scrollHeight -
         (window.scrollY + window.innerHeight);
-      setPastPlanTop(planTop < window.innerHeight * 0.6 && fromBottom >= 100);
+      setPastPlanTop(
+        planTop < window.innerHeight * 0.6 && fromBottom >= 100,
+      );
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -117,7 +143,13 @@ export default function ChurchRoute() {
     gsap.fromTo(
       "[data-hero]",
       { opacity: 0, y: -10 },
-      { opacity: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power3" },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.12,
+        ease: "power3",
+      },
     );
   }, []);
 
@@ -142,7 +174,9 @@ export default function ChurchRoute() {
     <div className="col middle center gap-20 w-100">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(serviceSchema),
+        }}
       />
       <script
         type="application/ld+json"
@@ -151,150 +185,126 @@ export default function ChurchRoute() {
         }}
       />
 
-      {/* 1. Hero */}
-      <div
-        className="row shrink-col middle center gap-20 w-75 shrink-p-10 border-box"
-        style={{ minHeight: "80vh" }}
+      {/* 1. Hero: video filling the screen from the bottom of the navbar
+          bar down, with an outline frame inset over it */}
+      <section
+        className="relative clip w-100 on-media"
+        style={{
+          marginTop: -navGap,
+          height: `calc(100svh - ${navBarHeight}px)`,
+        }}
       >
-        <div className="col gap-20 w-50">
-          <h1 data-hero style={{ letterSpacing: -1.5 }}>
-            Help new people find your church,{" "}
-            <strong style={{ fontWeight: 600 }}>
-              without it eating your week.
-            </strong>
-          </h1>
-          <p data-hero>
-            We're an Adelaide creative agency that captures your Sundays,
-            turns them into a week of content, and keeps your website up to
-            date. Pro-quality church media for about the cost of a
-            one-day-a-week comms person.
-          </p>
-          <div data-hero>
-            <button
-              type="button"
-              className="accent row middle center gap-5"
-              onClick={() => scrollToId(PLAN_ID)}
+        <video
+          className="layer-fill media-cover"
+          src={CHURCH_HERO_VIDEO ?? HERO_PLACEHOLDER_VIDEO}
+          poster={CHURCH_HERO_POSTER ?? DEFAULT_POSTER}
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden
+        />
+        <div className="layer-fill scrim-dark" />
+        <div
+          className={`layer-inset frame-light r-lg col middle center gap-20 textCenter border-box ${
+            context.inShrink ? "p-20" : "p-40"
+          }`}
+        >
+          <h1
+            data-hero
+            style={{
+              letterSpacing: -1.5,
+              lineHeight: 1,
+              textAlign: "center",
+              maxWidth: 900,
+            }}
+          >
+            Your church's{" "}
+            <strong
+              className="on-media-soft"
+              style={{ fontWeight: 500 }}
             >
-              <Icon name="arrow-down" size={16} color="var(--bkg)" />
-              Build your plan
-            </button>
-          </div>
-          <ul data-hero className="row wrap gap-10 p0 m0" style={{ listStyle: "none" }}>
-            {CHURCH_TRUST_POINTS.map((point) => (
-              <li key={point} className="pill-accent row middle gap-5">
+              local comms
+            </strong>{" "}
+            team.
+          </h1>
+
+          <div className="col middle center">
+            {/* <p data-hero style={{ maxWidth: 520 }}>
+              Sundays are{" "}
+              <strong style={{ fontWeight: 600 }}>
+                2 hours a week. What about the other 166?
+              </strong>
+            </p> */}
+            <div data-hero className="mt-20">
+              <button
+                type="button"
+                className="accent row middle center gap-5"
+                onClick={() => scrollToId(PLAN_ID)}
+              >
                 <Icon
-                  name="checkmark-circle-outline"
-                  size={12}
-                  color="var(--accent)"
+                  name="arrow-down"
+                  size={16}
+                  color="var(--bkg)"
                 />
-                <p className="text-sm">{point}</p>
-              </li>
-            ))}
-          </ul>
+                Build your plan
+              </button>
+            </div>
+          </div>
         </div>
-
-        <div data-hero className="w-50 accent boxed p-10 border-box">
-          {CHURCH_HERO_VIDEO ? (
-            <VideoPlayer
-              src={CHURCH_HERO_VIDEO}
-              poster={CHURCH_HERO_POSTER ?? undefined}
-              className="r-default"
-              label="90-second overview"
-            />
-          ) : (
-            // TODO: 90-sec overview video (captions on) + a poster frame
-            // from a real Sunday. No stock footage.
-            <MediaPlaceholder
-              label="90-sec overview video, poster from a real Sunday"
-              onAccent
-            />
-          )}
-        </div>
-      </div>
-
-      <div className="horizontal-line mediumFade" />
+      </section>
 
       {/* 2. Three jobs */}
       <section className="col middle gap-20 w-75 shrink-p-10 border-box">
-        <h2 className="textCenter" style={{ letterSpacing: -1.5 }}>
-          Church comms is really <strong>three jobs</strong>
-        </h2>
-        <p className="textCenter w-75">
-          In a lot of churches they all land on one or two busy people,
-          often volunteers, fitting it into the gaps of their week.
-        </p>
-        <div className="row shrink-col gap-20 w-100">
-          {CHURCH_JOBS.map((job) => (
-            <div
-              key={job.id}
-              className="col gap-10 flex-card boxed p-20 outline-accent"
-            >
-              <div
-                className="icon-tile row middle center"
-                style={{ background: job.color }}
+        <div className="row w-100 between middle">
+          <div className=" mt-20 mb-20 pt-20 pb-20 ">
+            <h2 className="w-100" style={{ letterSpacing: -1.5 }}>
+              We{" "}
+              <strong style={{ fontWeight: 600 }}>
+                shoot your service
+              </strong>
+              .
+            </h2>
+            <h3>
+              Then run your{" "}
+              <strong
+                style={{ fontWeight: 600, color: "var(--accent)" }}
               >
-                <Icon name={job.icon} size={18} color="var(--bkg)" />
-              </div>
-              <h3 className="bold">{job.jobTitle}</h3>
-              <p>{job.jobBody}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="horizontal-line mediumFade" />
-
-      {/* 3. Three things, done every week */}
-      <section className="col middle gap-20 w-75 shrink-p-10 border-box">
-        <h2 className="textCenter" style={{ letterSpacing: -1.5 }}>
-          Three things, <strong>done every week</strong>
-        </h2>
-        {CHURCH_JOBS.map((job) => (
-          <div
-            key={job.id}
-            className="row shrink-col middle gap-20 boxed p-20 outline-accent w-100 border-box"
-          >
-            <div className="col gap-10 w-50">
-              <div className="row middle gap-10">
-                <div
-                  className="icon-tile row middle center"
-                  style={{ background: job.color }}
-                >
-                  <Icon name={job.icon} size={18} color="var(--bkg)" />
-                </div>
-                <p className="field-label">{job.serviceTitle}</p>
-              </div>
-              <h3 className="bold">{job.serviceTagline}</h3>
-              {job.serviceBody.map((para) => (
-                <p key={para}>{para}</p>
-              ))}
-              <button
-                type="button"
-                className="text-button accent-text row middle gap-5"
-                onClick={() => builder.current?.openGroup(job.id)}
-              >
-                Price this
-                <Icon name="arrow-forward" size={14} color="var(--accent)" />
-              </button>
-            </div>
-            <div className="col middle center w-50">
-              {job.id === "photo" && (
-                // TODO: a real Sunday photo. No stock photos.
-                <MediaPlaceholder label="Photo from a real Sunday" />
-              )}
-              {job.id === "content" && <SermonSpokes />}
-              {job.id === "website" && <HubFlow />}
-            </div>
+                socials, website, slides & emails weekly.
+              </strong>
+            </h3>
           </div>
-        ))}
+          <div className="end col">
+            <p>
+              <strong style={{ fontWeight: 600 }}>So</strong> your vision is clear.
+            </p>
+            <p>
+              <strong style={{ fontWeight: 600 }}>So</strong> newcomers feel welcomed.
+            </p>
+             <p>
+              <strong style={{ fontWeight: 600 }}>So</strong> regulars know what's happening.
+            </p>
+          </div>
+        </div>
+      
       </section>
+      
+      <ProblemTabs jobs={CHURCH_JOBS} />
 
       <div className="horizontal-line mediumFade" />
+
+      {/* 3. What we do about it */}
+      <ServiceTabs
+        services={CHURCH_SERVICES}
+        onPrice={(group) => builder.current?.openGroup(group)}
+      />
+      <div className="horizontal-line mediumFade" />
+
 
       {/* 4. Build your plan */}
       <section
         id={PLAN_ID}
-        className="col middle w-75 shrink-p-10 border-box"
+        className="col middle w-75 shrink-p-10 border-box mt-20 pt-20"
       >
         <PlanBuilder
           ref={builder}
@@ -312,11 +322,21 @@ export default function ChurchRoute() {
         <h2 className="textCenter" style={{ letterSpacing: -1.5 }}>
           How a <strong>week</strong> works
         </h2>
-        <ol className="row shrink-col gap-20 w-100 p0 m0" style={{ listStyle: "none" }}>
+        <ol
+          className="row shrink-col gap-20 w-100 p0 m0"
+          style={{ listStyle: "none" }}
+        >
           {CHURCH_WEEK.map((step) => (
-            <li key={step.day} className="col gap-10 flex-card boxed p-20">
+            <li
+              key={step.day}
+              className="col gap-10 flex-card boxed p-20"
+            >
               <div className="row middle gap-10">
-                <Icon name={step.icon} size={16} color="var(--accent)" />
+                <Icon
+                  name={step.icon}
+                  size={16}
+                  color="var(--accent)"
+                />
                 <p className="field-label">{step.day}</p>
               </div>
               <p>{step.body}</p>
@@ -339,22 +359,22 @@ export default function ChurchRoute() {
               Who's <strong>doing this</strong>
             </h2>
             <p>
-              Hi, I'm Isaac. I run Transform Creative, and I spent two years
-              doing comms at Kings Baptist, so I know what a church week
-              looks like from the inside.
+              Hi, I'm Isaac. I run Transform Creative, and I spent two
+              years doing comms at Kings Baptist, so I know what a
+              church week looks like from the inside.
             </p>
             <p>
-              We've also made film for Baptist Churches SA, Baptist Care,
-              Crossover and others.
+              We've also made film for Baptist Churches SA, Baptist
+              Care, Crossover and others.
             </p>
             <p className="pill-accent bold">{CHURCH_CAPACITY_LINE}</p>
           </div>
         </div>
 
         {/* TODO: testimonial from the Kings pastor + office */}
-        <MediaPlaceholder label="Testimonial: Kings pastor + office" />
+        {/* <MediaPlaceholder label="Testimonial: Kings pastor + office" /> */}
 
-        <div className="grid-250 w-100">
+        {/* <div className="grid-250 w-100">
           {examples.map((project) => (
             <div key={project.id} className="col gap-5">
               <img
@@ -366,10 +386,10 @@ export default function ChurchRoute() {
               <p className="text-sm muted">{project.name}</p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* TODO: client logo strip, once logo permissions are confirmed */}
-        <MediaPlaceholder label="Logo strip (waiting on permissions)" />
+        {/* <MediaPlaceholder label="Logo strip (waiting on permissions)" /> */}
       </section>
 
       <div className="horizontal-line mediumFade" />
@@ -392,8 +412,8 @@ export default function ChurchRoute() {
             <strong>your church</strong>?
           </h2>
           <p className="textCenter w-75">
-            Build your plan and I'll email it through, or grab a no-pressure
-            20-minute chat.
+            Build your plan and I'll email it through, or grab a
+            no-pressure 20-minute chat.
           </p>
           <div className="row shrink-col gap-10 w-50">
             <button
@@ -423,7 +443,9 @@ export default function ChurchRoute() {
         <div className="col">
           <p className="bold num">{fmt(price.monthly)}/mo</p>
           {price.setup > 0 && (
-            <p className="text-sm muted">+ {fmt(price.setup)} setup</p>
+            <p className="text-sm muted">
+              + {fmt(price.setup)} setup
+            </p>
           )}
         </div>
         <button
@@ -465,7 +487,11 @@ interface MediaPlaceholderProps {
 /******************************
  * A labelled, dashed slot for real photos/video still to be supplied.
  */
-function MediaPlaceholder({ label, onAccent, tall }: MediaPlaceholderProps) {
+function MediaPlaceholder({
+  label,
+  onAccent,
+  tall,
+}: MediaPlaceholderProps) {
   const color = onAccent ? "var(--bkg)" : "var(--accent-lg)";
   return (
     <div

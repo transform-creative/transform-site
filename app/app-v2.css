@@ -897,6 +897,96 @@ h5.center {
   height: 100%;
 }
 
+/* Layer stretched over its .relative parent (backgrounds, scrims) */
+.layer-fill {
+  position: absolute;
+  inset: 0;
+}
+
+/* Thin light outline for frames sitting over media */
+.frame-light {
+  border: 2px solid #ffffff55;
+}
+
+/* Layer inset from its .relative parent's edges */
+.layer-inset {
+  position: absolute;
+  inset: 40px;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+.p-40 {
+  padding: 40px;
+}
+
+/* Darkens and softly blurs media so overlaid text stays legible */
+.scrim-dark {
+  background: #00000099;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Light text for use over photos/video */
+.on-media,
+.on-media h1,
+.on-media p {
+  color: #ffffff;
+}
+
+/* Softer secondary text over photos/video */
+.on-media .on-media-soft {
+  color: #ffffff99;
+}
+
+/* Translucent white washes, for layering panels on an accent background */
+.tint-1 {
+  background: #ffffff1a;
+}
+
+.tint-2 {
+  background: #ffffff2e;
+}
+
+/* Folder-style tab: rounded top only, so the active one merges into its panel */
+.tab-top {
+  border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+}
+
+/* Square off one corner where a tab or band meets a panel */
+.r-tl-0 {
+  border-top-left-radius: 0 !important;
+}
+
+/* Button text that stays light (and still) on an accent background */
+button.on-accent-button,
+button.on-accent-button:hover,
+button.on-accent-button:hover * {
+  color: var(--bkg);
+  transform: none;
+}
+
+.dimmed {
+  opacity: 0.5;
+}
+
+/* Softened accent text, e.g. inactive tab labels */
+.accent-soft {
+  color: var(--accent);
+  opacity: 0.7;
+}
+
+.text-xl {
+  font-size: 1.9rem;
+  line-height: 1.2;
+}
+
+.gap-40 {
+  gap: 40px;
+}
+
 .sticky {
   position: sticky;
   top: 0;
@@ -985,6 +1075,13 @@ h5.center {
   z-index: 30;
 }
 
+/* Full-viewport layer for drawers/menus, above the header (100) */
+.fill-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+}
+
 .severity-list {
   position: absolute;
   top: 100%;
@@ -1000,6 +1097,14 @@ h5.center {
 }
 
 @media (max-width: 1200px) {
+  .layer-inset {
+    inset: 16px;
+  }
+
+  .text-xl {
+    font-size: 1.4rem;
+  }
+
   .issue-comments {
     border-left: none;
     border-top: 1px solid var(--accent-md);

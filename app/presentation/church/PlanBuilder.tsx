@@ -182,10 +182,7 @@ export const PlanBuilder = forwardRef<PlanBuilderHandle, Props>(
           >
             Build your plan
           </h2>
-          <p className="textCenter pl-20 pr-20 pt-10">
-            Pick your system, then dial each bit up or down. We've loaded
-            what a church of 300–500 usually needs.
-          </p>
+
 
           <div className="row shrink-col between gap-20 p-20">
             {/* --- Controls --- */}

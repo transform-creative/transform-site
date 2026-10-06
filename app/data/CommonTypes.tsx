@@ -71,10 +71,29 @@ export interface ChurchJob {
   /** Section 2: the problem */
   jobTitle: string;
   jobBody: string;
+  /** Phrase within jobBody to bold */
+  jobHighlight?: string;
+  /** Photo shown beside jobBody in the problem tabs */
+  jobImage?: string;
   /** Section 3: what we do about it */
   serviceTitle: string;
   serviceTagline: string;
   serviceBody: string[];
+}
+
+/** One "We help churches by..." tab on /church */
+export interface ChurchService {
+  id: string;
+  /** Emphasised first word of the tab label, e.g. "Capturing" */
+  verb: string;
+  /** Rest of the tab label, e.g. "your Sunday" */
+  rest: string;
+  body: string;
+  /** Phrases within body to bold */
+  highlights?: string[];
+  image?: string;
+  /** Plan builder group the "Price this" link opens */
+  group?: ChurchJob["id"];
 }
 
 export interface ChurchWeekStep {
