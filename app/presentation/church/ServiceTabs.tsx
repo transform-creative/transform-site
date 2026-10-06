@@ -42,7 +42,7 @@ export function ServiceTabs({ services, onPrice }: Props) {
   return (
     <section className="col middle  gap-20 w-75 shrink-p-10 border-box mt-20 mb-20 pt-20 pb-20">
       <h2 className="textCenter" style={{ letterSpacing: -1.5 }}>
-        We help churches by...
+        We help churches like yours by...
       </h2>
 
       <div className="row shrink-col middle gap-40 w-100">
@@ -101,16 +101,16 @@ export function ServiceTabs({ services, onPrice }: Props) {
           </div>
           <div
             data-tab-content
-            className="col gap-10 tint-2 r-default p-20 border-box"
+            className="col gap-10  r-default p-5 border-box"
           >
             <p>{boldPhrases(service.body, service.highlights)}</p>
             {service.group && (
               <button
                 type="button"
-                className="on-accent-button bkg-none p0 row middle gap-5 w-fit"
+                className="boxed p-10 p0 row middle gap-5 w-fit"
                 onClick={() => onPrice(service.group!)}
               >
-                Price this
+                Add to your plan
                 <Icon name="arrow-forward" size={14} color="var(--bkg)" />
               </button>
             )}

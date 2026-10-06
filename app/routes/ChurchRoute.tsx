@@ -230,12 +230,12 @@ export default function ChurchRoute() {
           </h1>
 
           <div className="col middle center">
-            {/* <p data-hero style={{ maxWidth: 520 }}>
-              Sundays are{" "}
+            <p data-hero style={{ maxWidth: 520 }}>
+             Helping medium sized aussie churches {" "}
               <strong style={{ fontWeight: 600 }}>
-                2 hours a week. What about the other 166?
-              </strong>
-            </p> */}
+               create strong digital presence
+              </strong> to make more disciples.
+            </p>
             <div data-hero className="mt-20">
               <button
                 type="button"

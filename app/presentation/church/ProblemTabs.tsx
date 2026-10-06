@@ -46,7 +46,7 @@ export function ProblemTabs({ jobs }: Props) {
       </div>
 
       <div
-        className={`col w-100 border-box ${context.inShrink ? "p-10" : "p-40"}`}
+        className={`col w-100 border-box ${context.inShrink ? "p-10" : "p-20"}`}
       >
         <div role="tablist" className="row tint-1 tab-top">
           {jobs.map((tab, i) => (
@@ -60,7 +60,7 @@ export function ProblemTabs({ jobs }: Props) {
               className={`on-accent-button tab-top textLeft bold flex-card ${
                 i === activeIndex ? "tint-2" : "bkg-none dimmed"
               }`}
-              style={{ flexBasis: 0}}
+              style={{ flexBasis: 0, fontWeight: 300}}
               onClick={() => setActiveIndex(i)}
             >
               {tab.jobTitle}
@@ -97,14 +97,14 @@ export function ProblemTabs({ jobs }: Props) {
           </div>
           <div
             data-tab-content
-            className="tint-2 r-default p-20 w-50 border-box"
+            className="r-default p-10 w-50 border-box"
           >
-            <p>
+            <h2 style={{fontSize: 30}}>
               {boldPhrases(
                 job.jobBody,
                 job.jobHighlight ? [job.jobHighlight] : [],
               )}
-            </p>
+            </h2>
           </div>
         </div>
       </div>
