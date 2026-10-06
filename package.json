@@ -8,7 +8,7 @@
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
     "email": "npm --prefix ./supabase/functions/_shared/emails run dev",
-    "check:functions": "npx -y deno@2 task --cwd supabase/functions/dispatch-issue check && npx -y deno@2 task --cwd supabase/functions/email-handler check",
+    "check:functions": "npx -y deno@2 task --cwd supabase/functions/dispatch-issue check && npx -y deno@2 task --cwd supabase/functions/email-handler check && npx -y deno@2 task --cwd supabase/functions/insert-logs check",
     "deploy": "supabase functions deploy --project-ref hzfjmmakqwsmucxorhlb --no-verify-jwt"
   },
   "dependencies": {

@@ -236,3 +236,35 @@ export function timeAgo(date: string | Date | null): string {
 
   return "just now";
 }
+
+/*******************************
+ * Smooth-scroll to an element by id, leaving room for the sticky header.
+ */
+export function scrollToId(id: string, headerOffset = 100) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const top =
+    el.getBoundingClientRect().top + window.scrollY - headerOffset;
+  window.scrollTo({ top, behavior: "smooth" });
+}
+
+/*******************************
+ * Render `text` with each of `phrases` bolded wherever it appears.
+ */
+export function boldPhrases(text: string, phrases: string[] = []) {
+  if (phrases.length === 0) return text;
+  const escaped = phrases.map((p) =>
+    p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+  );
+  return text
+    .split(new RegExp(`(${escaped.join("|")})`))
+    .map((part, i) =>
+      phrases.includes(part) ? (
+        <b key={i} style={{ fontWeight: 600 }}>
+          {part}
+        </b>
+      ) : (
+        part
+      ),
+    );
+}

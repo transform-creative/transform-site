@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router";
 import gsap from "gsap";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import { Tooltip } from "~/presentation/elements/Tooltip/Tooltip";
+import { ToggleSwitch } from "~/presentation/elements/ToggleSwitch";
 
 /*************************************************************************
  * SavingCalculator
@@ -610,37 +611,6 @@ function CoverageRow({
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-interface ToggleSwitchProps {
-  on: boolean;
-  onChange: (on: boolean) => void;
-}
-
-function ToggleSwitch({ on, onChange }: ToggleSwitchProps) {
-  return (
-    <div className="row outline-secondary ">
-      {[true, false].map((state) => (
-        <button
-          key={String(state)}
-          onClick={() => onChange(state)}
-          style={{
-            border: "none",
-            cursor: "pointer",
-            borderRadius: "var(--borderRadius)",
-            padding: "4px 14px",
-            fontWeight: 700,
-            transition: "0.2s",
-            background:
-              on === state ? "var(--accent)" : "transparent",
-            color: on === state ? "var(--bkg)" : "var(--txt)",
-          }}
-        >
-          {state ? "On" : "Off"}
-        </button>
-      ))}
     </div>
   );
 }

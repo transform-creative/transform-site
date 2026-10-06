@@ -32,6 +32,12 @@ const MAX_GRACE = 2;
 /** readyState HAVE_CURRENT_DATA — the first frame is decoded and painted. */
 const HAVE_CURRENT_DATA = 2;
 
+/** Generic frame painted under every player, so the box is never empty —
+ *  even before a `poster` loads, or when it 404s or isn't given. */
+// TODO: placeholder — upload this object to the `transform` bucket.
+export const DEFAULT_POSTER =
+  "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/video-placeholder.jpg";
+
 /******************************
  * VideoPlayer component
  *
@@ -177,19 +183,18 @@ export function VideoPlayer({
     !playing &&
     (loadState === "ready" || (loadState === "waiting" && !!poster));
 
+  // Layered: the specific poster on top, the default beneath it as a backstop.
+  const posterStyle = {
+    backgroundImage: poster
+      ? `url(${poster}), url(${DEFAULT_POSTER})`
+      : `url(${DEFAULT_POSTER})`,
+  };
+
   if (loadState === "failed") {
     return (
       <figure
-        className={`media-16-9 w-100 clip relative media-fallback col middle center gap-10 ${className}`}
-        style={
-          poster
-            ? {
-                backgroundImage: `url(${poster})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
-            : undefined
-        }
+        className={`media-16-9 w-100 clip relative media-fallback bg-cover col middle center gap-10 ${className}`}
+        style={posterStyle}
       >
         <Icon
           name="videocam-off"
@@ -229,7 +234,15 @@ export function VideoPlayer({
   }
 
   return (
-    <div className={`media-16-9 w-100 clip relative ${className}`}>
+    // The poster is also painted behind the <video>: this wrapper is in the
+    // prerendered HTML, so the frame shows straight away instead of an empty
+    // box until hydration sets `video.poster` — on a cold first visit that
+    // gap is several seconds. An empty <video> is transparent, so this shows
+    // through until a real frame decodes over it.
+    <div
+      className={`media-16-9 w-100 clip relative bg-cover ${className}`}
+      style={posterStyle}
+    >
       <ReactPlayer
         key={attempt}
         ref={setVideo}

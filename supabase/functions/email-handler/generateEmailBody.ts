@@ -14,6 +14,12 @@ import { render } from "npm:@react-email/render@0.0.12";
 import NewIssueDeveloperEmail from "../_shared/emails/templates/NewIssueDeveloperEmail.tsx";
 import IssueForReviewClientEmail from "../_shared/emails/templates/IssueForReviewClientEmail.tsx";
 import IssueRejectedDeveloperEmail from "../_shared/emails/templates/IssueRejectedDeveloperEmail.tsx";
+import ChurchPlanEmail from "../_shared/emails/templates/ChurchPlanEmail.tsx";
+import {
+  CHURCH_BOOKING_URL,
+  generateChurchPlanPdf,
+} from "../_shared/church-plan-pdf.ts";
+import { bytesToBase64 } from "../_shared/base64.ts";
 
 const endpoint = "https://smtp.maileroo.com/api/v2/emails/";
 
@@ -40,6 +46,8 @@ export async function sendEmail(data: any) {
       return await sendIssueForReviewClientEmail(data);
     case "issue.rejected":
       return await sendIssueRejectedDeveloperEmail(data);
+    case "church_plan.requested":
+      return await sendChurchPlanEmail(data);
     default:
       return {
         error: `invalid_template ${data.type}`,
@@ -148,6 +156,92 @@ async function sendIssueRejectedDeveloperEmail(data: any) {
 
   console.info("sending IssueRejectedDeveloperEmail", {
     issue_id: data.issue_id,
+  });
+
+  const response = await fetch(
+    endpoint,
+    getEmailWithHeaders(emailBody),
+  );
+  if (!response.ok) {
+    const detail = await response.text();
+    return {
+      error: `Maileroo ${response.status} ${response.statusText}: ${detail}`,
+    };
+  }
+  return { data: response };
+}
+
+/*****************************************
+ * buildChurchPlanAttachment — the one-page plan PDF as a Maileroo attachment.
+ * Returns null if it can't be built, so the email still goes without it.
+ */
+async function buildChurchPlanAttachment(data: any) {
+  try {
+    const bytes = await generateChurchPlanPdf({
+      name: data.name,
+      church: data.church,
+      role: data.role,
+      lineItems: Array.isArray(data.lineItems) ? data.lineItems : [],
+      monthly: data.monthly,
+      setup: data.setup,
+      annual: data.annual,
+      hoursBack: data.hoursBack,
+      coordinator: data.coordinator,
+      submittedAt: data.submittedAt,
+    });
+    const slug = String(data.church ?? "church")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 40);
+    return {
+      file_name: `${slug || "church"}-comms-plan.pdf`,
+      content_type: "application/pdf",
+      content: bytesToBase64(bytes),
+      inline: false,
+    };
+  } catch (err) {
+    console.error(
+      `Church plan PDF failed for response ${data.response_id}; sending without it:`,
+      err,
+    );
+    return null;
+  }
+}
+
+/*****************************************
+ * sendChurchPlanEmail — "Email me this plan" on /church. Queued by the
+ * responses insert trigger (formId = 'church-plan'); carries the plan PDF.
+ */
+async function sendChurchPlanEmail(data: any) {
+  const attachment = await buildChurchPlanAttachment(data);
+
+  const emailBody = {
+    to: {
+      address: data.email,
+      display_name: data.name || "Friend",
+    },
+    from: SENDING_EMAIL,
+    subject: data.church
+      ? `Your church comms plan for ${data.church}`
+      : "Your church comms plan",
+    html: render(
+      ChurchPlanEmail({
+        name: data.name,
+        church: data.church,
+        monthly: data.monthly,
+        setup: data.setup,
+        annual: data.annual,
+        booking_url: CHURCH_BOOKING_URL,
+        pdf_attached: Boolean(attachment),
+      }),
+    ),
+    ...(attachment ? { attachments: [attachment] } : {}),
+  };
+
+  console.info("sending ChurchPlanEmail", {
+    response_id: data.response_id,
+    pdf_attached: Boolean(attachment),
   });
 
   const response = await fetch(
