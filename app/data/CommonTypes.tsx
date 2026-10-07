@@ -96,10 +96,15 @@ export interface ChurchService {
   group?: ChurchJob["id"];
 }
 
+/** One "How does it actually work" column on /church */
 export interface ChurchWeekStep {
-  day: string;
+  title: string;
   icon: IoniconName;
   body: string;
+  /** Phrases within body to bold */
+  highlights?: string[];
+  /** Photo behind the column */
+  image: string;
 }
 
 export interface BoardQuestion {

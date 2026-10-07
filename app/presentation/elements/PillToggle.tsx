@@ -13,6 +13,8 @@ export interface PillToggleProps<T extends string = string> {
   value: T;
   ariaLabel?: string;
   className?: string;
+  /** Light pill + text, for use on an accent background */
+  inverse?: boolean;
   onChange: (value: T) => void;
 }
 
@@ -25,8 +27,11 @@ export function PillToggle<T extends string = string> ({
   value,
   ariaLabel = "Toggle",
   className = "",
+  inverse = false,
   onChange,
 }: PillToggleProps<T>) {
+  const activeColor = inverse ? "var(--accent)" : "var(--accent-sm)";
+  const idleColor = inverse ? "var(--bkg)" : "var(--txt)";
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const [pillStyle, setPillStyle] = useState({ width: 0, x: 0 });
 
@@ -46,7 +51,11 @@ export function PillToggle<T extends string = string> ({
       role="radiogroup"
       aria-label={ariaLabel}
       className={`row w-100 gap-5 r-default  ${className}`}
-      style={{ position: "relative", isolation: "isolate", border: '1px solid var(--accent)' }}
+      style={{
+        position: "relative",
+        isolation: "isolate",
+        border: `1px solid ${inverse ? "var(--bkg)" : "var(--accent)"}`,
+      }}
     >
       <div
         className="pill"
@@ -54,6 +63,7 @@ export function PillToggle<T extends string = string> ({
         style={{
           width: `${pillStyle.width}px`,
           transform: `translateX(${pillStyle.x}px)`,
+          background: inverse ? "var(--bkg)" : undefined,
         }}
       />
       {options.map((opt, i) => (
@@ -66,7 +76,7 @@ export function PillToggle<T extends string = string> ({
           aria-checked={value === opt.value}
           style={{
             background: "none",
-            color: value === opt.value ? "var(--accent-sm)" : "var(--txt)",
+            color: value === opt.value ? activeColor : idleColor,
             padding: "4px 4px",
             fontSize: "var(--text-sm)"
           }}
@@ -76,7 +86,11 @@ export function PillToggle<T extends string = string> ({
           {opt.icon && (
             <Icon
               name={opt.icon}
-              color={value === opt.value ? "var(--bkg)" : "var(--txt)"}
+              color={
+                value === opt.value
+                  ? inverse ? "var(--accent)" : "var(--bkg)"
+                  : idleColor
+              }
             />
           )}
         </button>

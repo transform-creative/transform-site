@@ -20,7 +20,8 @@ export function FooterBar({}: FooterBarProps) {
   return (
     <div className={`col middle between boxedAccent raised`}>
       <div className="col p-20 center middle">
-        <div className="row middle center w100">
+        {/* wrap: five links don't fit one line on a phone */}
+        <div className="row middle center wrap gap-10 w100">
           <div className="pr-10">
             <a
               role="button"

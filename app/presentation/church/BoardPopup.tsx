@@ -25,7 +25,7 @@ export function BoardPopup({ active, onClose, onEmail }: Props) {
       active={active}
       onClose={onClose}
       context={context}
-      width={context.inShrink ? "100vw" : 480}
+      width={context.inShrink ? "min(350px, 100vw)" : 480}
       title="Taking this to your board?"
     >
       <div

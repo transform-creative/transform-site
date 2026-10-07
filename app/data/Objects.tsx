@@ -12,6 +12,7 @@ import type {
   FAQSection,
 } from "~/presentation/elements/FrequentlyAskedQuestions";
 import type { IoniconName } from "./Ionicons";
+import { smallestPlanAnnual } from "~/business/churchPlanBL";
 
 export const tabColors = {
   design: "var(--thirdColor)",
@@ -926,6 +927,17 @@ const churchPic = (n: number) =>
 
 /** TODO: overview video file (90 sec, captions on). Left null until it
  *  exists — the hero shows a placeholder. */
+/** Plan builder row id → photo shown (blurred, under the accent) when on */
+export const CHURCH_PLAN_IMAGES: Record<string, string> = {
+  shoots: churchPic(1),
+  websiteBuild: churchPic(6),
+  websiteCare: churchPic(7),
+  announcementSlides: churchPic(2),
+  posts: churchPic(5),
+  podcast: churchPic(3),
+  email: churchPic(4),
+};
+
 export const CHURCH_HERO_VIDEO: string | null = null;
 export const CHURCH_HERO_POSTER: string | null = churchPic(8);
 
@@ -1062,24 +1074,32 @@ export const CHURCH_SERMON_OUTPUTS: { label: string; icon: IoniconName }[] =
 
 export const CHURCH_WEEK: ChurchWeekStep[] = [
   {
-    day: "Sunday",
-    icon: "mic-outline",
-    body: "Your sermon records straight from the desk (we set it up once), and we film on your shoot Sundays.",
+    title: "We visit",
+    highlights: ["regular basis", "real people"],
+    icon: "camera-outline",
+    body: "We come to your church on a regular basis to get photos of real people and events you run.",
+    image: churchPic(3),
   },
   {
-    day: "Mon–Tue",
-    icon: "document-text-outline",
-    body: "We make the week from your sermon and your Elvanto or Planning Center service plan.",
+    title: "We plan",
+    highlights: ["your heart, mission and style", "communications strategy plan"],
+    icon: "map-outline",
+    body: "We meet with you to understand who your community is and how we can best represent your heart, mission and style accurately online, and train your volunteers to fill in any week to week gaps we can't do for you. This all goes into your 'communications strategy plan'.",
+    image: churchPic(9),
   },
   {
-    day: "Thursday",
-    icon: "checkmark-circle-outline",
-    body: "You check. Promos go out unless you flag them. Anything theological waits for your yes.",
+    title: "We connect",
+    highlights: ["Planning Center or Elvanto", "update your site each week"],
+    icon: "git-network-outline",
+    body: "We connect our system to your Planning Center or Elvanto account so we can keep on top of exactly what's going on in the life of your church, automatically create new content and update your site each week.",
+    image: churchPic(10),
   },
   {
-    day: "All week",
-    icon: "calendar-outline",
-    body: "Posts go out, the email lands, slides are ready for Sunday and the sermon hub updates itself.",
+    title: "We check in",
+    highlights: ["quarterly check in meetings", "serve you better"],
+    icon: "chatbubbles-outline",
+    body: "We continue to have quarterly check in meetings to find out how things are going, and where we can serve you better.",
+    image: churchPic(1),
   },
 ];
 
@@ -1094,7 +1114,8 @@ export const BOARD_QA: BoardQuestion[] = [
   {
     question: "What are we signing up to?",
     // TODO: exit terms
-    answer: "Monthly, on a 12-month term.",
+    answer:
+      "An annual plan on a 12-month term, paid in four quarterly instalments.",
   },
   {
     question: "What do we keep if we stop?",
@@ -1120,12 +1141,7 @@ export const BOARD_QA: BoardQuestion[] = [
   },
 ];
 
-export const CHURCH_FOOTNOTE = {
-  text: "*Illustrative pricing, ex GST, monthly on a 12-month term. Hours are based on what this took at Kings Baptist. Coordinator cost uses an average Australian comms coordinator salary of about $68K plus 12% super",
-  sourceLabel: "Payscale, 2026",
-  sourceUrl:
-    "https://www.payscale.com/research/AU/Job=Communications_Coordinator/Salary",
-};
+
 
 /** TODO: swap for a founding-church line if launching before Christmas. */
 export const CHURCH_CAPACITY_LINE =
@@ -1189,6 +1205,6 @@ export const CHURCH_FAQ: FAQQuestion[] = [
     section: "church",
     question: "Is this for big churches only?",
     answer:
-      "It's built for churches of 300–500, and the smallest plan starts at $450/mo.",
+      `It's built for churches of 300–500, and the smallest plan starts at $${smallestPlanAnnual().toLocaleString("en-AU")} a year.`,
   },
 ];

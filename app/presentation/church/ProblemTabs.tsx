@@ -58,9 +58,9 @@ export function ProblemTabs({ jobs }: Props) {
               aria-selected={i === activeIndex}
               aria-controls="problem-panel"
               className={`on-accent-button tab-top textLeft bold flex-card ${
-                i === activeIndex ? "tint-2" : "bkg-none dimmed"
-              }`}
-              style={{ flexBasis: 0, fontWeight: 300}}
+                context.inShrink ? "text-md break-word p-10" : ""
+              } ${i === activeIndex ? "tint-2" : "bkg-none dimmed"}`}
+              style={{ flexBasis: 0, fontWeight: 600}}
               onClick={() => setActiveIndex(i)}
             >
               {tab.jobTitle}

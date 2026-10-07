@@ -35,7 +35,9 @@ export default function ChurchPlanEmail({
   booking_url,
   pdf_attached = true,
 }: ChurchPlanEmailProps) {
-  const preview = `Your church comms plan: ${money(monthly)} a month ex GST`;
+  // Older leads may only carry `monthly`
+  const yearly = annual ?? (monthly ?? 0) * 12;
+  const preview = `Your church comms plan: ${money(yearly)} a year ex GST`;
 
   return (
     <EmailWrapper previewText={preview}>
@@ -53,8 +55,8 @@ export default function ChurchPlanEmail({
       <Section style={card}>
         <Text style={label}>Your plan, ex GST</Text>
         <Text style={{ ...p, margin: 0 }}>
-          <strong>{money(monthly)} a month</strong> on a 12-month term (
-          {money(annual)} a year)
+          <strong>{money(yearly)} a year</strong> on a 12-month term, paid as
+          four quarterly payments of {money(yearly / 4)}
           {setup ? `, plus ${money(setup)} one-off setup` : ""}.
         </Text>
       </Section>

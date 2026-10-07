@@ -124,7 +124,7 @@ export function PlanEmailForm({ active, plan, source, onClose }: Props) {
       onClose={onClose}
       context={context}
       isLoading={submitting}
-      width={context.inShrink ? "100vw" : 480}
+      width={context.inShrink ? "min(350px, 100vw)" : 480}
       title="Email me this plan"
     >
       <div
@@ -134,7 +134,7 @@ export function PlanEmailForm({ active, plan, source, onClose }: Props) {
         <div className="stat-tile col">
           <p className="field-label">Your plan</p>
           <p className="bold">
-            {fmt(price.monthly)}/mo ex GST
+            {fmt(price.annual)}/yr ex GST
             {price.setup > 0 && ` + ${fmt(price.setup)} setup`}
           </p>
         </div>

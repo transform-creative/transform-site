@@ -41,7 +41,7 @@ export function ServiceTabs({ services, onPrice }: Props) {
 
   return (
     <section className="col middle  gap-20 w-75 shrink-p-10 border-box mt-20 mb-20 pt-20 pb-20">
-      <h2 className="textCenter" style={{ letterSpacing: -1.5 }}>
+      <h2 className="textCenter mb-20" style={{ letterSpacing: -1.5 }}>
         We help churches like yours by...
       </h2>
 
@@ -64,7 +64,7 @@ export function ServiceTabs({ services, onPrice }: Props) {
                 className={`text-button text-xl ${
                   context.inShrink ? "textCenter" : "textRight"
                 } ${active ? "accent-text bold" : "muted"}`}
-                style={{fontSize: 30, fontWeight: '300'}}
+                style={{ fontWeight: 300 }}
                 onClick={() => setActiveIndex(i)}
               >
                 <strong style={{fontWeight: 600}}>{tab.verb}</strong>{" "}
@@ -101,7 +101,9 @@ export function ServiceTabs({ services, onPrice }: Props) {
           </div>
           <div
             data-tab-content
-            className="col gap-10  r-default p-5 border-box"
+            className={`col gap-10 r-default p-5 border-box ${
+              context.inShrink ? "middle textCenter" : ""
+            }`}
           >
             <p>{boldPhrases(service.body, service.highlights)}</p>
             {service.group && (

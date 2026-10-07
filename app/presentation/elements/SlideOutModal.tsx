@@ -54,6 +54,21 @@ export function SlideOutModal({
       );
   }, [active, onClose]);
 
+  // Lock the page behind the drawer while it's open. Both <html> and <body>,
+  // since mobile Safari scrolls whichever one the other leaves unlocked.
+  useEffect(() => {
+    if (!active) return;
+    const html = document.documentElement;
+    const body = document.body;
+    const prev = [html.style.overflow, body.style.overflow];
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = prev[0];
+      body.style.overflow = prev[1];
+    };
+  }, [active]);
+
   function handleMainClick(e: any) {
     e.stopPropagation();
   }
@@ -121,7 +136,9 @@ export function SlideOutModal({
               onClick={(e) => handleMainClick(e)}
             >
               <div
-                className="boxed p-10"
+                // border-box: the padding stays inside `width`, so a
+                // full-width panel can't spill past the screen edge
+                className="boxed p-10 border-box"
                 style={{
                   borderRadius: `var(--border) 0 0 0`,
                   minWidth: width,

@@ -427,13 +427,13 @@ input[type="date"] {
 }
 
 td {
-  font-size: 10pt;
+  font-size: 16px;
   padding: 5px 10px;
 }
 
 th {
   font-weight: bold;
-  font-size: 10pt;
+  font-size: 16px;
   padding: 5px 10px;
 }
 

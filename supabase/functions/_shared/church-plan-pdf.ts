@@ -22,7 +22,8 @@ export interface ChurchPlanPdfData {
   name: string;
   church: string;
   role?: string | null;
-  lineItems: { label: string; monthly: number }[];
+  /** `annual` is missing on leads saved before pricing went annual */
+  lineItems: { label: string; monthly: number; annual?: number }[];
   monthly: number;
   setup: number;
   annual: number;
@@ -49,7 +50,8 @@ const BOARD_QA = [
   {
     question: "What are we signing up to?",
     // TODO: exit terms
-    answer: "Monthly, on a 12-month term.",
+    answer:
+      "An annual plan on a 12-month term, paid in four quarterly instalments.",
   },
   {
     question: "What do we keep if we stop?",
@@ -77,7 +79,7 @@ const BOARD_QA = [
 
 /** Keep in sync with CHURCH_FOOTNOTE in app/data/Objects.tsx */
 const FOOTNOTE =
-  "*Illustrative pricing, ex GST, monthly on a 12-month term. Hours are based on what this took at Kings Baptist. Coordinator cost uses an average Australian comms coordinator salary of about $68K plus 12% super (Payscale, 2026).";
+  "*Illustrative pricing, ex GST, annual on a 12-month term, paid quarterly. Hours are based on what this took at Kings Baptist. Coordinator cost uses an average Australian comms coordinator salary of about $68K plus 12% super (Payscale, 2026).";
 
 // Brand colours matching app.css and email styles.ts
 const C_ACCENT = rgb(67 / 255, 105 / 255, 64 / 255); // --accent #436940
@@ -268,14 +270,19 @@ export async function generateChurchPlanPdf(
   const headerH = 22;
   fillRect(ML, y - headerH, CW, headerH, C_BG);
   txt("Your plan", ML + 6, y - 14, 9, fontBold);
-  txtRight("Monthly, ex GST", ML + CW - 6, y - 14, 9, fontBold, C_ACCENT);
+  txtRight("Annual, ex GST", ML + CW - 6, y - 14, 9, fontBold, C_ACCENT);
   y -= headerH;
 
   const rowH = 18;
   (data.lineItems ?? []).slice(0, 16).forEach((item, i) => {
     if (i % 2 === 1) fillRect(ML, y - rowH, CW, rowH, C_ROW_ALT);
     txt(safe(item.label, 80), ML + 6, y - 12, 9.5);
-    txtRight(money(item.monthly), ML + CW - 6, y - 12, 9.5);
+    txtRight(
+      money(item.annual ?? item.monthly * 12),
+      ML + CW - 6,
+      y - 12,
+      9.5,
+    );
     y -= rowH;
   });
   hline(y, 0.8, C_ACCENT);
@@ -283,8 +290,8 @@ export async function generateChurchPlanPdf(
   // ── Totals ───────────────────────────────────────────────────────────────
 
   const totals: [string, string][] = [
-    ["Monthly total, ex GST", money(data.monthly)],
-    ["Annual total, ex GST (12 months)", money(data.annual)],
+    ["Annual total, ex GST", money(data.annual)],
+    ["Quarterly payment (x4), ex GST", money(data.annual / 4)],
   ];
   if (data.setup > 0)
     totals.push(["One-off setup, ex GST", money(data.setup)]);
@@ -297,7 +304,7 @@ export async function generateChurchPlanPdf(
   y -= 8;
 
   const extras = [
-    "Monthly, on a 12-month term.",
+    "Annual plan on a 12-month term, paid quarterly.",
     data.hoursBack ? `About ${data.hoursBack} hrs a week back.*` : "",
     data.coordinator
       ? `About the cost of ${safe(data.coordinator, 20)} a week of a comms coordinator.*`
