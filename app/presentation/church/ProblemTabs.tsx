@@ -26,6 +26,7 @@ export function ProblemTabs({ jobs, onHelp }: Props) {
     jobs.length,
     activeIndex,
     setActiveIndex,
+    5000,
   );
 
   const job = jobs[activeIndex];

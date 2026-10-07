@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/chat",
+      "destination": "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2neXINmRa2l8cPxCMY8-FrrTt30-Tpwfj7-zqktFODuuJO9Z_wsSfv2wcNkiFvipiOl58trJuc",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/__spa-fallback.html" }
   ],

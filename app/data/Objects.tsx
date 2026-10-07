@@ -562,6 +562,7 @@ const ARCHIVED = [
 
 export const CONTACT = {
   email: "hello@transformcreative.com.au",
+  /** Also the /chat redirect in vercel.json — keep in sync */
   bookingUrl:
     "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2neXINmRa2l8cPxCMY8-FrrTt30-Tpwfj7-zqktFODuuJO9Z_wsSfv2wcNkiFvipiOl58trJuc",
 };
@@ -938,7 +939,8 @@ export const CHURCH_PLAN_IMAGES: Record<string, string> = {
   email: churchPic(4),
 };
 
-export const CHURCH_HERO_VIDEO: string | null = null;
+export const CHURCH_HERO_VIDEO =
+  "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/TC-church-content.mp4";
 export const CHURCH_HERO_POSTER: string | null = churchPic(8);
 
 export const CHURCH_TRUST_POINTS = [
@@ -1144,13 +1146,13 @@ export const BOARD_QA: BoardQuestion[] = [
   {
     question: "Why not use volunteers, or hire someone?",
     answer:
-      "The more the merrier! We'd love to work alongside your existing team of legends. A two-day-a-week comms coordinator is roughly $27K a year with super, and it's pretty rare to find one person who has skills doing video, photo, editing, design and web skills. Often when you do, they're a 20 year old uni student who leaves within the first couple of years.",
+      "The more the merrier! We'd love to work alongside your existing team of legends. A two-day-a-week comms coordinator is roughly $30K a year with super, and it's pretty rare to find one person who can shoot, edit, design and look after a website.",
   },
   {
     question: "What about kids and privacy?",
     // TODO: confirm the shooter's Working With Children Check
     answer:
-      "Our team all hold a Working With Children Check and a valid CPS training certificate. We endeavour to follow your church's photography policy. We don't ask for any children's details on our side, and any details collected .",
+      "Our team all hold a Working With Children Check and a valid CPS training certificate. We endeavour to follow your church's photography policy. We don't ask for any children's details on our side, and any personal details collected are saved in your database, not ours.",
   },
 ];
 

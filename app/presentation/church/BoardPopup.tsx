@@ -10,8 +10,7 @@ import {
   type ChurchCtaSource,
 } from "~/data/Analytics";
 import { Icon } from "~/presentation/elements/Icon";
-import { SlideOutModal } from "~/presentation/elements/SlideOutModal";
-import "../../app-v2.css";
+import { SlideOutModal } from "~/presentation/elements/SlideOutModal";import "../../app-v2.css";
 
 interface Props {
   active: boolean;

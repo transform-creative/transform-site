@@ -147,7 +147,7 @@ export const ServiceTabs = forwardRef<ServiceTabsHandle, Props>(
                 className="boxed p-10 p0 row middle gap-5 w-fit"
                 onClick={() => onPrice(service.group!)}
               >
-                What would great communication cost your church?
+                What would great comms cost you?
                 <Icon name="arrow-forward" size={14} color="var(--bkg)" />
               </button>
             )}

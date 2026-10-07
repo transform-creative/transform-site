@@ -90,7 +90,12 @@
       "Bash(grep -rn \"zIndex: [0-9]\\\\{3,\\\\}\" app/)",
       "PowerShell(npx tsc --noEmit -p tsconfig.json)",
       "PowerShell(npx vite build --logLevel warn)",
-      "PowerShell(npm audit --json 2>$null)"
+      "PowerShell(npm audit --json 2>$null)",
+      "Bash(sed 's#npm:pdf-lib@1.17.1#pdf-lib#' \"C:/Users/isaac/source/transform-site/supabase/functions/_shared/church-plan-pdf.ts\")",
+      "Bash(rm -f p*.png)",
+      "Bash(npx tsx *)",
+      "Bash(python -c \"import pymupdf; d=pymupdf.open\\('plan.pdf'\\); d[1].get_pixmap\\(dpi=90\\).save\\('p1.png'\\); d[0].get_pixmap\\(dpi=110, clip=pymupdf.Rect\\(0,370,595,440\\)\\).save\\('p0.png'\\)\")",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('C:/Users/isaac/source/transform-site/vercel.json','utf8'\\)\\); console.log\\('vercel.json ok'\\)\")"
     ],
     "deny": [
       "Read(**/.env*)",

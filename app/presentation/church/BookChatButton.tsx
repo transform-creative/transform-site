@@ -14,6 +14,8 @@ interface Props {
   source: ChurchCtaSource;
   /** Light text + outline, for use on an accent background */
   onAccent?: boolean;
+  /** Solid white fill with accent text */
+  white?: boolean;
   className?: string;
 }
 
@@ -22,15 +24,25 @@ interface Props {
  * The secondary "Book a chat" call to action on /church. Opens the booking
  * calendar and logs which button was used.
  */
-export function BookChatButton({ source, onAccent, className = "" }: Props) {
+export function BookChatButton({
+  source,
+  onAccent,
+  white,
+  className = "",
+}: Props) {
   const context: SharedContextProps = useOutletContext();
-  const color = onAccent ? "var(--bkg)" : "var(--accent)";
+  const color = onAccent && !white ? "var(--bkg)" : "var(--accent)";
+  const variant = white
+    ? "fill-white"
+    : onAccent
+      ? "outline-bkg"
+      : "outline-secondary";
 
   return (
     <a
       role="button"
-      className={`${onAccent ? "outline-bkg" : "outline-secondary"} row middle center gap-5 ${className}`}
-      style={{ color, background: "none" }}
+      className={`${variant} row middle center gap-5 ${className}`}
+      style={white ? undefined : { color, background: "none" }}
       href={CONTACT.bookingUrl}
       target="_blank"
       rel="noreferrer"

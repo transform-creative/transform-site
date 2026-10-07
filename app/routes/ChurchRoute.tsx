@@ -108,10 +108,6 @@ const serviceSchema = {
 
 const PLAN_ID = "plan";
 
-// TODO: swap for real Sunday footage (set CHURCH_HERO_VIDEO). No stock footage.
-const HERO_PLACEHOLDER_VIDEO =
-  "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/2026%20reel-LQ.mp4";
-
 export default function ChurchRoute() {
   const context: SharedContextProps =
     useOutletContext();
@@ -156,7 +152,7 @@ export default function ChurchRoute() {
     return () => observer.disconnect();
   }, []);
 
-  // The mobile price bar rides in once the plan builder is on screen, and
+  // The price bar rides in once the plan builder is on screen, and
   // steps out of the way as the page bottoms out so the footer is readable.
   useEffect(() => {
     const onScroll = () => {
@@ -217,8 +213,7 @@ export default function ChurchRoute() {
     setEmailSource(source);
   }
 
-  const showMobileBar =
-    context.inShrink &&
+  const showPriceBar =
     pastPlanTop &&
     !boardOpen &&
     !emailSource;
@@ -255,10 +250,7 @@ export default function ChurchRoute() {
       >
         <video
           className="layer-fill media-cover"
-          src={
-            CHURCH_HERO_VIDEO ??
-            HERO_PLACEHOLDER_VIDEO
-          }
+          src={CHURCH_HERO_VIDEO}
           poster={
             CHURCH_HERO_POSTER ?? DEFAULT_POSTER
           }
@@ -304,7 +296,7 @@ export default function ChurchRoute() {
               </strong>{" "}
              up to date every week.
             </p>
-            <div data-hero className="mt-20">
+            <div data-hero className="row middle center gap-10 mt-20">
               <button
                 type="button"
                 className="accent row middle center gap-5"
@@ -319,6 +311,11 @@ export default function ChurchRoute() {
                 />
                 Build your digital strategy
               </button>
+              <BookChatButton
+                source={CHURCH_CTA_SOURCE.HERO}
+                white
+                className="btn-pad"
+              />
             </div>
           </div>
         </div>
@@ -611,12 +608,12 @@ export default function ChurchRoute() {
         </div>
       </section>
 
-      {/* Mobile price bar */}
+      {/* Price bar */}
       <div
         className={`sticky-bottom-bar row middle between gap-10 boxed p-10 ${
-          showMobileBar ? "" : "faded-out"
+          showPriceBar ? "" : "faded-out"
         }`}
-        aria-hidden={!showMobileBar}
+        aria-hidden={!showPriceBar}
       >
         <div className="col flex-1">
           <p className="bold num">
@@ -631,7 +628,7 @@ export default function ChurchRoute() {
         <button
           type="button"
           className="accent row middle center gap-5 no-shrink"
-          tabIndex={showMobileBar ? 0 : -1}
+          tabIndex={showPriceBar ? 0 : -1}
           onClick={() =>
             openEmail(
               CHURCH_CTA_SOURCE.MOBILE_BAR,
@@ -645,6 +642,12 @@ export default function ChurchRoute() {
           />
           Email me this plan
         </button>
+        {!context.inShrink && (
+          <BookChatButton
+            source={CHURCH_CTA_SOURCE.MOBILE_BAR}
+            className="no-shrink btn-pad"
+          />
+        )}
       </div>
 
       <BoardPopup

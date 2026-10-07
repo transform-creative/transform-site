@@ -222,7 +222,7 @@ export const PlanBuilder = forwardRef<
             background: "#11111122",
           }}
         >
-          What would great communication cost your church?
+          What would great comms cost you?
         </h2>
 
         <div className="row shrink-col between gap-20 p-20">

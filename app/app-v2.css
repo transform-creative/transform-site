@@ -94,6 +94,11 @@ a[role="button"].accent {
   color: var(--bkg);
 }
 
+/* Link button padded like a <button>, for when it isn't full width */
+a[role="button"].btn-pad {
+  padding: 10px;
+}
+
 /* Keep accent button text readable on hover (global button:hover turns it
    the same green as the background, making it invisible) */
 button.accent:hover,
@@ -983,8 +988,8 @@ h5.center {
 /* Darkens and softly blurs media so overlaid text stays legible */
 .scrim-dark {
   background: #00000099;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 /* Dark wash fading down from the top, so text pinned at the top of a photo reads */
@@ -1591,6 +1596,14 @@ button.chip.active:hover * {
 /* Sit on the right of a column without stretching */
 .self-end {
   align-self: flex-end;
+}
+
+/* Solid white fill with accent text, e.g. a secondary button on a hero */
+.fill-white,
+a[role="button"].fill-white,
+a[role="button"].fill-white:hover {
+  background: #fff;
+  color: var(--accent);
 }
 
 /* Light (page background) fill — reads as white on the cards */
