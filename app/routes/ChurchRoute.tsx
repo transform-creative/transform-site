@@ -317,7 +317,7 @@ export default function ChurchRoute() {
                   size={16}
                   color="var(--bkg)"
                 />
-                Build your plan
+                Build your digital strategy
               </button>
             </div>
           </div>
@@ -584,7 +584,7 @@ export default function ChurchRoute() {
             Could this work for <strong>your church</strong>?
           </h2>
           <p className="textCenter w-75">
-            Build your plan and we'll email it
+            Build your digital strategy and we'll email it
             through, or grab a no-pressure
             20-minute chat.
           </p>

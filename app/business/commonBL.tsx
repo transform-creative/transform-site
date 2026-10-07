@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoniconName } from "~/data/Ionicons";
 import type { Project } from "~/data/CommonTypes";
 import type {
@@ -253,7 +253,9 @@ export function scrollToId(id: string, headerOffset = 100) {
  * Step a tab set to its next index every `ms`, wrapping round. Spread
  * `hoverProps` on the tabs + content so cycling pauses while hovered; call
  * `hold()` to pause until the pointer next leaves (e.g. after opening a tab
- * from elsewhere on the page). The timer restarts on every index change.
+ * from elsewhere on the page). Pausing freezes the time left rather than
+ * resetting it; a new index starts a fresh `ms`. A progress bar keyed on
+ * `activeIndex`, run for `ms` and paused with `paused` stays in step.
  */
 export function useAutoCycle(
   count: number,
@@ -262,17 +264,34 @@ export function useAutoCycle(
   ms = 3000,
 ) {
   const [paused, setPaused] = useState(false);
+  const remaining = useRef(ms);
+  const lastIndex = useRef(activeIndex);
 
   useEffect(() => {
+    if (lastIndex.current !== activeIndex) {
+      lastIndex.current = activeIndex;
+      remaining.current = ms;
+    }
     if (paused || count < 2) return;
+    const startedAt = Date.now();
     const timer = setTimeout(
       () => setActiveIndex((activeIndex + 1) % count),
-      ms,
+      remaining.current,
     );
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      // Bank the time left so a pause picks up where it stopped
+      remaining.current = Math.max(
+        0,
+        remaining.current - (Date.now() - startedAt),
+      );
+    };
   }, [paused, activeIndex, count, ms]);
 
   return {
+    /** True when there's no cycle running (hovered, held or a single tab) */
+    paused: paused || count < 2,
+    ms,
     hold: () => setPaused(true),
     hoverProps: {
       onMouseEnter: () => setPaused(true),

@@ -222,7 +222,7 @@ export const PlanBuilder = forwardRef<
             background: "#11111122",
           }}
         >
-          Create your annual plan
+          Create your digital plan
         </h2>
 
         <div className="row shrink-col between gap-20 p-20">

@@ -72,7 +72,7 @@ export const CHURCH_PLAN = {
       max: 6,
       default: 4,
       price: 0,
-      tiered: { start: 700, step: 100 },
+      tiered: { start: 850, step: 100 },
       hours: 0,
       priceLabel: "",
       //      note: "Easter, Christmas and launch Sundays count as 2",

@@ -53,7 +53,7 @@ export function ToggleSwitch({
             color: on === state ? activeTxt : idleTxt,
           }}
         >
-          {state ? "On" : "Off"}
+          {state ? "Yes" : "No"}
         </button>
       ))}
     </div>

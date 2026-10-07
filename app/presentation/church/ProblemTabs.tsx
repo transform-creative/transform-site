@@ -22,7 +22,7 @@ export function ProblemTabs({ jobs, onHelp }: Props) {
   const context: SharedContextProps = useOutletContext();
   const [activeIndex, setActiveIndex] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
-  const { hoverProps } = useAutoCycle(
+  const { paused, ms, hoverProps } = useAutoCycle(
     jobs.length,
     activeIndex,
     setActiveIndex,
@@ -56,6 +56,18 @@ export function ProblemTabs({ jobs, onHelp }: Props) {
         className={`col w-100 border-box ${context.inShrink ? "p-10" : "p-20"}`}
         {...hoverProps}
       >
+        {/* Time until the next tab; freezes with the auto-cycle on hover */}
+        <div className="tint-1 h-4 w-100 r-default clip mb-20" aria-hidden>
+          <div
+            key={activeIndex}
+            className="progress-fill"
+            style={{
+              animationDuration: `${ms}ms`,
+              animationPlayState: paused ? "paused" : "running",
+            }}
+          />
+        </div>
+
         <div role="tablist" className="row tint-1 tab-top">
           {jobs.map((tab, i) => (
             <button

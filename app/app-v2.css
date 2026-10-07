@@ -1026,6 +1026,28 @@ h5.center {
   background: #ffffff2e;
 }
 
+.h-4 {
+  height: 4px;
+}
+
+/* Bar (in the text colour) that grows left to right over its
+   animation-duration, then holds */
+.progress-fill {
+  height: 100%;
+  background: currentColor;
+  transform-origin: left;
+  animation: progress-fill linear forwards;
+}
+
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 /* Folder-style tab: rounded top only, so the active one merges into its panel */
 .tab-top {
   border-radius: var(--borderRadius) var(--borderRadius) 0 0;

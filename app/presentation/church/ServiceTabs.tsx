@@ -42,7 +42,7 @@ export const ServiceTabs = forwardRef<ServiceTabsHandle, Props>(
   const context: SharedContextProps = useOutletContext();
   const [activeIndex, setActiveIndex] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
-  const { hold, hoverProps } = useAutoCycle(
+  const { paused, ms, hold, hoverProps } = useAutoCycle(
     services.length,
     activeIndex,
     setActiveIndex,
@@ -147,10 +147,22 @@ export const ServiceTabs = forwardRef<ServiceTabsHandle, Props>(
                 className="boxed p-10 p0 row middle gap-5 w-fit"
                 onClick={() => onPrice(service.group!)}
               >
-                Add to your plan
+                Create your digital plan
                 <Icon name="arrow-forward" size={14} color="var(--bkg)" />
               </button>
             )}
+          </div>
+
+          {/* Time until the next tab; freezes with the auto-cycle on hover */}
+          <div className="tint-1 h-4 w-100 r-default clip" aria-hidden>
+            <div
+              key={activeIndex}
+              className="progress-fill"
+              style={{
+                animationDuration: `${ms}ms`,
+                animationPlayState: paused ? "paused" : "running",
+              }}
+            />
           </div>
         </div>
       </div>
