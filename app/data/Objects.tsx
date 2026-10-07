@@ -46,7 +46,7 @@ export const PROJECTS: Project[] = [
     ],
     //endorsement: {name: "David Goode", text: "it's great"}
   },
- 
+
   {
     id: 105,
     organisation: "Crossover",
@@ -135,7 +135,7 @@ export const PROJECTS: Project[] = [
     ],
     link: "https://redfrogs.com.au/",
   },
-   {
+  {
     id: 102,
     organisation: "BaptistCare",
     name: "Breaking Free Program",
@@ -344,7 +344,6 @@ export const PROJECTS: Project[] = [
       "The course went on to sell out completely!",
     ],
   },
-  
 
   {
     id: 11,
@@ -380,7 +379,7 @@ export const PROJECTS: Project[] = [
       "Their ping-pong-a-thon went on to raise $3000!",
     ],
   },
-   {
+  {
     id: 2,
     name: "RBC Alpha promo",
     type: "media",
@@ -418,7 +417,7 @@ export const PROJECTS: Project[] = [
     ],
     link: "https://www.crossover.org.au/",
   },
-{
+  {
     id: 1011,
     name: "DBS Promo",
     type: "media",
@@ -619,8 +618,9 @@ export const WORKED_WITH_LOGOS: {
   },
   {
     name: "Sonder",
-    image: "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/sonder_logo.png"
-  }
+    image:
+      "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/sonder_logo.png",
+  },
 ];
 
 export const FEATURES: Feature[] = [
@@ -955,7 +955,7 @@ export const CHURCH_JOBS: ChurchJob[] = [
     color: tabColors.media,
     jobTitle: "Capture your community well",
     jobBody:
-      "Because on a Sunday morning, whoever has the skills, time and gear is usually busy running 10 other teams.",
+      "On a Sunday morning, whoever has the skills, time and gear is usually busy running 10 other teams. (Let's not start on who's trying to find time to edit them).",
     jobHighlight: "skills, time and gear",
     jobImage: churchPic(1),
     serviceId: "capture",
@@ -970,17 +970,16 @@ export const CHURCH_JOBS: ChurchJob[] = [
     id: "content",
     icon: "megaphone-outline",
     color: tabColors.design,
-    jobTitle: "Communicate your vision online",
+    jobTitle: "Share church life",
     jobBody:
-      "Because curating social media accounts that actually reflect the life of your church needs a clear strategy.",
-    jobHighlight: "a clear strategy",
+      "To many outsiders, inconsistent social media = disintrested community. Sharing consistently shows onlookers they can trust you.",
+    jobHighlight: "inconsistent social media = disintrested community",
     jobImage: churchPic(5),
     serviceId: "posting",
     serviceTitle: "Content",
     serviceTagline: "Your week's content, done",
     serviceBody: [
       "Each quarter we build an invite plan around the series and events you've already got planned. Then each week we turn your sermon into reels, posts, slides, the weekly email and a follow-up pack for small group leaders, plus a monthly brochure if you want one.",
-      "You check it by Thursday, and nothing theological goes out without your pastor's yes.",
     ],
   },
   {
@@ -989,8 +988,8 @@ export const CHURCH_JOBS: ChurchJob[] = [
     color: tabColors.software,
     jobTitle: "Keep your website current",
     jobBody:
-      "Because each time a new sermon, event or form is rushed onto your site, it gets slightly more broken.",
-    jobHighlight: "slightly more broken",
+      "Old service times, a staff page from three years ago, and a login nobody can find. Your site's the first place newcomers look, but the last job on your list.",
+    jobHighlight: "login nobody can find",
     jobImage: churchPic(4),
     serviceId: "website",
     serviceTitle: "Website",
@@ -1023,7 +1022,7 @@ export const CHURCH_SERVICES: ChurchService[] = [
     group: "photo",
     image: churchPic(3),
   },
-  
+
   {
     id: "slides",
     verb: "Creating",
@@ -1047,7 +1046,7 @@ export const CHURCH_SERVICES: ChurchService[] = [
     verb: "Posting",
     rest: "for you",
     body: "We take your notices, sermon series and posts, and schedule them onto Facebook and instagram to help you maintain a consistent online presence.",
-    highlights: ["schedule them","consistent online presence"],
+    highlights: ["schedule them", "consistent online presence"],
     group: "content",
     image: churchPic(6),
   },
@@ -1056,43 +1055,51 @@ export const CHURCH_SERVICES: ChurchService[] = [
     verb: "Updating",
     rest: "your website",
     body: "Important notices, upcoming services, sermons, all kept current on your site, so newcomers and regulars alike can always find exactly what they need.",
-    highlights: ["kept current","newcomers and regulars alike"],
+    highlights: ["kept current", "newcomers and regulars alike"],
     group: "website",
     image: churchPic(2),
   },
 ];
 
 /** Outputs fanned out from the sermon in the content diagram */
-export const CHURCH_SERMON_OUTPUTS: { label: string; icon: IoniconName }[] =
-  [
-    { label: "Reels", icon: "film-outline" },
-    { label: "Posts", icon: "images-outline" },
-    { label: "Slides", icon: "easel-outline" },
-    { label: "Email", icon: "mail-outline" },
-    { label: "Small group pack", icon: "people-outline" },
-    { label: "Brochure", icon: "newspaper-outline" },
-    { label: "Podcast", icon: "headset-outline" },
-    { label: "Sermon hub", icon: "globe-outline" },
-  ];
+export const CHURCH_SERMON_OUTPUTS: {
+  label: string;
+  icon: IoniconName;
+}[] = [
+  { label: "Reels", icon: "film-outline" },
+  { label: "Posts", icon: "images-outline" },
+  { label: "Slides", icon: "easel-outline" },
+  { label: "Email", icon: "mail-outline" },
+  { label: "Small group pack", icon: "people-outline" },
+  { label: "Brochure", icon: "newspaper-outline" },
+  { label: "Podcast", icon: "headset-outline" },
+  { label: "Sermon hub", icon: "globe-outline" },
+];
 
 export const CHURCH_WEEK: ChurchWeekStep[] = [
   {
     title: "We visit",
-    highlights: ["regular basis", "real people"],
+    highlights: ["regular basis", "your existing volunteers"],
     icon: "camera-outline",
-    body: "We come to your church on a regular basis to get photos of real people and events you run.",
+    body: "We come to your church on a regular basis to get photos of real people and events you run, and train your exsisting volunteers to hold down the fort when we're not there..",
     image: churchPic(3),
   },
   {
     title: "We plan",
-    highlights: ["your heart, mission and style", "communications strategy plan"],
+    highlights: [
+      "your heart, mission and style",
+      "communications strategy plan",
+    ],
     icon: "map-outline",
-    body: "We meet with you to understand who your community is and how we can best represent your heart, mission and style accurately online, and train your volunteers to fill in any week to week gaps we can't do for you. This all goes into your 'communications strategy plan'.",
+    body: "We meet with you to understand who your community is and how we can best represent your heart, mission and style accurately online, and train your volunteers to fill in any week to week gaps. This all goes into your 'communications strategy plan'.",
     image: churchPic(9),
   },
   {
     title: "We connect",
-    highlights: ["Planning Center or Elvanto", "update your site each week"],
+    highlights: [
+      "Planning Center or Elvanto",
+      "update your site each week",
+    ],
     icon: "git-network-outline",
     body: "We connect our system to your Planning Center or Elvanto account so we can keep on top of exactly what's going on in the life of your church, automatically create new content and update your site each week.",
     image: churchPic(10),
@@ -1107,44 +1114,45 @@ export const CHURCH_WEEK: ChurchWeekStep[] = [
 ];
 
 /** Also printed in the plan PDF — keep in sync with
+ *  supabase/functions/_shared/church-plan-pdf.ts (BOARD_TIME_BACK). */
+export const BOARD_TIME_BACK =
+  "If your team spends 3–4 hours a week on slides, notices and socials, that's four or five weeks of their year. This gives that time back for people and preaching.";
+
+/** Also printed in the plan PDF — keep in sync with
  *  supabase/functions/_shared/church-plan-pdf.ts (BOARD_QA). */
 export const BOARD_QA: BoardQuestion[] = [
   {
-    question: "How does it compare to hiring?",
+    question: "Is this a good use of our budget?",
     answer:
-      "A typical plan is about $19K a year ex GST. A two-day-a-week comms coordinator is roughly $30K with super, and one person rarely covers shooting, editing and web work as well.",
+      "Fair question. What it pays for is people finding your church online, and your regulars knowing what's on, without it all landing on your pastor or a volunteer each week.",
+  },
+  {
+    question: "How will we know it's working?",
+    answer:
+      "You'll get a short quarterly report with 'plan-a-visit' sign-ups (if you're on our website), sermon listens, email opens and feedback on how your socials are tracking. We'll go through it together each quarter. It's also worth asking newcomers how they found you, which is often the most useful number of all.",
   },
   {
     question: "What are we signing up to?",
-    // TODO: exit terms
     answer:
-      "An annual plan on a 12-month term, paid in four quarterly instalments.",
+      "We collect payment in quarterly instalments. You can stop at any time, and your photos, video, templates, podcast feed and Google Business Profile are all yours.",
   },
   {
-    question: "What do we keep if we stop?",
-    // TODO: confirm what happens to the hosted pages if a church leaves
+    question: "Who decides what goes out under our name?",
     answer:
-      "Your photos, video, templates, podcast feed and Google Business Profile are yours, and visitor details already live in your Elvanto or PCO.",
+      "You do. Anything we think could be potentially dicey waits for your pastor's yes.",
   },
   {
-    question: "Who's filming in our building?",
+    question: "Why not use volunteers, or hire someone?",
+    answer:
+      "The more the merrier! We'd love to work alongside your existing team of legends. A two-day-a-week comms coordinator is roughly $27K a year with super, and it's pretty rare to find one person who has skills doing video, photo, editing, design and web skills. Often when you do, they're a 20 year old uni student who leaves within the first couple of years.",
+  },
+  {
+    question: "What about kids and privacy?",
     // TODO: confirm the shooter's Working With Children Check
     answer:
-      "Our shooter holds a Working With Children Check and follows your church's photography policy.",
-  },
-  {
-    question: "What data do you hold?",
-    answer:
-      "Plan a visit only asks for name, contact details, service and group size. No children's details, and it goes straight into your system.",
-  },
-  {
-    question: "Who controls what's said?",
-    answer:
-      "Promos publish unless you flag them by Thursday. Anything theological needs a yes from your pastor.",
+      "Our team all hold a Working With Children Check and a valid CPS training certificate. We endeavour to follow your church's photography policy. We don't ask for any children's details on our side, and any details collected .",
   },
 ];
-
-
 
 /** TODO: swap for a founding-church line if launching before Christmas. */
 export const CHURCH_CAPACITY_LINE =
@@ -1162,52 +1170,61 @@ export const CHURCH_FAQ_SECTIONS: FAQSection[] = [
 export const CHURCH_FAQ: FAQQuestion[] = [
   {
     section: "church",
-    question: "Do you use AI?",
-    answer:
-      "Yes, for the grunt work: first drafts of captions and slide layouts from your sermon and service plan. A real person shapes every piece, and your pastor signs off on anything theological.",
+    question: "We're a smaller church. Is this for us?",
+    answer: `It's built for churches of around 200–500, and the smallest plan starts at $${smallestPlanAnnual().toLocaleString("en-AU")} a year. You can start small and add more once you've seen how it goes.`,
   },
+  {
+    section: "church",
+    question:
+      "Some of our people already do this! What happens to them?",
+    // Isaac to confirm: pointers on shoot days
+    answer:
+      "Hopefully they keep going! We'd love to work alongside them using the same templates, and we're happy to share a few pointers on shoot days if they're keen.",
+  },
+  {
+    section: "church",
+    question: "How much of our week will this take?",
+    // Isaac to confirm: ~15 min a week, check against Kings
+    answer:
+      "We organise a 30-minute strategy catch-up each quarter, and other than that we hope you'll spend less than 10 minutes week thinking about us (so you can focus on the pastoral stuff)!",
+  },
+  {
+    section: "church",
+    question: "Will it look and sound like us?",
+    answer:
+      "That's the plan. We shoot in your building with your people and work from your own sermon and service plan, so it should look like your church on a normal Sunday. A real person approves every piece of work we create.",
+  },
+
+  {
+    section: "church",
+    question: "How do you handle kids in photos and video?",
+    // Isaac to confirm: helping set up a photography policy
+    answer:
+      "Carefully. We follow your photography policy and only share photos of kids with consent.",
+  },
+  // {
+  //   section: "church",
+  //   question: "Our budget's already set for this year.",
+  //   answer:
+  //     "Totally understand. Lots of churches set budgets at the AGM, so you could start small now and use the plan PDF to budget properly for next year.",
+  // },
+  // {
+  //   section: "church",
+  //   question: "Can you be at our Easter or Christmas service?",
+  //   answer:
+  //     "We'd love to! We can film two churches on each big day, so it's first in, best dressed. If we're full, we'll shoot a promo the week before, which is probably when your invites need it most.",
+  // },
   {
     section: "church",
     question: "We're not on Elvanto or Planning Center.",
     answer:
-      "Let's chat. Most of this still works; plan a visit is the bit that needs one of the two.",
-  },
-  {
-    section: "church",
-    question: "What if we miss Thursday?",
-    answer:
-      "Promos go out as planned and anything theological waits. Late sermon changes go into your editable slide template.",
-  },
-  {
-    section: "church",
-    question: "What about Easter and Christmas?",
-    answer:
-      "Big days use two shoot credits, and we can film two churches on each. Everyone else gets a promo shoot the week before.",
-  },
-  {
-    section: "church",
-    question: "Do you film kids?",
-    answer:
-      "Only in line with your photography policy and consent process.",
-  },
-  {
-    section: "church",
-    question: "Our volunteers already do some of this.",
-    // TODO: answer
-    answer: "TODO: volunteers answer",
-    visible: import.meta.env.DEV,
+      "Let's chat. Most of this still works; but it might make life a bit harder.",
   },
   {
     section: "church",
     question: "How long until we're up and running?",
     // TODO: onboarding time
-    answer: "TODO: onboarding time",
-    visible: import.meta.env.DEV,
-  },
-  {
-    section: "church",
-    question: "Is this for big churches only?",
     answer:
-      `It's built for churches of 300–500, and the smallest plan starts at $${smallestPlanAnnual().toLocaleString("en-AU")} a year.`,
+      "We like to move fast! Usually we can find time to meet within a few weeks of you reaching out and get the ball rolling.",
   },
 ];

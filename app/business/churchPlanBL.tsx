@@ -49,7 +49,7 @@ export const CHURCH_PLAN = {
   base: {
     label: "Always included",
     price: 70,
-    note: "Quarterly invite plan + 30-min call, start-up setup (Spotify, Apple Podcasts, Google Business Profile), monthly report",
+    note: "Quarterly invite plan + 30-min call, start-up setup (Spotify, Apple Podcasts, Google Business Profile), quarterly report",
   },
   groups: [
     {
@@ -66,7 +66,7 @@ export const CHURCH_PLAN = {
       group: "photo",
       label:
         "Shoot content at our church {times} each year",
-      note: "You choose the time and place.",
+      note: "Pro photo and video to feed your website, socials and slides all year.",
       control: "stepper",
       min: 2,
       max: 6,
@@ -129,7 +129,7 @@ export const CHURCH_PLAN = {
       id: "email",
       group: "content",
       label: "Create our email weekly",
-      note: "Based on your planning center details, and anything else you send us.",
+      note: "Built from what's on in Elvanto or Planning Center, plus anything else you send us.",
       control: "toggle",
       default: 0,
       price: 150,
@@ -146,7 +146,6 @@ export const CHURCH_PLAN = {
     //   price: 100,
     //   hours: 1.5,
     //   priceLabel: "$100/mo",
-    //   note: "Sermon notes in by Thursday",
     // },
     // {
     //   id: "followUpPack",
@@ -175,7 +174,8 @@ export const CHURCH_PLAN = {
     {
       id: "websiteBuild",
       group: "website",
-      label: "Design us a new, easy to maintain website",
+      label: "A new website for your church",
+      note: "Designed around your strategy and connected to Elvanto or Planning Center.",
       control: "toggle",
       default: 1,
       hours: 0.5,
@@ -186,8 +186,8 @@ export const CHURCH_PLAN = {
     {
       id: "websiteCare",
       group: "website",
-      label: "Maintain our website",
-      note: "Regularly keep it up to date with latest notices, events and photos.",
+      label: "Keep our website current",
+      note: "We update your service times, events, sermons and photos weekly.",
       control: "toggle",
       default: 1,
       hours: 0.5,
@@ -206,6 +206,9 @@ export const CHURCH_PLAN = {
     minShoots: 4,
   },
   termMonths: 12,
+  /** Church size used for the "cents per person, per week" line. Keep in
+   *  sync with GIVING_MEMBERS in supabase/functions/_shared/church-plan-pdf.ts */
+  givingMembers: 200,
 };
 
 /** A `type` (not interface) so it is assignable to the Json column the lead
@@ -484,6 +487,21 @@ export function hoursBack(
     total - CHURCH_PLAN.approvalHours,
   );
   return back < 1 ? null : back;
+}
+
+/*******************************
+ * The annual total spread across CHURCH_PLAN.givingMembers, per week, in
+ * words ("96 cents", "$1.25"). Keep in sync with perPersonWeekly in
+ * supabase/functions/_shared/church-plan-pdf.ts
+ */
+export function perPersonWeekly(
+  annual: number,
+): string {
+  const cents = Math.round(
+    (annual * 100) / CHURCH_PLAN.givingMembers / 52,
+  );
+  if (cents < 100) return `${cents} cents`;
+  return `$${(cents / 100).toFixed(2)}`;
 }
 
 /*******************************

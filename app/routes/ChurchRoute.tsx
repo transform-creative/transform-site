@@ -298,11 +298,11 @@ export default function ChurchRoute() {
               data-hero
               style={{ maxWidth: 520 }}
             >
-              Helping aussie churches{" "}
+             We shoot your Sundays, then keep your {" "}
               <strong style={{ fontWeight: 600 }}>
-                create consistent digital presence
+               website, socials, slides and emails
               </strong>{" "}
-              to make more disciples.
+             up to date every week.
             </p>
             <div data-hero className="mt-20">
               <button
@@ -342,26 +342,24 @@ export default function ChurchRoute() {
               }`}
               style={{ letterSpacing: -1.5 }}
             >
-              We{" "}
+              A new website, {" "}
               <strong style={{ fontWeight: 600 }}>
-                shoot your service
+                kept current.
               </strong>
-              .
             </h2>
             <h3
               className={
                 context.inShrink ? "textCenter" : ""
               }
             >
-              Then run your{" "}
+             We'll build your church a new site for $1,500, {" "}
               <strong
                 style={{
                   fontWeight: 600,
                   color: "var(--accent)",
                 }}
               >
-                socials, website, slides & emails
-                weekly.
+               and keep everything up to date
               </strong>
             </h3>
           </div>
@@ -653,6 +651,7 @@ export default function ChurchRoute() {
         active={boardOpen}
         onClose={() => setBoardOpen(false)}
         onEmail={openEmail}
+        annual={price.annual}
       />
       <PlanEmailForm
         active={!!emailSource}

@@ -46,9 +46,9 @@ export function ProblemTabs({ jobs, onHelp }: Props) {
       <div className="col accent boxed clip w-100">
       <div className="col middle tint-1 w-100 p-20 border-box">
         <h2 className="textCenter w-75" style={{ letterSpacing: -1.5 }}>
-          Most medium sized churches lack{" "}
-          <b style={{ fontWeight: 600 }}>time, skills or direction</b>{" "}
-          to...
+          Church comms is{" "}
+          <b style={{ fontWeight: 600 }}>three big jobs</b>
+          , and in most churches it lands on one person.
         </h2>
       </div>
 
@@ -105,7 +105,6 @@ export function ProblemTabs({ jobs, onHelp }: Props) {
                 className="media-16-9 media-cover r-default w-100"
               />
             ) : (
-              // TODO: real Sunday photos (set jobImage). No stock photos.
               <div
                 className="placeholder-box media-16-9 col middle center gap-5 border-box w-100"
                 style={{ borderColor: "var(--bkg)" }}

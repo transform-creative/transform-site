@@ -40,40 +40,55 @@ export const CHURCH_BOOKING_URL =
 const ALWAYS_INCLUDED =
   "Quarterly invite plan + 30-min call, start-up setup (Spotify, Apple Podcasts, Google Business Profile), monthly report.";
 
+/** Keep in sync with BOARD_TIME_BACK in app/data/Objects.tsx */
+const BOARD_TIME_BACK =
+  "If your team spends 3–4 hours a week on slides, notices and socials, that's four or five weeks of their year. This gives that time back for people and preaching.";
+
+/** Keep in sync with CHURCH_PLAN.givingMembers in app/business/churchPlanBL.tsx */
+const GIVING_MEMBERS = 200;
+
+/** Keep in sync with perPersonWeekly in app/business/churchPlanBL.tsx */
+function perPersonWeekly(annual: number): string {
+  const cents = Math.round(((Number(annual) || 0) * 100) / GIVING_MEMBERS / 52);
+  if (cents < 100) return `${cents} cents`;
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
 /** Keep in sync with BOARD_QA in app/data/Objects.tsx */
 const BOARD_QA = [
   {
-    question: "How does it compare to hiring?",
+    question: "Is this a good use of our budget?",
     answer:
-      "A typical plan is about $19K a year ex GST. A two-day-a-week comms coordinator is roughly $30K with super, and one person rarely covers shooting, editing and web work as well.",
+      "Fair question. What it pays for is people finding your church online, and your regulars knowing what's on, without it all landing on your pastor or a volunteer each week.",
+  },
+  {
+    question: "How will we know it's working?",
+    // TODO: confirm what's in the monthly report
+    answer:
+      "You'll get a short monthly report with plan-a-visit sign-ups, sermon listens, email opens and how your socials are tracking, and we'll go through it together each quarter. It's also worth asking newcomers how they found you, which is often the most useful number of all.",
   },
   {
     question: "What are we signing up to?",
-    // TODO: exit terms
+    // TODO: exit terms (suggest a review point, then rename to "What if it's not right for us?")
+    // TODO: confirm what happens to the website or hosted pages if a church leaves
     answer:
-      "An annual plan on a 12-month term, paid in four quarterly instalments.",
+      "An annual plan on a 12-month term, paid in four quarterly instalments. If you stop after that, your photos, video, templates, podcast feed and Google Business Profile are yours, and visitor details already live in your Elvanto or PCO.",
   },
   {
-    question: "What do we keep if we stop?",
-    // TODO: confirm what happens to the hosted pages if a church leaves
+    question: "Who decides what goes out under our name?",
     answer:
-      "Your photos, video, templates, podcast feed and Google Business Profile are yours, and visitor details already live in your Elvanto or PCO.",
+      "You do. Anything we think could be potentially dicey waits for your pastor's yes.",
   },
   {
-    question: "Who's filming in our building?",
+    question: "Why not use volunteers, or hire someone?",
+    answer:
+      "Your volunteers can stay involved, and we'd love to work alongside them. A two-day-a-week comms coordinator is roughly $30K a year with super, and it's pretty rare to find one person who can shoot, edit, design and look after a website.",
+  },
+  {
+    question: "What about kids and privacy?",
     // TODO: confirm the shooter's Working With Children Check
     answer:
-      "Our shooter holds a Working With Children Check and follows your church's photography policy.",
-  },
-  {
-    question: "What data do you hold?",
-    answer:
-      "Plan a visit only asks for name, contact details, service and group size. No children's details, and it goes straight into your system.",
-  },
-  {
-    question: "Who controls what's said?",
-    answer:
-      "Promos publish unless you flag them by Thursday. Anything theological needs a yes from your pastor.",
+      "Our shooter holds a Working With Children Check and follows your church's photography policy. Plan a visit only asks for name, contact details, service and group size, with no children's details, and it goes straight into your system.",
   },
 ];
 
@@ -335,6 +350,15 @@ export async function generateChurchPlanPdf(
     paragraph(qa.question, 9, fontBold);
     paragraph(qa.answer, 8.5);
   }
+
+  // Time + cost in context, closing out the board answers
+  ensureSpace(30);
+  y -= 10;
+  paragraph(
+    `${BOARD_TIME_BACK} For a church with ${GIVING_MEMBERS} giving members, that's ${perPersonWeekly(data.annual)} per person, per week.`,
+    9,
+    fontBold,
+  );
   y -= 14;
 
   // ── Book a chat ──────────────────────────────────────────────────────────
