@@ -347,8 +347,9 @@ export const PlanBuilder = forwardRef<
               </div>
             ))}
 
-            {/* Shown once they reach the last section */}
-            {openGroups[
+            {/* Shown once they reach the last section. Hidden on mobile,
+                where the output box straight below has the same button */}
+            {!context.inShrink && openGroups[
               CHURCH_PLAN.groups[
                 CHURCH_PLAN.groups.length - 1
               ].id

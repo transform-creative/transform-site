@@ -296,7 +296,15 @@ export default function ChurchRoute() {
               </strong>{" "}
              up to date every week.
             </p>
-            <div data-hero className="row middle center gap-10 mt-20">
+            {/* Stacked on mobile, stretched so both buttons match the wider one */}
+            <div
+              data-hero
+              className={`gap-10 mt-20 ${
+                context.inShrink
+                  ? "col stretch w-fit"
+                  : "row middle center"
+              }`}
+            >
               <button
                 type="button"
                 className="accent row middle center gap-5"

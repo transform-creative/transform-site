@@ -74,15 +74,17 @@ export default function Alert({
           position: "fixed",
           zIndex: 100,
           height: "auto",
-          width: "50%",
+          // Full width less a 16px gutter on phones, half width on desktop
+          width: "max(50%, min(600px, calc(100vw - 32px)))",
+          boxSizing: "border-box",
           left: "50%",
           transform: "translate(-50%, -50%)",
           top: -260,
         }}
       >
-        <div className="row between middle p1">
+        <div className="row between middle gap-10 p1">
           <Icon
-            className=""
+            className="no-shrink"
             name={`${
               state == "success"
                 ? "checkmark-circle-outline"
@@ -92,7 +94,7 @@ export default function Alert({
             color={state == "fail" ? "var(--bkg)" : "var(--bkg)"}
           />
 
-          <div>
+          <div className="flex-1 break-word">
             {header && (
               <h3
                 style={{ color: "var(--bkg)" }}
