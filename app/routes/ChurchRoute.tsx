@@ -55,7 +55,10 @@ import { BoardPopup } from "~/presentation/church/BoardPopup";
 import { PlanEmailForm } from "~/presentation/church/PlanEmailForm";
 import { BookChatButton } from "~/presentation/church/BookChatButton";
 import { ProblemTabs } from "~/presentation/church/ProblemTabs";
-import { ServiceTabs } from "~/presentation/church/ServiceTabs";
+import {
+  ServiceTabs,
+  type ServiceTabsHandle,
+} from "~/presentation/church/ServiceTabs";
 
 const TITLE =
   "Church Comms, Done For You | Transform Creative";
@@ -113,6 +116,7 @@ export default function ChurchRoute() {
   const context: SharedContextProps =
     useOutletContext();
   const builder = useRef<PlanBuilderHandle>(null);
+  const serviceTabs = useRef<ServiceTabsHandle>(null);
 
   const [plan, setPlan] = useState(defaultPlan);
   const [boardOpen, setBoardOpen] =
@@ -389,12 +393,18 @@ export default function ChurchRoute() {
       </section>
       <div className="horizontal-line" />
 
-      <ProblemTabs jobs={CHURCH_JOBS} />
+      <ProblemTabs
+        jobs={CHURCH_JOBS}
+        onHelp={(id) =>
+          serviceTabs.current?.openService(id)
+        }
+      />
 
       <div className="horizontal-line mediumFade" />
 
       {/* 3. What we do about it */}
       <ServiceTabs
+        ref={serviceTabs}
         services={CHURCH_SERVICES}
         onPrice={(group) =>
           builder.current?.openGroup(group)

@@ -1,4 +1,9 @@
-import { useRef, useState } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { useOutletContext } from "react-router";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -6,7 +11,11 @@ import type {
   ChurchService,
   SharedContextProps,
 } from "~/data/CommonTypes";
-import { boldPhrases } from "~/business/commonBL";
+import {
+  boldPhrases,
+  scrollToId,
+  useAutoCycle,
+} from "~/business/commonBL";
 import { Icon } from "~/presentation/elements/Icon";
 import "../../app-v2.css";
 
@@ -16,15 +25,38 @@ interface Props {
   onPrice: (group: NonNullable<ChurchService["group"]>) => void;
 }
 
+export interface ServiceTabsHandle {
+  /** Select a tab, hold it there and scroll it into view ("How we help") */
+  openService: (id: string) => void;
+}
+
+const SECTION_ID = "how-we-help";
+
 /******************************
  * ServiceTabs component
  * The /church "We help churches by..." section: a vertical list of tabs on
  * the left, with the selected one's photo and description in a card beside it.
  */
-export function ServiceTabs({ services, onPrice }: Props) {
+export const ServiceTabs = forwardRef<ServiceTabsHandle, Props>(
+  function ServiceTabs({ services, onPrice }, ref) {
   const context: SharedContextProps = useOutletContext();
   const [activeIndex, setActiveIndex] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
+  const { hold, hoverProps } = useAutoCycle(
+    services.length,
+    activeIndex,
+    setActiveIndex,
+  );
+
+  useImperativeHandle(ref, () => ({
+    openService: (id) => {
+      const index = services.findIndex((s) => s.id === id);
+      if (index !== -1) setActiveIndex(index);
+      // Stay on the chosen tab until the reader has hovered and left
+      hold();
+      scrollToId(SECTION_ID);
+    },
+  }));
 
   const service = services[activeIndex];
 
@@ -40,12 +72,15 @@ export function ServiceTabs({ services, onPrice }: Props) {
   );
 
   return (
-    <section className="col middle  gap-20 w-75 shrink-p-10 border-box mt-20 mb-20 pt-20 pb-20">
+    <section
+      id={SECTION_ID}
+      className="col middle  gap-20 w-75 shrink-p-10 border-box mt-20 mb-20 pt-20 pb-20"
+    >
       <h2 className="textCenter mb-20" style={{ letterSpacing: -1.5 }}>
         We help churches like yours by...
       </h2>
 
-      <div className="row shrink-col middle gap-40 w-100">
+      <div className="row shrink-col middle gap-40 w-100" {...hoverProps}>
         <div
           role="tablist"
           aria-orientation="vertical"
@@ -121,4 +156,5 @@ export function ServiceTabs({ services, onPrice }: Props) {
       </div>
     </section>
   );
-}
+  },
+);

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { IoniconName } from "~/data/Ionicons";
 import type { Project } from "~/data/CommonTypes";
 import type {
@@ -246,6 +247,38 @@ export function scrollToId(id: string, headerOffset = 100) {
   const top =
     el.getBoundingClientRect().top + window.scrollY - headerOffset;
   window.scrollTo({ top, behavior: "smooth" });
+}
+
+/*******************************
+ * Step a tab set to its next index every `ms`, wrapping round. Spread
+ * `hoverProps` on the tabs + content so cycling pauses while hovered; call
+ * `hold()` to pause until the pointer next leaves (e.g. after opening a tab
+ * from elsewhere on the page). The timer restarts on every index change.
+ */
+export function useAutoCycle(
+  count: number,
+  activeIndex: number,
+  setActiveIndex: (index: number) => void,
+  ms = 3000,
+) {
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused || count < 2) return;
+    const timer = setTimeout(
+      () => setActiveIndex((activeIndex + 1) % count),
+      ms,
+    );
+    return () => clearTimeout(timer);
+  }, [paused, activeIndex, count, ms]);
+
+  return {
+    hold: () => setPaused(true),
+    hoverProps: {
+      onMouseEnter: () => setPaused(true),
+      onMouseLeave: () => setPaused(false),
+    },
+  };
 }
 
 /*******************************

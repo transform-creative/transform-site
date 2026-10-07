@@ -3,12 +3,14 @@ import { useOutletContext } from "react-router";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import type { ChurchJob, SharedContextProps } from "~/data/CommonTypes";
-import { boldPhrases } from "~/business/commonBL";
+import { boldPhrases, useAutoCycle } from "~/business/commonBL";
 import { Icon } from "~/presentation/elements/Icon";
 import "../../app-v2.css";
 
 interface Props {
   jobs: ChurchJob[];
+  /** Jumps to the job's "We help churches by..." tab */
+  onHelp: (serviceId: string) => void;
 }
 
 /******************************
@@ -16,10 +18,15 @@ interface Props {
  * The /church problem section: a headline band over folder-style tabs, one
  * per job, each showing a photo beside why churches struggle with it.
  */
-export function ProblemTabs({ jobs }: Props) {
+export function ProblemTabs({ jobs, onHelp }: Props) {
   const context: SharedContextProps = useOutletContext();
   const [activeIndex, setActiveIndex] = useState(0);
   const panel = useRef<HTMLDivElement>(null);
+  const { hoverProps } = useAutoCycle(
+    jobs.length,
+    activeIndex,
+    setActiveIndex,
+  );
 
   const job = jobs[activeIndex];
 
@@ -47,6 +54,7 @@ export function ProblemTabs({ jobs }: Props) {
 
       <div
         className={`col w-100 border-box ${context.inShrink ? "p-10" : "p-20"}`}
+        {...hoverProps}
       >
         <div role="tablist" className="row tint-1 tab-top">
           {jobs.map((tab, i) => (
@@ -97,7 +105,9 @@ export function ProblemTabs({ jobs }: Props) {
           </div>
           <div
             data-tab-content
-            className="r-default p-10 w-50 border-box"
+            className={`col gap-20 r-default p-10 w-50 border-box ${
+              context.inShrink ? "middle" : ""
+            }`}
           >
             <h2 style={{fontSize: 30}}>
               {boldPhrases(
@@ -105,6 +115,14 @@ export function ProblemTabs({ jobs }: Props) {
                 job.jobHighlight ? [job.jobHighlight] : [],
               )}
             </h2>
+            <button
+              type="button"
+              className="boxed p-10 row middle gap-5 w-fit"
+              onClick={() => onHelp(job.serviceId)}
+            >
+              How we help
+              <Icon name="arrow-down" size={14} color="var(--bkg)" />
+            </button>
           </div>
         </div>
       </div>

@@ -464,7 +464,7 @@ export const PlanBuilder = forwardRef<
         </div>
       </div>
 
-      <p className="textCenter text-sm muted mt-20">
+      <p className="textCenter text-sm muted mt-20 mb-20 pb-20">
         All plans include a baseline{" "}
         {fmt(
           CHURCH_PLAN.base.price * CHURCH_PLAN.termMonths,

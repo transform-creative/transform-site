@@ -75,6 +75,8 @@ export interface ChurchJob {
   jobHighlight?: string;
   /** Photo shown beside jobBody in the problem tabs */
   jobImage?: string;
+  /** "We help churches by..." tab the "How we help" button opens */
+  serviceId: string;
   /** Section 3: what we do about it */
   serviceTitle: string;
   serviceTagline: string;

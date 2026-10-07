@@ -1054,7 +1054,9 @@ button.on-accent-button:hover * {
   opacity: 0.7;
 }
 
-.text-xl {
+/* .text-button.text-xl: beats the later `.text-button { font-size: inherit }` */
+.text-xl,
+.text-button.text-xl {
   font-size: 1.9rem;
   line-height: 1.2;
 }
@@ -1177,7 +1179,8 @@ button.on-accent-button:hover * {
     inset: 16px;
   }
 
-  .text-xl {
+  .text-xl,
+  .text-button.text-xl {
     font-size: 1.4rem;
   }
 

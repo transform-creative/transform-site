@@ -958,6 +958,7 @@ export const CHURCH_JOBS: ChurchJob[] = [
       "Because on a Sunday morning, whoever has the skills, time and gear is usually busy running 10 other teams.",
     jobHighlight: "skills, time and gear",
     jobImage: churchPic(1),
+    serviceId: "capture",
     serviceTitle: "Photo + video",
     serviceTagline: "Your Sundays, captured properly",
     serviceBody: [
@@ -974,6 +975,7 @@ export const CHURCH_JOBS: ChurchJob[] = [
       "Because curating social media accounts that actually reflect the life of your church needs a clear strategy.",
     jobHighlight: "a clear strategy",
     jobImage: churchPic(5),
+    serviceId: "posting",
     serviceTitle: "Content",
     serviceTagline: "Your week's content, done",
     serviceBody: [
@@ -990,6 +992,7 @@ export const CHURCH_JOBS: ChurchJob[] = [
       "Because each time a new sermon, event or form is rushed onto your site, it gets slightly more broken.",
     jobHighlight: "slightly more broken",
     jobImage: churchPic(4),
+    serviceId: "website",
     serviceTitle: "Website",
     serviceTagline:
       "A sermon hub and visitor page that keep themselves current",
