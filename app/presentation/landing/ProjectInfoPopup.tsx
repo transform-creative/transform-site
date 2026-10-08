@@ -7,12 +7,18 @@ import type {
 import "./landing.css";
 import BasicMenu from "../elements/BasicMenu";
 import { Icon } from "../elements/Icon";
-import { useNavigate, useOutletContext } from "react-router";
+import { Link, useOutletContext } from "react-router";
 import { MouseEvent, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import "../../app-v2.css";
-import { EndorsementCard } from "../elements/EndorsementCard";
 import { PROJECTS } from "~/data/Objects";
+import { projectSlug } from "~/business/commonBL";
+import {
+  ProjectDescription,
+  ProjectEndorsement,
+  ProjectGallery,
+  ProjectMoreLink,
+} from "./ProjectSections";
 
 export interface ProjectInfoPopupProps extends ActivatableElement {
   project: Project | undefined;
@@ -28,7 +34,6 @@ export function ProjectInfoPopup({
   onClose,
 }: ProjectInfoPopupProps) {
   const context: SharedContextProps = useOutletContext();
-  const navigate = useNavigate();
   const [playerMuted, setPlayerMuted] = useState(true);
   const [playerPlay, setPlayerPlay] = useState(false);
   const reactPlayer = useRef<HTMLVideoElement>(null);
@@ -60,8 +65,8 @@ export function ProjectInfoPopup({
       zIndex={100}
     >
       <div className="col middle" style={{ gap: 20 }}>
-        {project?.link && (
-          <div className="row middle center">
+        <div className="row middle center wrap gap-10">
+          {project?.link && (
             <a
               style={{ textDecoration: "none" }}
               className="p2 accentButton row center middle"
@@ -72,8 +77,19 @@ export function ProjectInfoPopup({
               <Icon name="open-outline" className="mr2" />
               View live project
             </a>
-          </div>
-        )}
+          )}
+          {/* The same content as a standalone, indexable page */}
+          {project && (
+            <Link
+              to={`/portfolio/${projectSlug(project, PROJECTS)}`}
+              onClick={onClose}
+              className="btn-look link-plain row center middle gap-5"
+            >
+              <Icon name="expand-outline" color="var(--accent)" />
+              Open full page
+            </Link>
+          )}
+        </div>
         <div className="col center middle mt-20 gap-10">
           <Icon
             name={
@@ -191,82 +207,12 @@ export function ProjectInfoPopup({
         {context.inShrink && (
           <div className="horizontal-line fade-md" />
         )}
-        {/* Description prose */}
-        <div style={{ maxWidth: 1200, width: "100%" }}>
-          {project?.description.map((d, i) => (
-            <p
-              key={i}
-              style={{ fontSize: "14pt", lineHeight: 1.7 }}
-              className="mb2 textCenter"
-            >
-              {d}
-            </p>
-          ))}
-        </div>
+        <ProjectDescription project={project} />
         <div className="horizontal-line fade-md" />
-        {/* Image gallery */}
-        {project?.images && project.images.length > 0 && (
-          <div
-            className=""
-            style={{
-              display: "grid",
-              gridTemplateColumns: context.inShrink
-                ? "repeat(auto-fill, minmax(200px, 1fr))"
-                : "repeat(4, 1fr)",
-              gap: 12,
-            }}
-          >
-            {project.images.map((img, idx) => (
-              <div key={idx}>
-                <img
-                  style={{ width: "100%", aspectRatio: "16 / 9" }}
-                  src={img}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        <ProjectGallery project={project} />
         <div className="horizontal-line fade-md" />
-
-        {/* Endorsement */}
-        <div>
-          <div className="col middle center">
-            {(() => {
-              const org = project?.organisation || project?.name;
-              const endorsement = PROJECTS.find(
-                (p) =>
-                  (p.organisation || p.name) === org &&
-                  p.type === project?.type &&
-                  p.endorsement,
-              )?.endorsement;
-              return endorsement && org ? (
-                <EndorsementCard
-                  width={context.inShrink ? "90%" : "70%"}
-                  text={endorsement.text}
-                  name={endorsement.name}
-                  organisation={org}
-                />
-              ) : null;
-            })()}
-          </div>
-        </div>
-
-        {/* More CTA */}
-        <div className="row center w100" style={{ overflow: "clip" }}>
-          <a
-            role="button"
-            href={
-              project?.type === "software"
-                ? "/development"
-                : `/Portfolio?type=${project?.type}`
-            }
-            className="accentButton row center middle"
-            style={{ maxWidth: 400, width: "100%" }}
-          >
-            <Icon name="link" className="mr2" />
-            More {project?.type}
-          </a>
-        </div>
+        <ProjectEndorsement project={project} />
+        <ProjectMoreLink project={project} />
       </div>
     </BasicMenu>
   );

@@ -9,8 +9,10 @@ export const SITE_URL = "https://www.transformcreative.com.au";
  */
 const DEFAULT_OG_IMAGE = "/transform-icon-color-donut.png";
 
-/** Scrapers reject relative og:image / og:url, so everything is absolute. */
+/** Scrapers reject relative og:image / og:url, so everything is absolute.
+ *  Already-absolute URLs (e.g. project images in Supabase storage) pass through. */
 function absolute(path: string): string {
+  if (/^https?:\/\//.test(path)) return path;
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
@@ -20,7 +22,8 @@ export interface SeoOptions {
   path: string;
   keywords?: string;
   image?: string;
-  /** Pixel size of `image`. Defaults to the 1200x630 share card size. */
+  /** Pixel size of `image`. Defaults to the 1200x630 share card size;
+   *  pass 0 to omit the size tags when it isn't known. */
   imageWidth?: number;
   imageHeight?: number;
   imageAlt?: string;
@@ -70,8 +73,12 @@ export function buildMeta({
     { property: "og:title", content: shareTitle },
     { property: "og:description", content: shareDescription },
     { property: "og:image", content: ogImage },
-    { property: "og:image:width", content: String(imageWidth) },
-    { property: "og:image:height", content: String(imageHeight) },
+    ...(imageWidth && imageHeight
+      ? [
+          { property: "og:image:width", content: String(imageWidth) },
+          { property: "og:image:height", content: String(imageHeight) },
+        ]
+      : []),
     ...(imageAlt ? [{ property: "og:image:alt", content: imageAlt }] : []),
     { property: "og:type", content: "website" },
     { property: "og:site_name", content: "Transform Creative" },

@@ -70,7 +70,9 @@ app/
 |------|-----------|-------|
 | `/` | LandingPage | Hero, animated intro, tabbed portfolio |
 | `/home` | LandingPage | Duplicate of `/` |
-| `/portfolio` | Portfolio | Project listing with type filters |
+| `/portfolio` | Portfolio | Project listing with type filters, plus a crawlable "All projects" link list |
+| `/portfolio/:slug` | ProjectRoute | Indexable twin of the project popup (slug from `projectSlug()` in `commonBL`); every project is prerendered |
+| `/sitemap.xml` | SitemapRoute | Resource route prerendered to a static file; lists pages + every project |
 | `/contact` | ContactTab | Email CTA |
 | `/development` | DevelopmentRoute | Software/development showcase |
 | `/auth` | Authentication | Supabase OTP sign-in |

@@ -142,6 +142,8 @@ export default function FeatureSelector({
           bend the platform around you.
         </b>
         {" "}Your donor journey, your unique quirks, your 'what if' ideas.
+        Whether that's a new charity website or a full custom fundraising
+        platform.
       </p>
       {/* Search bar */}
       <div className="row center w-100 mb-20">

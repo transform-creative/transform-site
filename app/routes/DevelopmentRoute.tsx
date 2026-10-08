@@ -14,7 +14,17 @@ import { useOutletContext, useSearchParams } from "react-router";
 import { ContactTab } from "~/presentation/landing/ContactTab";
 import { EndorsementSection } from "~/presentation/landing/EndorsementSection";
 import { SavingCalculator } from "~/presentation/software/SavingCalculator";
-import { CONTACT, FEATURES, PROJECTS } from "~/data/Objects";
+import {
+  CONTACT,
+  DEVELOPMENT_FAQ,
+  DEVELOPMENT_FAQ_SECTIONS,
+  FEATURES,
+  PROJECTS,
+} from "~/data/Objects";
+import {
+  FrequentlyAskedQuestions,
+  faqJsonLd,
+} from "~/presentation/elements/FrequentlyAskedQuestions";
 import { buildMeta, canonical, SITE_URL } from "~/business/seoBL";
 import { SplashCursor } from "~/presentation/elements/SplashCursor";
 import { GradualBlur } from "~/presentation/elements/GradualBlur";
@@ -32,10 +42,20 @@ const TRANSFORM_STORAGE =
 const HERO_VIDEO = `${TRANSFORM_STORAGE}/fundrasing_ad_1_subs_720.mp4`;
 const HERO_POSTER = `${TRANSFORM_STORAGE}/software-video-poster.jpg`;
 
+/* Copy on this page is written to match what people actually search for:
+   "nonprofit / not-for-profit / charity" × "website design / development /
+   agency", plus the fundraising platform (Raisely alternative) terms.
+   Search Console (Oct 2026): ~75% of impressions say "nonprofit" or
+   "non profit" (Google treats them as one), ~18% "not for profit", ~4%
+   "charity". So headings and titles say "nonprofit"; "not-for-profit" and
+   "charity" go in the description and body copy. The
+   title, h1, h2s, feature card titles + first paragraphs and the FAQ are all
+   in the prerendered HTML — feature popout paragraphs after the first are
+   not, so keep search terms out of those. */
 const TITLE =
-  "Nonprofit Website Development Adelaide | Transform Creative";
+  "Not-for-profit Website Design & Development, Adelaide | Transform Creative";
 const DESCRIPTION =
-  "Custom fundraising platforms for Australian charities — a Raisely & Funraisin alternative. Keep what your donors give instead of it going to a platform. Adelaide-based, nonprofit only.";
+  "Website design and development for Australian not-for-profits and charities. An Adelaide agency building custom sites and fundraising platforms — a Raisely alternative.";
 
 export function meta() {
   return buildMeta({
@@ -43,9 +63,9 @@ export function meta() {
     description: DESCRIPTION,
     path: "/development",
     keywords:
-      "custom donation platform Australia, custom fundraising website developer, Raisely alternative Australia, Funraisin alternative, reduce fundraising platform fees, nonprofit website development Adelaide, peer-to-peer fundraising platform Australia",
+      "Not-for-profit website design, not for profit web development, charity website design, nonprofit web design agency, NFP website developer, nonprofit web design Adelaide, Raisely alternative Australia, custom fundraising platform",
     twitterDescription:
-      "Custom fundraising platforms for Australian charities — a Raisely & Funraisin alternative. Adelaide-based, nonprofit only.",
+      "Website design and development for Australian not-for-profits and charities — custom sites and fundraising platforms, built in Adelaide.",
   });
 }
 
@@ -60,14 +80,18 @@ export const links = () => [
 const serviceSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
-  name: "Custom fundraising platform development",
-  serviceType: "Custom fundraising platform development",
+  name: "Nonprofit website design & development",
+  serviceType: [
+    "Not-for-profit website design",
+    "Nonprofit website development",
+    "Custom fundraising platform development",
+  ],
   description: DESCRIPTION,
   url: `${SITE_URL}/development`,
   areaServed: ["Australia", "South Australia"],
   audience: {
     "@type": "Audience",
-    audienceType: "Nonprofits and charities",
+    audienceType: "Not-for-profits, nonprofits and charities",
   },
   provider: {
     "@type": "Organization",
@@ -177,6 +201,12 @@ export default function DevelopmentRoute() {
           __html: JSON.stringify(serviceSchema),
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd(DEVELOPMENT_FAQ)),
+        }}
+      />
       <div className="center col middle w-100">
         {/* shrink-p-10 = the 10px mobile gutter, as padding on the section
             rather than margins on the children that go w-100 below 1200px.
@@ -191,20 +221,21 @@ export default function DevelopmentRoute() {
             <AnimatedDots autoPlayDelay={3000} />
 
             <div className="col middle gap-10 w-100">
+              {/* One h1: the eyebrow carries the search terms, the slogan
+                  reads exactly as before */}
               <h1
-                className="textCenter w-100"
+                className="textCenter w-100 mb-20"
                 style={{ color: "var(--txt)", letterSpacing: -1.5 }}
               >
+                <small className="eyebrow accent-text">
+                  Not-for-profit website design & development
+                </small>
                 Own your{" "}
                 <strong style={{ fontWeight: 600 }}>
                   fundraising platform
                 </strong>
                 ,
-              </h1>
-              <h1
-                className="textCenter w-100 mb-20"
-                style={{ color: "var(--txt)", letterSpacing: -1.5 }}
-              >
+                <br />
                 Maximise your mission.
               </h1>
               {/* <p
@@ -285,8 +316,8 @@ export default function DevelopmentRoute() {
           className="textCenter accent m-10"
           style={{ color: "var(--txt)", letterSpacing: -1.5 }}
         >
-          Sites that help Aussie non-profits{" "}
-          <strong>decrease overheads</strong>,{" "}
+          Websites and fundraising platforms that help Aussie
+          nonprofits <strong>decrease overheads</strong>,{" "}
           <strong>increase donations</strong> and{" "}
           <strong>deliver great experiences</strong>.
         </h2>
@@ -320,9 +351,9 @@ export default function DevelopmentRoute() {
           className="textCenter w-75"
           style={{ margin: "0px 0 40px 0", color: "var(--txt)" }}
         >
-          We've created with some of Australia's most innovative{" "}
+          We've built websites with some of Australia's most innovative{" "}
           <b style={{ fontWeight: 600, color: "var(--accent)" }}>
-            non-profits
+            charities and nonprofits
           </b>{" "}
         </h2>
 
@@ -384,6 +415,18 @@ export default function DevelopmentRoute() {
       <div className="w-100 col middle m-20">
         <HowItWorks />
       </div>
+
+      <div
+        className="horizontal-line mediumFade mt-20 mb-20 ot02"
+        style={{ top: 0 }}
+      />
+
+      <section className="col middle w-50 shrink-p-10 border-box">
+        <FrequentlyAskedQuestions
+          sections={DEVELOPMENT_FAQ_SECTIONS}
+          questions={DEVELOPMENT_FAQ}
+        />
+      </section>
 
       <div
         className="horizontal-line mediumFade mt-20 mb-20 ot02"

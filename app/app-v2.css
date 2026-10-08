@@ -1048,6 +1048,29 @@ h5.center {
   box-sizing: border-box;
 }
 
+/* Real <a> link that reads as plain text — crawlable nav in place of buttons */
+.link-plain {
+  color: var(--txt);
+  text-decoration: none;
+  transition: 0.2s;
+}
+.link-plain:hover,
+.link-plain.current {
+  color: var(--accent);
+}
+
+address {
+  font-style: normal;
+}
+
+/* Small label line above a heading's main text (e.g. <small> inside an h1) */
+.eyebrow {
+  display: block;
+  font-size: 0.4em;
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+
 /* Light text for use over photos/video */
 .on-media,
 .on-media h1,

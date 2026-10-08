@@ -12,7 +12,10 @@ import type {
   FAQSection,
 } from "~/presentation/elements/FrequentlyAskedQuestions";
 import type { IoniconName } from "./Ionicons";
-import { smallestPlanAnnual } from "~/business/churchPlanBL";
+// Relative, not "~/": react-router.config.ts imports this file to list the
+// /portfolio/:slug pages to prerender, and the config can't resolve the alias.
+// Keep every *value* import in here (and in commonBL) alias-free.
+import { smallestPlanAnnual } from "../business/churchPlanBL";
 
 export const tabColors = {
   design: "var(--thirdColor)",
@@ -560,8 +563,23 @@ const ARCHIVED = [
   },
 ];
 
+/** Main site nav, shared by the header and footer */
+export const NAV_LINKS: { to: string; label: string; footerLabel: string }[] =
+  [
+    { to: "/", label: "Home", footerLabel: "Home" },
+    { to: "/portfolio", label: "Portfolio", footerLabel: "Portfolio" },
+    { to: "/media", label: "Video", footerLabel: "Nonprofit video" },
+    {
+      to: "/development",
+      label: "Websites",
+      footerLabel: "Nonprofit websites",
+    },
+  ];
+
 export const CONTACT = {
   email: "hello@transformcreative.com.au",
+  /** Shown in the footer — keep matching the Google Business Profile */
+  location: "Adelaide, South Australia",
   /** Also the /chat redirect in vercel.json — keep in sync */
   bookingUrl:
     "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2neXINmRa2l8cPxCMY8-FrrTt30-Tpwfj7-zqktFODuuJO9Z_wsSfv2wcNkiFvipiOl58trJuc",
@@ -672,6 +690,75 @@ export const FEATURES: Feature[] = [
     description: [
       "Only 23% of organisations report having systems that let them understand the impact of their services",
       "Our custom site will generate better data and integrate directly into your existing systems & workflows.",
+    ],
+  },
+
+  // ─── WEBSITE DESIGN & BUILD ───
+  // Card title + first paragraph are prerendered (indexed); later paragraphs
+  // only render in the popout, so the search terms live up front.
+  {
+    className: "center col middle",
+    icon: { name: "color-palette-outline", size: 50 },
+    category: "Website design & build",
+    text: "Custom nonprofit website design",
+    description: [
+      "Website design built around your charity's brand, people and mission — not a template with your logo dropped on top.",
+      "Every page is designed to move visitors toward the thing that matters: giving, volunteering or getting in touch.",
+    ],
+  },
+  {
+    className: "center col middle",
+    icon: { name: "heart-outline", size: 50 },
+    category: "Website design & build",
+    text: "Donations built into your website",
+    description: [
+      "Donation forms that live on your own not-for-profit website, so donors never get bounced to a third-party platform halfway through a gift.",
+      "One-off, monthly or for a specific appeal — set up the way your donors actually give.",
+    ],
+  },
+  {
+    className: "center col middle",
+    icon: { name: "create-outline", size: 50 },
+    category: "Website design & build",
+    text: "Easy updates for staff & volunteers",
+    description: [
+      "A website your team can actually update. Change pages, news, events and appeals yourselves, without waiting on a web developer.",
+    ],
+  },
+  {
+    className: "center col middle",
+    icon: { name: "logo-google", size: 50 },
+    category: "Website design & build",
+    text: "Google Ad Grants ready",
+    description: [
+      "Nonprofit websites built to meet Google Ad Grants requirements, so you're ready to apply for up to US$10,000 a month in free Google search ads.",
+    ],
+  },
+  {
+    className: "center col middle",
+    icon: { name: "search-outline", size: 50 },
+    category: "Website design & build",
+    text: "SEO that gets your cause found",
+    description: [
+      "Search-friendly from day one: fast pages, clean structure and the basics done right, so people searching for your cause can find your charity website.",
+    ],
+  },
+  {
+    className: "center col middle",
+    icon: { name: "git-compare-outline", size: 50 },
+    category: "Website design & build",
+    text: "Website migration without the mess",
+    description: [
+      "Moving off WordPress, Wix, Squarespace or Raisely? We bring your pages and content across and redirect your old links, so you keep your Google rankings.",
+    ],
+  },
+  {
+    className: "center col middle",
+    icon: { name: "construct-outline", size: 50 },
+    category: "Website design & build",
+    text: "Hosting, care & maintenance",
+    description: [
+      "Website hosting, security updates and ongoing maintenance for your not-for-profit site, all in one predictable monthly fee.",
     ],
   },
 
@@ -813,9 +900,9 @@ export const FEATURES: Feature[] = [
     className: "center col middle",
     icon: { name: "accessibility-outline", size: 50 },
     category: "Increase donations",
-    text: "Fast and accessible for all",
+    text: "Fast, accessible web design",
     description: [
-      "Quick to load on old phones and patchy regional connections, and properly usable with a screen reader.",
+      "Accessible web design that's quick to load on old phones and patchy regional connections, and properly usable with a screen reader.",
       "Your donors aren't all on new iPhones and the NBN — the ones who aren't still deserve to get through checkout.",
     ],
   },
@@ -827,6 +914,68 @@ export const FEATURES: Feature[] = [
     description: [
       "Someone starts a donation, gets distracted, closes the tab. We can automate follow up, offer one-tap repeat giving, and win a good chunk of them back.",
     ],
+  },
+];
+
+/** /development FAQ. The section title renders as the h2
+ *  "Nonprofit website questions", and every answer goes into FAQPage JSON-LD. */
+export const DEVELOPMENT_FAQ_SECTIONS: FAQSection[] = [
+  { id: "websites", title: "Nonprofit website" },
+];
+
+export const DEVELOPMENT_FAQ: FAQQuestion[] = [
+  {
+    section: "websites",
+    question: "Do you build full websites, or just fundraising platforms?",
+    answer:
+      "Both. We design and build complete websites for not-for-profits and charities, and custom fundraising platforms for organisations ready to move off Raisely, Funraisin or GoFundraise. The two can live together on one site.",
+  },
+  {
+    section: "websites",
+    question: "Is a custom fundraising platform worth it for our charity?",
+    // Rendered with pre-line, so the blank lines become paragraph breaks
+    answer:
+      "It usually starts to make sense once your organisation raises around $500K or more a year through online donations (online giving, not total revenue).\n\n" +
+      "At that size, the \"cover our costs\" tips that platforms like Raisely and Funraisin prompt donors to add (usually around 4–5%) could be close to $20K a year. That's money which could be going towards your cause, not your platform, and it's roughly where owning your website and fundraising platform starts to stack up.\n\n" +
+      "If you're raising less than that online, a custom build probably won't pay for itself yet, and an off-the-shelf platform is likely the better fit for now. We're still happy to chat through where you're at.\n\n" +
+      "Not sure where you sit? Pop your numbers into the savings calculator above, or book a free discovery call.",
+    links: [{ label: "Book a free discovery call", href: CONTACT.bookingUrl }],
+  },
+  {
+    section: "websites",
+    question: "How much does a nonprofit website cost?",
+    answer:
+      "Every organisation needs something different, so we scope your site first and give you a fixed proposal before we write a line of code. Hosting and maintenance are then one predictable monthly fee. Book a free discovery call and we'll give you a real number.",
+  },
+  {
+    section: "websites",
+    question: "Do you only work with nonprofits?",
+    answer:
+      "Yes. Our websites and fundraising platforms are built for not-for-profits, charities and churches, so we already know the things that matter to you: donations, DGR receipts, volunteers and boards.",
+  },
+  {
+    section: "websites",
+    question: "Do you only work with Adelaide organisations?",
+    answer:
+      "We're an Adelaide web design agency and love meeting face to face, but we build websites for not-for-profits right across Australia.",
+  },
+  {
+    section: "websites",
+    question: "Can you move us off WordPress, Wix or Raisely?",
+    answer:
+      "Yes. We bring across your pages and content, and for fundraising platforms your donor records, giving history, receipts and active recurring gifts too. Old links are redirected, and we schedule the switch around your calendar.",
+  },
+  {
+    section: "websites",
+    question: "Will our donors still get tax receipts?",
+    answer:
+      "Yes. Tax-deductible receipts go out automatically, and end-of-financial-year statements are ready whenever you need them, all to DGR standards.",
+  },
+  {
+    section: "websites",
+    question: "Do we own our website?",
+    answer:
+      "Yes. It's built around your organisation and it's yours. Any improvements we make are yours too, never held back for a higher pricing tier.",
   },
 ];
 

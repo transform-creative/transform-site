@@ -27,14 +27,21 @@ export default {
    * vercel.json's catch-all rewrite must point at.
    */
   prerender: isProductionBuild
-    ? [
-        "/",
-        "/home",
-        "/portfolio",
-        "/contact",
-        "/development",
-        "/media",
-        "/church",
-      ]
+    ? async () => {
+        const { PROJECTS } = await import("./app/data/Objects");
+        const { projectSlug } = await import("./app/business/commonBL");
+        return [
+          "/",
+          "/home",
+          "/portfolio",
+          "/contact",
+          "/development",
+          "/media",
+          "/church",
+          "/sitemap.xml",
+          // One indexable page per project (the popup's twin)
+          ...PROJECTS.map((p) => `/portfolio/${projectSlug(p, PROJECTS)}`),
+        ];
+      }
     : undefined,
 } satisfies Config;

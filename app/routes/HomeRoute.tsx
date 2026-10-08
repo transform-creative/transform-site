@@ -12,7 +12,7 @@ export function meta() {
     // og:url points at "/" — this route duplicates the landing page.
     path: "/",
     keywords:
-      "not for profit website Adelaide, NFP video production South Australia, charity website Australia, nonprofit website design, creative agency Adelaide, video production Adelaide",
+      "not for profit website Adelaide, NFP video production South Australia, charity website Australia, not-for-profit website design, creative agency Adelaide, video production Adelaide",
     twitterDescription:
       "Adelaide creative agency specialising in websites, video production and software for Australian not-for-profits and charities.",
   });

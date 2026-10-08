@@ -332,7 +332,8 @@ export function SavingCalculator({}: SavingCalculatorProps) {
               </div>
             </div>
             <div className="col end center w-50 shrink-col">
-              <h1>+{fmt(extraToCause / 1000)}k</h1>
+              {/* h1-sized, not an h1 — the page title is the only h1 */}
+              <h2 className="text-h1">+{fmt(extraToCause / 1000)}k</h2>
               <p style={{ opacity: 0.7 }}>To your cause annually*</p>
             </div>
           </div>

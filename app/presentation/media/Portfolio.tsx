@@ -1,5 +1,6 @@
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { PROJECTS } from "~/data/Objects";
+import { projectSlug, projectToIcon } from "~/business/commonBL";
 import { useRef } from "react";
 import { Icon } from "../elements/Icon";
 import HeaderText from "../landing/HeaderText";
@@ -100,6 +101,26 @@ export function Portfolio({}: PortfolioProps) {
           projects={filteredProjects}
         />
       </div>
+      {/* Plain links to every project's own page — the carousel opens
+          popups, which crawlers can't follow */}
+      <nav
+        aria-label="All projects"
+        className="col middle gap-10 w-75 shrink-p-10 border-box mt-20"
+      >
+        <h2 className="textCenter">All projects</h2>
+        <div className="grid-250 w-100">
+          {filteredProjects.map((p) => (
+            <Link
+              key={p.id}
+              to={`/portfolio/${projectSlug(p, PROJECTS)}`}
+              className="link-plain row middle gap-5 p-10"
+            >
+              <Icon name={projectToIcon(p.type)} color="var(--accent)" />
+              {p.organisation ? `${p.name} · ${p.organisation}` : p.name}
+            </Link>
+          ))}
+        </div>
+      </nav>
       <div className="horizontal-line mediumFade mt-20" />
       <div
         className="col middle center"

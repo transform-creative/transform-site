@@ -18,13 +18,53 @@ import type {
 export function projectImageAlt(project: Project): string {
   const what =
     project.type == "software"
-      ? "custom fundraising platform built by Transform Creative"
+      ? "nonprofit website built by Transform Creative"
       : project.type == "media"
       ? "video production by Transform Creative"
       : "graphic design by Transform Creative";
 
   const org = project.organisation ? `${project.organisation} ` : "";
   return `${org}${project.name} — ${what}`;
+}
+
+/*******************************************
+ * URL slug for a project's indexable page (/portfolio/:slug), from its name.
+ * Projects sharing a name (e.g. The Middle Sister Project's video and design
+ * entries) are told apart by type — the first in PROJECTS keeps the bare slug.
+ * Renaming a project changes its URL.
+ */
+export function projectSlug(project: Project, projects: Project[]): string {
+  const base = project.name
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  const first = projects.find((p) => p.name === project.name);
+  return first && first.id !== project.id
+    ? `${base}-${project.type}`
+    : base;
+}
+
+/*******************************************
+ * Find the project behind a /portfolio/:slug URL
+ */
+export function projectFromSlug(
+  slug: string | undefined,
+  projects: Project[],
+): Project | undefined {
+  return projects.find((p) => projectSlug(p, projects) === slug);
+}
+
+/*******************************************
+ * Searchable name for the service behind a project type — used in
+ * case-study page titles and headings.
+ */
+export function projectTypeLabel(type: Project["type"]): string {
+  return type == "software"
+    ? "Nonprofit website"
+    : type == "media"
+    ? "Nonprofit video production"
+    : "Graphic design";
 }
 
 /*******************************************

@@ -87,7 +87,7 @@ const organizationSchema = {
     "Adelaide creative agency specialising in websites, video production and software for Australian not-for-profits and charities.",
   areaServed: ["South Australia", "Australia"],
   knowsAbout: [
-    "Nonprofit website design",
+    "Not-for-profit website design",
     "Video production",
     "Software development",
     "Charity digital content",

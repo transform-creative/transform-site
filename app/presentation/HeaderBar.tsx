@@ -1,7 +1,7 @@
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { Logo } from "./elements/Logo";
-import { useEffect, useState } from "react";
-import { CONTACT } from "~/data/Objects";
+import { Fragment, useEffect, useState } from "react";
+import { NAV_LINKS } from "~/data/Objects";
 import { Icon } from "./elements/Icon";
 import EditMenu from "./elements/EditMenu";
 import { useGSAP } from "@gsap/react";
@@ -145,76 +145,22 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
   return (
     <div className={`${inShrink ? "col" : 'row middle'}`} style={{zIndex: 30, width: inShrink ? "300px" : "100%"}}>
       {inShrink && <div style={{ height: 50 }} />}
-      <button
-        disabled={location.pathname == "/"}
-        style={{
-          fontSize: textSize,
-          color: `${
-            location.pathname == "/" ? "var(--accent)" : ""
-          }`,
-          opacity: 1,
-        }}
-        onClick={() => {
-          navigate("/");
-          onClose();
-        }}
-      >
-        Home
-      </button>
-      <div className="div10" />
-
-      <button
-        disabled={location.pathname == "/portfolio"}
-        style={{
-          fontSize: textSize,
-          color: `${
-            location.pathname == "/portfolio"
-              ? "var(--accent)"
-              : ""
-          }`,
-          opacity: 1,
-        }}
-        onClick={() => {
-          navigate("/portfolio");
-          onClose();
-        }}
-      >
-        Portfolio
-      </button>
-      <button
-        disabled={location.pathname == "/media"}
-        style={{
-          fontSize: textSize,
-          color: `${
-            location.pathname == "/media" ? "var(--accent)" : ""
-          }`,
-          opacity: 1,
-        }}
-        onClick={() => {
-          navigate("/media");
-          onClose();
-        }}
-      >
-        Video
-      </button>
-        <button
-        disabled={location.pathname == "/development"}
-        style={{
-          fontSize: textSize,
-          color: `${
-            location.pathname == "/development"
-              ? "var(--accent)"
-              : ""
-          }`,
-          opacity: 1,
-        }}
-        onClick={() => {
-          navigate("/development");
-          onClose();
-        }}
-      >
-        Websites
-      </button>
+      {/* Real links (not buttons) so crawlers can follow the nav */}
+      {NAV_LINKS.map((link, i) => (
+        <Fragment key={link.to}>
+          <Link
+            to={link.to}
+            onClick={onClose}
+            className={`btn-look link-plain ${
+              location.pathname == link.to ? "current" : ""
+            }`}
+            style={{ fontSize: textSize }}
+          >
+            {link.label}
+          </Link>
+          {i == 0 && <div className="div10" />}
+        </Fragment>
+      ))}
       <div className="div20" />
       {/* /church swaps Contact for its own page CTA into the plan builder */}
       {location.pathname == "/church" ? (
@@ -232,16 +178,14 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
           What would great comms cost you?
         </button>
       ) : (
-        <button
-          onClick={() => navigate("/contact")}
-          style={{
-            textDecoration: "none",
-            fontSize: textSize,
-          }}
-          className="row center middle accent"
+        <Link
+          to="/contact"
+          onClick={onClose}
+          style={{ fontSize: textSize }}
+          className="btn-look no-underline row center middle accent"
         >
           Contact
-        </button>
+        </Link>
       )}
       <div className="div10" />
       {isSignedIn ? (
