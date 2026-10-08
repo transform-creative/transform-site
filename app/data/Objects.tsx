@@ -922,8 +922,9 @@ export const MEDIA_HOW_WE_WORK: {
 
 /* ── /church — Church Creative Partner ─────────────────────────────────── */
 
-/** Real Sunday photos, numbered 1–10 in the `transform/images` bucket */
-const churchPic = (n: number) =>
+/** Real Sunday photos in the `transform/images` bucket: numbered 1–10, plus
+ *  named ones (checkin, connect, feet, plan, walk) */
+const churchPic = (n: number | string) =>
   `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/churchpics_${n}.jpg`;
 
 /** TODO: overview video file (90 sec, captions on). Left null until it
@@ -974,9 +975,9 @@ export const CHURCH_JOBS: ChurchJob[] = [
     color: tabColors.design,
     jobTitle: "Share church life",
     jobBody:
-      "To many outsiders, inconsistent social media = disintrested community. Sharing consistently shows onlookers they can trust you.",
-    jobHighlight: "inconsistent social media = disintrested community",
-    jobImage: churchPic(5),
+      "To many outsiders, inconsistent social media = disinterested community. Sharing consistently shows onlookers they can trust you.",
+    jobHighlight: "inconsistent social media = disinterested community",
+    jobImage: churchPic("social"),
     serviceId: "posting",
     serviceTitle: "Content",
     serviceTagline: "Your week's content, done",
@@ -992,7 +993,7 @@ export const CHURCH_JOBS: ChurchJob[] = [
     jobBody:
       "Old service times, a staff page from three years ago, and a login nobody can find. Your site's the first place newcomers look, but the last job on your list.",
     jobHighlight: "login nobody can find",
-    jobImage: churchPic(4),
+    jobImage: churchPic("website"),
     serviceId: "website",
     serviceTitle: "Website",
     serviceTagline:
@@ -1047,7 +1048,7 @@ export const CHURCH_SERVICES: ChurchService[] = [
     id: "posting",
     verb: "Posting",
     rest: "for you",
-    body: "We take your notices, sermon series and posts, and schedule them onto Facebook and instagram to help you maintain a consistent online presence.",
+    body: "We take your notices, sermon series and posts, and schedule them onto Facebook and Instagram to help you maintain a consistent online presence.",
     highlights: ["schedule them", "consistent online presence"],
     group: "content",
     image: churchPic(6),
@@ -1083,8 +1084,8 @@ export const CHURCH_WEEK: ChurchWeekStep[] = [
     title: "We visit",
     highlights: ["regular basis", "your existing volunteers"],
     icon: "camera-outline",
-    body: "We come to your church on a regular basis to get photos of real people and events you run, and train your exsisting volunteers to hold down the fort when we're not there..",
-    image: churchPic(3),
+    body: "We come to your church on a regular basis to get photos of real people and events you run, and train your existing volunteers to hold down the fort when we're not there.",
+    image: churchPic("walk"),
   },
   {
     title: "We plan",
@@ -1094,7 +1095,7 @@ export const CHURCH_WEEK: ChurchWeekStep[] = [
     ],
     icon: "map-outline",
     body: "We meet with you to understand who your community is and how we can best represent your heart, mission and style accurately online, and train your volunteers to fill in any week to week gaps. This all goes into your 'communications strategy plan'.",
-    image: churchPic(9),
+    image: churchPic("plan"),
   },
   {
     title: "We connect",
@@ -1104,14 +1105,14 @@ export const CHURCH_WEEK: ChurchWeekStep[] = [
     ],
     icon: "git-network-outline",
     body: "We connect our system to your Planning Center or Elvanto account so we can keep on top of exactly what's going on in the life of your church, automatically create new content and update your site each week.",
-    image: churchPic(10),
+    image: churchPic("connect"),
   },
   {
     title: "We check in",
     highlights: ["quarterly check in meetings", "serve you better"],
     icon: "chatbubbles-outline",
     body: "We continue to have quarterly check in meetings to find out how things are going, and where we can serve you better.",
-    image: churchPic(1),
+    image: churchPic("checkin"),
   },
 ];
 
@@ -1188,7 +1189,7 @@ export const CHURCH_FAQ: FAQQuestion[] = [
     question: "How much of our week will this take?",
     // Isaac to confirm: ~15 min a week, check against Kings
     answer:
-      "We organise a 30-minute strategy catch-up each quarter, and other than that we hope you'll spend less than 10 minutes week thinking about us (so you can focus on the pastoral stuff)!",
+      "We organise a 30-minute strategy catch-up each quarter, and other than that we hope you'll spend less than 10 minutes a week thinking about us (so you can focus on the pastoral stuff)!",
   },
   {
     section: "church",

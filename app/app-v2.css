@@ -850,6 +850,11 @@ h5.center {
   text-align: center !important;
 }
 
+/* h1 sizing on a lower heading level, to keep the outline correct */
+.text-h1 {
+  font-size: 53pt;
+}
+
 .wrap {
   flex-wrap: wrap;
 }
@@ -1006,6 +1011,41 @@ h5.center {
 .blur-2 {
   filter: blur(2px);
   transform: scale(1.03);
+}
+
+/* Heavier blur for a photo used as background texture only */
+.blur-8 {
+  filter: blur(8px);
+  transform: scale(1.1);
+}
+
+/* 80% accent wash laid over media */
+.wash-accent-80 {
+  background: color-mix(in srgb, var(--accent) 80%, transparent);
+}
+
+.min-h-260 {
+  min-height: 260px;
+}
+
+/* Whole block acts as a link */
+.clickable {
+  cursor: pointer;
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+/* Button styling for a non-interactive element, e.g. a CTA inside a link card */
+.btn-look {
+  font-family: "Onest", sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.2em;
+  padding: 10px;
+  border-radius: var(--borderRadius);
+  box-sizing: border-box;
 }
 
 /* Light text for use over photos/video */
@@ -1248,6 +1288,10 @@ button.on-accent-button:hover * {
   }
   h1 {
     font-size: 30pt;
+  }
+  /* Matches app.css, whose 35pt !important h1 rule wins on mobile */
+  .text-h1 {
+    font-size: 35pt;
   }
   h2 {
     font-size: 25pt;

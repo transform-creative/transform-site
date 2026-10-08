@@ -20,6 +20,14 @@ export interface SeoOptions {
   path: string;
   keywords?: string;
   image?: string;
+  /** Pixel size of `image`. Defaults to the 1200x630 share card size. */
+  imageWidth?: number;
+  imageHeight?: number;
+  imageAlt?: string;
+  /** Share-card title (og/twitter). Defaults to `title`. */
+  shareTitle?: string;
+  /** Share-card description (og/twitter). Defaults to `description`. */
+  shareDescription?: string;
   /** Shorter description for the Twitter card. Defaults to `description`. */
   twitterDescription?: string;
   /** Private/auth-gated pages: emit robots noindex and skip social tags. */
@@ -36,6 +44,11 @@ export function buildMeta({
   path,
   keywords,
   image,
+  imageWidth = 1200,
+  imageHeight = 630,
+  imageAlt,
+  shareTitle = title,
+  shareDescription = description,
   twitterDescription,
   noIndex,
 }: SeoOptions): MetaDescriptor[] {
@@ -54,21 +67,25 @@ export function buildMeta({
     { name: "description", content: description },
     ...(keywords ? [{ name: "keywords", content: keywords }] : []),
     // Open Graph
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
+    { property: "og:title", content: shareTitle },
+    { property: "og:description", content: shareDescription },
     { property: "og:image", content: ogImage },
-    { property: "og:image:width", content: "1200" },
-    { property: "og:image:height", content: "630" },
+    { property: "og:image:width", content: String(imageWidth) },
+    { property: "og:image:height", content: String(imageHeight) },
+    ...(imageAlt ? [{ property: "og:image:alt", content: imageAlt }] : []),
     { property: "og:type", content: "website" },
+    { property: "og:site_name", content: "Transform Creative" },
+    { property: "og:locale", content: "en_AU" },
     { property: "og:url", content: absolute(path) },
     // Twitter card
     { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
+    { name: "twitter:title", content: shareTitle },
     {
       name: "twitter:description",
-      content: twitterDescription ?? description,
+      content: twitterDescription ?? shareDescription,
     },
     { name: "twitter:image", content: ogImage },
+    ...(imageAlt ? [{ name: "twitter:image:alt", content: imageAlt }] : []),
   ];
 }
 

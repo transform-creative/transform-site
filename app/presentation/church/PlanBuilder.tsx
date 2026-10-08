@@ -390,13 +390,14 @@ export const PlanBuilder = forwardRef<
               cost (estimate only)
             </p>
             <div className="col middle mt-10 mb-10">
-              <h1
+              {/* h2 so the hero stays the page's only h1 */}
+              <h2
                 ref={totalRef}
-                className="num"
+                className="num text-h1"
                 aria-live="polite"
               >
                 {fmt(price.annual)}
-              </h1>
+              </h2>
               <p
                 style={{
                   color: "var(--accent-md)",

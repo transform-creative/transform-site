@@ -122,7 +122,7 @@ const localBusinessSchema = {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en-AU">
       <head>
         <meta charSet="utf-8" />
         <meta

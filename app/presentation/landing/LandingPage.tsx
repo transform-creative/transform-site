@@ -1,5 +1,5 @@
 import { type SharedContextProps } from "~/data/CommonTypes";
-import { useNavigate, useOutletContext } from "react-router";
+import { Link, useOutletContext } from "react-router";
 import { Icon } from "../elements/Icon";
 import { DesignTab } from "./DesignTab";
 import { MediaTab } from "./MediaTab";
@@ -7,7 +7,7 @@ import { SoftwareTab } from "./SoftwareTab";
 import { ContactTab } from "./ContactTab";
 import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
-import { PROJECTS } from "~/data/Objects";
+import { CHURCH_HERO_POSTER, PROJECTS } from "~/data/Objects";
 import type { IoniconName } from "~/data/Ionicons";
 import { useGSAP } from "@gsap/react";
 import { SplitText, ScrollTrigger } from "gsap/all";
@@ -30,13 +30,14 @@ interface FeatureCardProps {
   subtitle: string;
   videoSrc: string;
   cta:string;
-  onClick: () => void;
+  to: string;
 }
 
 /******************************
  * FeatureCard component
  * Teaser card for a service (video, one-line pitch, CTA). The video only
- * plays while the card is on screen.
+ * plays while the card is on screen. The whole card is a real link so
+ * crawlers can follow it.
  */
 function FeatureCard({
   id,
@@ -45,7 +46,7 @@ function FeatureCard({
   subtitle,
   videoSrc,
   cta="Find out more",
-  onClick,
+  to,
 }: FeatureCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -63,7 +64,11 @@ function FeatureCard({
   }, []);
 
   return (
-    <article id={id} className="boxed accent col flex-card  outline-accent p-5">
+    <Link
+      id={id}
+      to={to}
+      className="boxed accent col flex-card outline-accent p-5 clickable no-underline"
+    >
       {/* Placeholder painted behind the video, so the card isn't an empty
           box before the first frame arrives */}
       <div
@@ -92,9 +97,10 @@ function FeatureCard({
           {title}
         </h2>
         <p className="mt-10 mb-20" style={{color: 'var(--accent-sm)'}}>{subtitle}</p>
-        <button
-          className="outline-bkg boxed row middle center gap-10 w-100"
-          onClick={onClick}
+        {/* Styled as a button, but not one: interactive content can't
+            sit inside the card's link */}
+        <div
+          className="btn-look outline-bkg boxed row middle center gap-10 w-100"
           style={{color: 'var(--accent)'}}
         >
          {cta}
@@ -103,9 +109,9 @@ function FeatureCard({
             size={20}
             color="var(--bkg)"
           />
-        </button>
+        </div>
       </div>
-    </article>
+    </Link>
   );
 }
 
@@ -115,8 +121,6 @@ function FeatureCard({
  */
 export function LandingPage({}: LandingPageProps) {
   const context: SharedContextProps = useOutletContext();
-
-  const navigate = useNavigate();
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -287,19 +291,60 @@ export function LandingPage({}: LandingPageProps) {
             title="Website"
             subtitle="We build custom giving platforms that redirect third party fees back to your mission."
             videoSrc="https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/software_video.mp4"
-            onClick={() => navigate("/development")}
+            to="/development"
           />
           <FeatureCard
             id="landing-media-button"
                         cta="Film with us"
             icon="film-outline"
             title="Video"
-            subtitle="helping charities and christian organisations raise money and awareness."
+            subtitle="Helping charities and Christian organisations raise money and awareness."
             videoSrc="https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/2026%20reel-LQ.mp4"
-            onClick={() => navigate("/portfolio?type=media")}
+            to="/portfolio?type=media"
           />
+
+          {/* Church comms: spans both cards, blurred church photo under an accent wash */}
+          <Link
+            to="/church"
+            className={`boxed accent outline-accent relative clip col center w-100 border-box p-5 clickable no-underline ${
+              context.inShrink ? "" : "min-h-260"
+            }`}
+          >
+            <img
+              src={CHURCH_HERO_POSTER ?? DEFAULT_POSTER}
+              alt=""
+              loading="lazy"
+              className="layer-fill media-cover blur-8"
+            />
+            <div className="layer-fill wash-accent-80" />
+            <div
+              // Explicit alignment: the link's a.center rule would otherwise centre the text
+              className={`relative row shrink-col middle between gap-20 p-20 border-box w-100 ${
+                context.inShrink ? "textCenter" : "textLeft"
+              }`}
+            >
+              <div className="col gap-10">
+                <h2 className="row middle gap-10 shrink-col ">
+                  <Icon name="people-outline" size={35} color="var(--bkg)" />
+                  Church comms
+                </h2>
+                <p className="w-75">
+                  We shoot your Sundays, then keep your website, socials,
+                  slides and emails up to date every week.
+                </p>
+              </div>
+              <div
+                style={{color: 'var(--accent)'}}
+                className="btn-look bkg row middle center gap-10 no-shrink"
+              >
+                See church plans
+                <Icon name="arrow-forward-circle" size={20} />
+              </div>
+            </div>
+          </Link>
         </div>
       </div>
+
       <EndorsementSection />
 
         <div className="p-20">

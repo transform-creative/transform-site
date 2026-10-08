@@ -229,7 +229,7 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
           }}
           className="row center middle accent"
         >
-          Build your digital strategy
+          What would great comms cost you?
         </button>
       ) : (
         <button
