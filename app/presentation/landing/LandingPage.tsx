@@ -300,7 +300,7 @@ export function LandingPage({}: LandingPageProps) {
             title="Video"
             subtitle="Helping charities and Christian organisations raise money and awareness."
             videoSrc="https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/2026%20reel-LQ.mp4"
-            to="/portfolio?type=media"
+            to="/media"
           />
 
           {/* Church comms: spans both cards, blurred church photo under an accent wash */}

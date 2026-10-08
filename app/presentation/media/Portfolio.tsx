@@ -1,6 +1,10 @@
 import { Link, useSearchParams } from "react-router";
 import { PROJECTS } from "~/data/Objects";
-import { projectSlug, projectToIcon } from "~/business/commonBL";
+import {
+  projectImageAlt,
+  projectSlug,
+  projectToIcon,
+} from "~/business/commonBL";
 import { useRef } from "react";
 import { Icon } from "../elements/Icon";
 import HeaderText from "../landing/HeaderText";
@@ -110,13 +114,30 @@ export function Portfolio({}: PortfolioProps) {
         <h2 className="textCenter">All projects</h2>
         <div className="grid-250 w-100">
           {filteredProjects.map((p) => (
+            // The whole card is the link, image included, so it stays
+            // crawlable and the image gives Google extra context
             <Link
               key={p.id}
               to={`/portfolio/${projectSlug(p, PROJECTS)}`}
-              className="link-plain row middle gap-5 p-10"
+              className="link-plain zoom-on-hover col gap-5 p-10"
             >
-              <Icon name={projectToIcon(p.type)} color="var(--accent)" />
-              {p.organisation ? `${p.name} · ${p.organisation}` : p.name}
+              {p.images[0] && (
+                <div className="media-16-9 r-default">
+                  <img
+                    src={p.images[0]}
+                    alt={projectImageAlt(p)}
+                    loading="lazy"
+                    className="media-cover"
+                  />
+                </div>
+              )}
+              <div className="row middle gap-5">
+                <Icon name={projectToIcon(p.type)} color="var(--accent)" />
+                <h3 className="m0">{p.name}</h3>
+              </div>
+              {p.organisation && (
+                <p className="text-sm muted m0">{p.organisation}</p>
+              )}
             </Link>
           ))}
         </div>

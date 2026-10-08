@@ -53,9 +53,9 @@ const HERO_POSTER = `${TRANSFORM_STORAGE}/software-video-poster.jpg`;
    in the prerendered HTML — feature popout paragraphs after the first are
    not, so keep search terms out of those. */
 const TITLE =
-  "Not-for-profit Website Design & Development, Adelaide | Transform Creative";
+  "Not-for-profit Website Design & Development | Adelaide";
 const DESCRIPTION =
-  "Website design and development for Australian not-for-profits and charities. An Adelaide agency building custom sites and fundraising platforms — a Raisely alternative.";
+  "Website design and development for Australian not-for-profits and charities, plus custom fundraising platforms as a Raisely alternative. Adelaide-based.";
 
 export function meta() {
   return buildMeta({
@@ -228,7 +228,7 @@ export default function DevelopmentRoute() {
                 style={{ color: "var(--txt)", letterSpacing: -1.5 }}
               >
                 <small className="eyebrow accent-text">
-                  Not-for-profit website design & development
+                  Not-for-profit website design & development, Adelaide
                 </small>
                 Own your{" "}
                 <strong style={{ fontWeight: 600 }}>

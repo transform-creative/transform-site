@@ -332,8 +332,10 @@ export function SavingCalculator({}: SavingCalculatorProps) {
               </div>
             </div>
             <div className="col end center w-50 shrink-col">
-              {/* h1-sized, not an h1 — the page title is the only h1 */}
-              <h2 className="text-h1">+{fmt(extraToCause / 1000)}k</h2>
+              {/* Big figure, not a heading — the page title is the only h1 */}
+              <p className="heading-look text-h1 accent-text m0">
+                +{fmt(extraToCause / 1000)}k
+              </p>
               <p style={{ opacity: 0.7 }}>To your cause annually*</p>
             </div>
           </div>
@@ -532,7 +534,10 @@ function CardHeading({
         <strong>{emphasis}</strong>
         {after}
       </p>
-      <h2 style={{ color, margin: 0 }}>{fmt(amount)}</h2>
+      {/* Big figure, not a heading — Google reads headings as section titles */}
+      <p className="heading-look text-h2 m0" style={{ color }}>
+        {fmt(amount)}
+      </p>
       {pill && (
         <p className="pill-soft" style={{ color, fontWeight: 600 }}>
           {pill}

@@ -855,6 +855,17 @@ h5.center {
   font-size: 53pt;
 }
 
+.text-h2 {
+  font-size: 40pt;
+}
+
+/* Heading typeface on non-heading text, e.g. a big figure in a <p> */
+.heading-look {
+  font-family: "Onest", sans-serif;
+  font-weight: 200;
+  line-height: 1.2;
+}
+
 .wrap {
   flex-wrap: wrap;
 }
@@ -1061,6 +1072,14 @@ h5.center {
 
 address {
   font-style: normal;
+}
+
+/* Gentle zoom on a card's image while the card is hovered */
+.zoom-on-hover img {
+  transition: transform 0.4s ease;
+}
+.zoom-on-hover:hover img {
+  transform: scale(1.04);
 }
 
 /* Small label line above a heading's main text (e.g. <small> inside an h1) */
@@ -1315,6 +1334,9 @@ button.on-accent-button:hover * {
   /* Matches app.css, whose 35pt !important h1 rule wins on mobile */
   .text-h1 {
     font-size: 35pt;
+  }
+  .text-h2 {
+    font-size: 25pt;
   }
   h2 {
     font-size: 25pt;

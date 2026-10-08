@@ -563,6 +563,10 @@ const ARCHIVED = [
   },
 ];
 
+/** Isaac's headshot (4:5), used in the "about" sections on /church and /media */
+export const FOUNDER_PHOTO =
+  "https://egixfwkawhrysjzycbcv.supabase.co/storage/v1/object/public/storage_images/public_photos/isaac_drury.jpg";
+
 /** Main site nav, shared by the header and footer */
 export const NAV_LINKS: { to: string; label: string; footerLabel: string }[] =
   [
@@ -611,7 +615,7 @@ export const WORKED_WITH_LOGOS: {
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/worked_with_pong_3.png",
   },
   {
-    name: "Baptist Chuches South Australia & Northern Territory",
+    name: "Baptist Churches South Australia & Northern Territory",
     image:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/worked_with_baptist_2.png",
   },
@@ -660,7 +664,7 @@ export const FEATURES: Feature[] = [
     category: "Increase donations",
     text: "Machine learning",
     description: [
-      "We utlize custom built machine learning algorithms which analyse donor activity, and use the results of A/B tests to optimise your site's effectiveness.",
+      "We utilise custom-built machine learning algorithms which analyse donor activity, and use the results of A/B tests to optimise your site's effectiveness.",
     ],
   },
   {
@@ -679,7 +683,7 @@ export const FEATURES: Feature[] = [
     category: "Increase donations",
     text: "Generate regular donors",
     description: [
-      "We have experience optimisng how you find regular donors. The timing of the ask, the thank-you, the gentle nudge to set it up as recurring.",
+      "We have experience optimising how you find regular donors. The timing of the ask, the thank-you, the gentle nudge to set it up as recurring.",
     ],
   },
   {
@@ -1074,7 +1078,7 @@ export const MEDIA_HOW_WE_WORK: {
 /** Real Sunday photos in the `transform/images` bucket: numbered 1–10, plus
  *  named ones (checkin, connect, feet, plan, walk) */
 const churchPic = (n: number | string) =>
-  `https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/images/churchpics_${n}.jpg`;
+  `https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/images/churchpics_${n}.jpg`;
 
 /** TODO: overview video file (90 sec, captions on). Left null until it
  *  exists — the hero shows a placeholder. */

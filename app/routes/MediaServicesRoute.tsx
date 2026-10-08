@@ -5,7 +5,12 @@ import { useGSAP } from "@gsap/react";
 import { SplitText, ScrollTrigger } from "gsap/all";
 import gsap from "gsap";
 import { SharedContextProps } from "~/data/CommonTypes";
-import { CONTACT, MEDIA_HOW_WE_WORK, PROJECTS } from "~/data/Objects";
+import {
+  CONTACT,
+  FOUNDER_PHOTO,
+  MEDIA_HOW_WE_WORK,
+  PROJECTS,
+} from "~/data/Objects";
 import { buildMeta, canonical, SITE_URL } from "~/business/seoBL";
 import { AnimatedDots } from "~/presentation/elements/AnimatedDots";
 import { SplashCursor } from "~/presentation/elements/SplashCursor";
@@ -20,9 +25,6 @@ const TRANSFORM_STORAGE =
   "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform";
 
 const HERO_VIDEO = `${TRANSFORM_STORAGE}/2026%20reel-LQ.mp4`;
-
-/** {{TODO: Isaac to supply a headshot — set this once it's uploaded}} */
-const PORTRAIT_SRC: string | null = null;
 
 const TITLE = "Nonprofit Video Production, Adelaide | Transform Creative";
 const DESCRIPTION =
@@ -288,41 +290,41 @@ export default function MediaServicesRoute() {
         </Link>
       </section>
 
-      <div className="horizontal-line mediumFade mt-20 mb-20" />
-
-      {/* 5. About — {{TODO: Isaac to fill in}} */}
+      {/* 5. About — same layout as the "Who's doing this?" section on /church */}
       <section
         aria-labelledby="media-about"
-        className="row gap-20 w-75 shrink-col middle shrink-p-10"
+        className="col middle center gap-20 w-50 shrink-p-10 border-box"
+        style={{ minHeight: "60vh" }}
       >
-        <div className="flex-card">
-          {PORTRAIT_SRC ? (
+        <div className="horizontal-line" />
+        <div className="row shrink-col middle gap-20 w-100">
+          {/* Capped on mobile, where w-45 goes full width and the 4:5 photo gets huge */}
+          <div className={`w-45 ${context.inShrink ? "max-w-260" : ""}`}>
             <img
-              src={PORTRAIT_SRC}
-              alt="Isaac, video producer and founder of Transform Creative, Adelaide"
-              className="media-4-5 media-cover r-default"
+              src={FOUNDER_PHOTO}
+              alt="Isaac Drury, video producer and founder of Transform Creative, Adelaide"
               loading="lazy"
+              className="media-4-5 media-cover r-16 w-100"
             />
-          ) : (
-            <div className="media-4-5 media-fallback r-default col middle center">
-              <Icon name="person-outline" size={50} color="var(--accent)" />
-            </div>
-          )}
+          </div>
+          {/* Centred on mobile, matching /church */}
+          <div className={`col gap-10 w-100 ${context.inShrink ? "middle" : ""}`}>
+            <h2 id="media-about" style={{ letterSpacing: -1.5 }}>
+              Who's <strong>behind the camera</strong>?
+            </h2>
+            <p>
+              Hi, I'm Isaac. I've been creating videos and websites for
+              nonprofits for the last {new Date().getFullYear() - 2018} years,
+              and I love bringing your vision to life!
+            </p>
+            <p>
+              We've made film for Baptist Churches SA, BaptistCare,
+              Crossover, Sonder and others.
+            </p>
+          </div>
         </div>
-        <div className="flex-card-2 col gap-10">
-          <p className="m0" style={{ color: "var(--accent-lg)" }}>
-            Who you'll work with
-          </p>
-          <h2 id="media-about" className="m0" style={{ color: "var(--txt)" }}>
-            {/* {{TODO: heading}} */}
-            Hi, I'm Isaac.
-          </h2>
-          {/* {{TODO: about copy}} */}
-          <p className="m0">About copy goes here.</p>
-        </div>
+        <div className="horizontal-line" />
       </section>
-
-      <div className="horizontal-line mediumFade mt-20 mb-20" />
 
       {/* 6. Book a call */}
       <div className="w-100 col middle">

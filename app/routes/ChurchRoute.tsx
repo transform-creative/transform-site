@@ -14,6 +14,7 @@ import {
   CHURCH_JOBS,
   CHURCH_SERVICES,
   CHURCH_WEEK,
+  FOUNDER_PHOTO,
   PROJECTS,
 } from "~/data/Objects";
 import {
@@ -422,10 +423,14 @@ export default function ChurchRoute() {
                   context.inShrink ? "" : "flex-1"
                 } ${atBottom ? "bottom" : ""}`}
               >
+                {/* Not lazy: lazy waited until the cards were nearly on
+                    screen, so they sat blank for a few seconds. Eager +
+                    low priority fetches them with the page, after the hero. */}
                 <img
                   src={step.image}
                   alt=""
-                  loading="lazy"
+                  fetchPriority="low"
+                  decoding="async"
                   className="layer-fill media-cover blur-2"
                 />
                 <div
@@ -496,7 +501,7 @@ export default function ChurchRoute() {
             className={`w-45 ${context.inShrink ? "max-w-260" : ""}`}
           >
             <img
-              src="https://egixfwkawhrysjzycbcv.supabase.co/storage/v1/object/public/storage_images/public_photos/isaac_drury.jpg"
+              src={FOUNDER_PHOTO}
               alt="Isaac Drury, founder of Transform Creative"
               loading="lazy"
               className="media-4-5 media-cover r-16 w-100"
