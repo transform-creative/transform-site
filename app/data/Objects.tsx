@@ -1130,7 +1130,7 @@ export const CHURCH_JOBS: ChurchJob[] = [
     serviceTitle: "Photo + video",
     serviceTagline: "Your Sundays, captured properly",
     serviceBody: [
-      "Pro photo and video on your key Sundays (2–6 shoots a year), plus your sermon audio set up properly so every message can become clips.",
+      "Pro photo and video on your key Sundays (1–6 shoots a year), plus your sermon audio set up properly so every message can become clips.",
       "Easter, Christmas and launch Sundays covered.",
     ],
   },

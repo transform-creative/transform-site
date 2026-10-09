@@ -37,6 +37,9 @@ import { Icon } from "../elements/Icon";
 import TypeInput from "../elements/TypeInput";
 import { IssueCard } from "./IssueCard";
 import { IssueModal } from "./IssueModal";
+import { ResponseViewer } from "./ResponseViewer";
+import { Radar } from "../radar/Radar";
+import type { IoniconName } from "~/data/Ionicons";
 import "../../app-v2.css";
 
 interface ClientPortalProps {
@@ -61,6 +64,15 @@ const TAB_META: { key: TabKey; label: string }[] = [
   { key: "needs_approval", label: "Needs approval" },
   { key: "being_updated", label: "Being updated" },
   { key: "not_started", label: "Not started" },
+];
+
+/** The admin side-nav's sections. Radar is Transform Creative only. */
+type PortalView = "radar" | "tickets" | "responses";
+
+const NAV_META: { key: PortalView; label: string; icon: IoniconName }[] = [
+  { key: "radar", label: "Radar", icon: "radio-outline" },
+  { key: "tickets", label: "Tickets", icon: "albums-outline" },
+  { key: "responses", label: "Responses", icon: "document-text-outline" },
 ];
 
 /** Split the open issues into the three tab buckets by derived status. */
@@ -142,6 +154,11 @@ export function ClientPortal({
     focusComments: boolean;
     defaultSeverity?: IssueSeverity;
   } | null>(null);
+  // The admin side-nav's active section (clients only ever see tickets).
+  const [view, setView] = useState<PortalView>("tickets");
+  const navItems = NAV_META.filter(
+    (n) => n.key !== "radar" || business?.id === TRANSFORM_BUSINESS_ID,
+  );
   const mounted = useRef(true);
 
   const reload = useCallback(async () => {
@@ -405,10 +422,49 @@ export function ClientPortal({
 
   return (
     <div
-      className="col middle gap-20 ml-20 mr-20"
+      className={`${isAdmin && !context.inShrink ? "row start" : "col middle"} gap-20 ml-20 mr-20 mb-20`}
       style={{ minHeight: "90vh" }}
     >
-      <div className="col w-75 gap-20">
+      {/* Admin side-nav: switches between the portal's sections */}
+      {isAdmin && (
+        <nav
+          className="side-300 col gap-10 p-20 r-10 outline-secondary"
+          style={{ background: "var(--accent-sm)" }}
+        >
+          <h3 className="mb-10">{business?.name || "Your business"}</h3>
+          {navItems.map((n) => (
+            <button
+              key={n.key}
+              className={`${view === n.key ? "accentButton" : "outline-secondary"} row middle gap-10`}
+              onClick={() => setView(n.key)}
+            >
+              <Icon
+                name={n.icon}
+                color={view === n.key ? "var(--bkg)" : "var(--accent)"}
+              />
+              {n.label}
+            </button>
+          ))}
+          <button
+            className="row middle gap-10 outline-secondary mt-20"
+            onClick={handleSignOut}
+          >
+            <Icon name="log-out-outline" color="var(--accent)" />
+            Sign out
+          </button>
+        </nav>
+      )}
+
+      {isAdmin && view === "radar" ? (
+        <div className="flex-1 min-w-0 w-100">
+          <Radar embedded />
+        </div>
+      ) : isAdmin && view === "responses" ? (
+        <div className="flex-1 min-w-0 w-100">
+          <ResponseViewer businessId={business!.id} />
+        </div>
+      ) : (
+      <div className={`col gap-20 ${isAdmin ? "flex-1 min-w-0 w-100" : "w-75"}`}>
         {/* Header */}
         <div
           className="row relative p-20 r-10 outline-secondary"
@@ -424,27 +480,21 @@ export function ClientPortal({
                         orgName ? ` · ${orgName}` : ""
                       }`}
                 </h3>
-                <button
-                  className="row middle outline-secondary gap-5"
-                  onClick={handleSignOut}
-                >
-                  <Icon
-                    name="log-out-outline"
-                    color="var(--accent)"
-                  />
-                  Sign out
-                </button>
-              </div>
-              <div className="row middle gap-10">
-                {business?.id === TRANSFORM_BUSINESS_ID && (
+                {/* Admins sign out from the side-nav */}
+                {!isAdmin && (
                   <button
                     className="row middle outline-secondary gap-5"
-                    onClick={() => context.navigate("/radar")}
+                    onClick={handleSignOut}
                   >
-                    <Icon name="radio-outline" color="var(--accent)" />
-                    Radar
+                    <Icon
+                      name="log-out-outline"
+                      color="var(--accent)"
+                    />
+                    Sign out
                   </button>
                 )}
+              </div>
+              <div className="row middle gap-10">
                 <button
                   className="row middle outline-secondary"
                   onClick={handleRefresh}
@@ -547,6 +597,7 @@ export function ClientPortal({
           </div>
         )}
       </div>
+      )}
 
       <IssueModal
         active={modal !== null}

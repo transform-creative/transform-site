@@ -77,6 +77,8 @@ export type OrgRadarRow = Database["public"]["Views"]["org_radar"]["Row"];
 export type OrgSegment = "jenny" | "phil" | "both" | "phil_review";
 /** One radar triage decision (append-only; latest per ABN is current) */
 export type OrgDecision = Database["public"]["Tables"]["org_decisions"]["Row"];
+/** One public form / survey submission; the answers live in `metadata` */
+export type FormResponse = Database["public"]["Tables"]["responses"]["Row"];
 export type OrgStatus = "new" | "pursuing" | "snoozed" | "not_fit" | "never" | "client";
 /** Manual Jenny / Phil tag for an org; overrides the automatic segment when present */
 export type OrgOwner = Database["public"]["Tables"]["org_owners"]["Row"];

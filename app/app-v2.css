@@ -1290,9 +1290,38 @@ button.on-accent-button:hover * {
   padding: 10px;
 }
 
+/* Fixed-width side column (e.g. a dashboard nav) */
+.side-300 {
+  width: 300px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+/* Two-column label / value grid, e.g. a <dl> of answers */
+.kv-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) 2fr;
+  gap: 8px 20px;
+}
+
+/* Lets a flex child shrink below its content width */
+.min-w-0 {
+  min-width: 0;
+}
+
 @media (max-width: 1200px) {
   .layer-inset {
     inset: 16px;
+  }
+
+  .side-300 {
+    width: 100%;
+    position: static;
+  }
+
+  .kv-grid {
+    grid-template-columns: 1fr;
+    gap: 2px;
   }
 
   .text-xl,

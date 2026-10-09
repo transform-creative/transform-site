@@ -31,9 +31,15 @@ export interface PlanItem {
   default: number;
   /** Monthly price, per unit for steppers (ignored when `tiered` is set) */
   price: number;
-  /** Stepper volume pricing, per year: the first max(1, min) units cost
-   *  `start`, then each unit after costs `step` less than the one before */
-  tiered?: { start: number; step: number };
+  /** Stepper volume pricing, per year: the first `fullUnits` (default
+   *  max(1, min)) units cost `start`, then each unit after costs `step` less
+   *  than the one before. `singleExtra` is added when only one is taken. */
+  tiered?: {
+    start: number;
+    step: number;
+    fullUnits?: number;
+    singleExtra?: number;
+  };
   /** Hours a week handed back, per unit for steppers */
   hours: number;
   /** One-off setup fee when switched on */
@@ -68,11 +74,12 @@ export const CHURCH_PLAN = {
         "Shoot content at our church {times} each year",
       note: "Pro photo and video to feed your website, socials and slides all year.",
       control: "stepper",
-      min: 2,
+      min: 1,
       max: 6,
       default: 2,
       price: 0,
-      tiered: { start: 850, step: 100 },
+      // 1 = $950, 2 = $1,700, 3 = $2,450, 4 = $3,100
+      tiered: { start: 850, step: 100, fullUnits: 2, singleExtra: 100 },
       hours: 0,
       priceLabel: "",
       //      note: "Easter, Christmas and launch Sundays count as 2",
@@ -269,7 +276,8 @@ export function itemLabel(
 
 /*******************************
  * What an item costs a year at a given count. Tiered steppers get cheaper
- * per unit: e.g. shoots 2 = $1,400, 3 = $2,000, 4 = $2,500.
+ * per unit: e.g. shoots 2 = $1,700, 3 = $2,450, 4 = $3,100 (and a lone
+ * shoot carries a small surcharge: 1 = $950).
  */
 export function itemAnnual(
   item: PlanItem,
@@ -277,9 +285,10 @@ export function itemAnnual(
 ): number {
   if (!item.tiered)
     return item.price * qty * CHURCH_PLAN.termMonths;
-  const { start, step } = item.tiered;
-  const fullUnits = Math.max(1, item.min ?? 0);
-  let total = 0;
+  const { start, step, singleExtra = 0 } = item.tiered;
+  const fullUnits =
+    item.tiered.fullUnits ?? Math.max(1, item.min ?? 0);
+  let total = qty === 1 ? singleExtra : 0;
   for (let unit = 1; unit <= qty; unit++)
     total += Math.max(
       0,

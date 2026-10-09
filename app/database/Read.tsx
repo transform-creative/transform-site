@@ -4,12 +4,34 @@ import type {
   Business,
   BusinessRole,
   ClientIssue,
+  FormResponse,
   Org,
   OrgRadarRow,
   OrgDecision,
   OrgOwner,
   Profile,
 } from "~/data/CustomTypes";
+
+/*************************
+ * Read every form / survey response submitted to a business, newest first.
+ * RLS limits this to admins of that business.
+ */
+export async function getBusinessResponses(
+  businessId: number
+): Promise<FormResponse[]> {
+  const { data, error } = await supabase
+    .from("responses")
+    .select("*")
+    .eq("business_id", businessId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    await logError(error, ["getBusinessResponses", "Read"]);
+    throw error;
+  }
+
+  return data ?? [];
+}
 
 /*************************
  * Read all issues for a client, each with its full comments list.

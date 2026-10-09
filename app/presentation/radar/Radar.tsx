@@ -65,7 +65,13 @@ const EMPTY_TEXT: Record<OrgStatus, string> = {
 /******************************
  * The ACNC radar: which charities are worth a coffee this month, and why.
  */
-export function Radar() {
+interface Props {
+  // Fill the parent instead of the standalone page's centred 75% column
+  // (used when embedded in the client portal beside its side-nav).
+  embedded?: boolean;
+}
+
+export function Radar({ embedded = false }: Props) {
   const context: SharedContextProps = useOutletContext();
   const [rows, setRows] = useState<OrgRadarRow[]>([]);
   const [decisions, setDecisions] = useState<OrgDecision[]>([]);
@@ -234,8 +240,8 @@ export function Radar() {
   const openScored = openAbn ? byAbn.get(openAbn) : undefined;
 
   return (
-    <div className="col middle gap-20 ml-20 mr-20" style={{ minHeight: "90vh" }}>
-      <div className={`col gap-20 ${context.inShrink ? "w-100" : "w-75"}`}>
+    <div className={`col middle gap-20 ${embedded ? "" : "ml-20 mr-20"}`} style={{ minHeight: "90vh" }}>
+      <div className={`col gap-20 ${context.inShrink || embedded ? "w-100" : "w-75"}`}>
         {/* Header */}
         <header className="col gap-10 p-20 outline-secondary r-default" style={{ background: "var(--accent-sm)" }}>
           <div className={`row between start gap-20 ${context.inShrink ? "col" : ""}`}>

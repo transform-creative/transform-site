@@ -452,7 +452,7 @@ export function notionSnippet(orgs: ScoredOrg[]): string {
     .join("\n");
 }
 
-function csvCell(v: unknown): string {
+export function csvCell(v: unknown): string {
   if (v == null) return "";
   const s = String(v);
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
