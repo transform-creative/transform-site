@@ -115,7 +115,7 @@ export const CHURCH_PLAN = {
      {
       id: "announcementSlides",
       group: "content",
-      label: "Design our notice slides weekly",
+      label: "Design our notice slides",
       control: "toggle",
       default: 1,
       price: 60,

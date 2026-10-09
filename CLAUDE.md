@@ -226,3 +226,11 @@ Both are set in `.env.local` and exposed via `import.meta.env.*`.
 - Never use spans - use appropriate relevant tags instead
 - rely on app-v2.css for styling and only use inline style props unless absolutely neccessary. Prefer adding new entries to app-v2.css instead whenever a pattern is likely to be used again. Keep entries in the css file small (2-5 lines ideally) so they can generally be reused more than once and generic (no component specific css classes)
 - always import 'app-v2.css' and useOutletContext() in all new files
+- **Keep the /church offer consistent everywhere.** Any change to a church plan price, item wording, frequency (weekly, twice a year, etc.) or FAQ/board answer must be carried through to every place that repeats it, in the same change, without being asked. Grep for the old price, wording and frequency before calling it done. The places that repeat it:
+  - `app/business/churchPlanBL.tsx` — `CHURCH_PLAN` (prices, `priceLabel`s, item labels and notes, base fee, tier comments)
+  - `app/data/Objects.tsx` — `CHURCH_JOBS`, `CHURCH_SERVICES`, `CHURCH_WEEK`, `BOARD_QA`, `CHURCH_FAQ`, and the `planParts` rows in `CHURCH_SURVEY` (labels include prices)
+  - `app/presentation/church/` — `PlanBuilder.tsx` (footnotes, base-fee line), `BoardPopup.tsx`
+  - `app/routes/ChurchRoute.tsx` — meta `DESCRIPTION`, share copy, hero
+  - `supabase/functions/_shared/church-plan-pdf.ts` — `BASE_LABEL`, `SETUP_PLAN`, `BOARD_QA`, `BOARD_TIME_BACK` (its own copies; the edge function needs a redeploy to pick them up)
+  - `supabase/functions/_shared/emails/templates/ChurchPlanEmail.tsx`
+  After making the change, point out anything it can't fix on its own: renamed survey rows split existing answers in the CSV (answers are stored under the row's wording), and the PDF needs a redeploy.

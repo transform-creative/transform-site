@@ -72,7 +72,8 @@ const BOARD_TITLE = "Taking this to your board?";
 const BOARD_SUBTITLE = "Here's what your treasurer and elders might ask.";
 
 /** The plan's first line item (CHURCH_PLAN.base) is relabelled in the PDF */
-const BASE_LABEL = "Strategy and feedback meetings + baseline costs";
+const BASE_LABEL =
+  "Bi-annual feedback + strategy meetings, setup & contingency";
 
 /** The website build is a one-off cost, shown under the setup line instead */
 const WEBSITE_BUILD_ID = "websiteBuild";

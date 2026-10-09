@@ -1421,7 +1421,7 @@ export const CHURCH_SURVEY: SurveySection[] = [
           "A new website ($1,500 one-off)",
           "Keeping your website current, updated regularly ($2,760/yr)",
           "Social posts, 1 a week ($1,000/yr)",
-          "Weekly notice slides ($720/yr)",
+          "Notice slide design ($720/yr)",
           "Weekly sermon podcast/video upload ($480/yr)",
           "Weekly email draft ($900/yr)",
           "Strategy/feedback meetings twice a year (included in the $550/yr base)",
