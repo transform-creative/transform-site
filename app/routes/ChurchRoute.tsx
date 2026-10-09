@@ -50,7 +50,7 @@ import {
 const TITLE =
   "Church Websites & Media in Adelaide | Transform Creative";
 const DESCRIPTION =
-  "A new church website for $1,500, kept current every week, plus Sunday shoots, socials, slides and email. From an Adelaide creative agency.";
+  "A new church website for $1,500, regularly kept current, plus Sunday shoots, socials, slides and email. From an Adelaide creative agency.";
 
 export function meta() {
   return buildMeta({

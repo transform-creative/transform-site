@@ -215,15 +215,18 @@ export const PlanBuilder = forwardRef<
           background: "var(--accent-sm)",
         }}
       >
-        <h2
-          className="textCenter pt-20 pb-20"
-          style={{
-            color: "var(--accent)",
-            background: "#11111122",
-          }}
+        <div
+          className="col middle gap-5 pt-20 pb-20 textCenter"
+          style={{ background: "#11111122" }}
         >
-          What would great comms cost you?
-        </h2>
+          <h2 style={{ color: "var(--accent)" }}>
+            What would great comms cost you?
+          </h2>
+          <p className="muted">
+            For comparison, a two-day-a-week comms coordinator is
+            about $30K a year.*
+          </p>
+        </div>
 
         <div className="row shrink-col between gap-20 p-20">
           {/* --- Controls --- */}
@@ -248,7 +251,7 @@ export const PlanBuilder = forwardRef<
                   <p className="text-sm muted">{CHURCH_PLAN.base.note}</p>
                 </div>
                 <p className="text-sm no-shrink">
-                  {fmt(CHURCH_PLAN.base.price)}/mo
+                  {fmt(CHURCH_PLAN.base.annual)}/yr
                 </p>
               </div> */}
 
@@ -466,14 +469,19 @@ export const PlanBuilder = forwardRef<
         </div>
       </div>
 
-      <p className="textCenter text-sm muted mt-20 mb-20 pb-20">
-        All plans include a baseline{" "}
-        {fmt(
-          CHURCH_PLAN.base.price * CHURCH_PLAN.termMonths,
-        )}{" "}
-        per year fee which covers quarterly strategy and
-        feedback meetings and behind-the-scenes admin costs.
-      </p>
+      <div className="col middle gap-5 mt-20 mb-20 pb-20">
+        <p className="textCenter text-sm muted">
+          All annual plans include strategy + feedback catchups
+          twice a year, setup baked in and contingency coverage for{" "}
+          {fmt(CHURCH_PLAN.base.annual)}.
+        </p>
+        <p className="textCenter text-sm muted">
+          <b className="bold">
+            *Based on an average Australian comms coordinator salary
+            of about $68K + super.
+          </b>
+        </p>
+      </div>
     </div>
   );
 });

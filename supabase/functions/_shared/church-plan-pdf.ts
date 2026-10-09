@@ -84,10 +84,10 @@ const SETUP_LABEL = "A new website for your church";
 const SETUP_PLAN = [
   "We meet to understand your community, heart, mission and style, and write your communications strategy plan.",
   "We visit to capture photos and video of your real people and events.",
-  "We connect to your Planning Center or Elvanto, so your content and site stay current each week.",
+  "We connect to your Planning Center or Elvanto, so your content stays current each week and your site is updated regularly.",
   "We train your existing volunteers to fill any week-to-week gaps.",
   "We set up Spotify, Apple Podcasts and your Google Business Profile.",
-  "We check in each quarter with a short report and a 30-min strategy and feedback meeting.",
+  "We check in twice a year with a short report and a 30-min strategy and feedback meeting.",
 ];
 
 /** Keep in sync with BOARD_TIME_BACK in app/data/Objects.tsx */
@@ -114,7 +114,7 @@ const BOARD_QA = [
   {
     question: "How will we know it's working?",
     answer:
-      "You'll get a short quarterly report with 'plan-a-visit' sign-ups (if you're on our website), sermon listens, email opens and feedback on how your socials are tracking. We'll go through it together each quarter. It's also worth asking newcomers how they found you, which is often the most useful number of all.",
+      "You'll get a short report every six months with 'plan-a-visit' sign-ups (if you're on our website), sermon listens, email opens and feedback on how your socials are tracking. We'll go through it together at our catch-up. It's also worth asking newcomers how they found you, which is often the most useful number of all.",
   },
   {
     question: "What are we signing up to?",
@@ -127,9 +127,9 @@ const BOARD_QA = [
       "You do. Anything we think could be potentially dicey waits for your pastor's yes.",
   },
   {
-    question: "Why not use volunteers, or hire someone?",
+    question: "Why not use volunteers?",
     answer:
-      "The more the merrier! We'd love to work alongside your existing team of legends. A two-day-a-week comms coordinator is roughly $30K a year with super, and it's pretty rare to find one person who can shoot, edit, design and look after a website.",
+      "Maybe! Lots of churches try. The hard part is doing it reliably, often enough and well, every week, on top of everything else. We'd love to work alongside your volunteers using the same templates, and share a few pointers on shoot days if they're keen.",
   },
   {
     question: "What about kids and privacy?",

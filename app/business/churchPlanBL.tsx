@@ -54,8 +54,9 @@ export interface PlanItem {
 export const CHURCH_PLAN = {
   base: {
     label: "Always included",
-    price: 70,
-    note: "Quarterly invite plan + 30-min strategy and feedback meeting, start-up setup (Spotify, Apple Podcasts, Google Business Profile), quarterly report",
+    /** Per year */
+    annual: 550,
+    note: "Invite plan + 30-min strategy & feedback meeting twice a year, start-up setup (Spotify, Apple Podcasts, Google Business Profile), six-monthly report",
   },
   groups: [
     {
@@ -78,8 +79,8 @@ export const CHURCH_PLAN = {
       max: 6,
       default: 2,
       price: 0,
-      // 1 = $950, 2 = $1,700, 3 = $2,450, 4 = $3,100
-      tiered: { start: 850, step: 100, fullUnits: 2, singleExtra: 100 },
+      // 1 = $750, 2 = $1,400, 3 = $1,950, 4 = $2,400, 5 = $2,750, 6 = $3,000
+      tiered: { start: 750, step: 100, fullUnits: 1 },
       hours: 0,
       priceLabel: "",
       //      note: "Easter, Christmas and launch Sundays count as 2",
@@ -135,13 +136,13 @@ export const CHURCH_PLAN = {
     {
       id: "email",
       group: "content",
-      label: "Create our email weekly",
+      label: "Draft our email weekly",
       note: "Built from what's on in Elvanto or Planning Center, plus anything else you send us.",
       control: "toggle",
       default: 0,
-      price: 150,
+      price: 75,
       hours: 2,
-      priceLabel: "$1,800/yr",
+      priceLabel: "$900/yr",
     },
 
     // {
@@ -194,12 +195,12 @@ export const CHURCH_PLAN = {
       id: "websiteCare",
       group: "website",
       label: "Keep our website current",
-      note: "We update your service times, events, sermons and photos weekly.",
+      note: "We regularly update your service times, events, sermons and photos.",
       control: "toggle",
       default: 1,
       hours: 0.5,
-      price: 300,
-      priceLabel: "$3,600 / yr",
+      price: 230,
+      priceLabel: "$2,760 / yr",
       requiresSystem: true,
     },
   ] as PlanItem[],
@@ -276,8 +277,7 @@ export function itemLabel(
 
 /*******************************
  * What an item costs a year at a given count. Tiered steppers get cheaper
- * per unit: e.g. shoots 2 = $1,700, 3 = $2,450, 4 = $3,100 (and a lone
- * shoot carries a small surcharge: 1 = $950).
+ * per unit: e.g. shoots 1 = $750, 2 = $1,400, 3 = $1,950, 4 = $2,400.
  */
 export function itemAnnual(
   item: PlanItem,
@@ -429,15 +429,13 @@ export function priceOf(
       id: "base",
       label: CHURCH_PLAN.base.label,
       qty: 1,
-      monthly: CHURCH_PLAN.base.price,
-      annual:
-        CHURCH_PLAN.base.price * CHURCH_PLAN.termMonths,
+      monthly: CHURCH_PLAN.base.annual / CHURCH_PLAN.termMonths,
+      annual: CHURCH_PLAN.base.annual,
     },
   ];
   let setup = 0;
   // Summed per year so tiered prices stay whole dollars
-  let annual =
-    CHURCH_PLAN.base.price * CHURCH_PLAN.termMonths;
+  let annual = CHURCH_PLAN.base.annual;
 
   for (const item of CHURCH_PLAN.items) {
     const qty = plan.values[item.id] ?? 0;

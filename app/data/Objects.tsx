@@ -1147,7 +1147,7 @@ export const CHURCH_JOBS: ChurchJob[] = [
     serviceTitle: "Content",
     serviceTagline: "Your week's content, done",
     serviceBody: [
-      "Each quarter we build an invite plan around the series and events you've already got planned. Then each week we turn your sermon into reels, posts, slides, the weekly email and a follow-up pack for small group leaders, plus a monthly brochure if you want one.",
+      "Twice a year we build an invite plan around the series and events you've already got planned. Then each week we turn your sermon into reels, posts, slides, the weekly email and a follow-up pack for small group leaders, plus a monthly brochure if you want one.",
     ],
   },
   {
@@ -1156,8 +1156,8 @@ export const CHURCH_JOBS: ChurchJob[] = [
     color: tabColors.software,
     jobTitle: "Keep your website current",
     jobBody:
-      "Old service times, a staff page from three years ago, and a login nobody can find. Your site's the first place newcomers look, but the last job on your list.",
-    jobHighlight: "login nobody can find",
+      "An out-of-date website never yells at you. Your members hardly check it, so no one notices when it slips. But it's often the first place a newcomer looks.",
+    jobHighlight: "first place a newcomer looks",
     jobImage: churchPic("website"),
     serviceId: "website",
     serviceTitle: "Website",
@@ -1177,8 +1177,8 @@ export const CHURCH_SERVICES: ChurchService[] = [
     id: "plan",
     verb: "Creating",
     rest: "your digital plan",
-    body: "We meet with you quarterly to discuss who you are as a congregation, and how we can create a digital presence that truly reflects you and connects with your community.",
-    highlights: ["quarterly", "truly reflects you"],
+    body: "We meet with you twice a year to discuss who you are as a congregation, and how we can create a digital presence that truly reflects you and connects with your community.",
+    highlights: ["twice a year", "truly reflects you"],
     image: churchPic(9),
   },
   {
@@ -1266,17 +1266,17 @@ export const CHURCH_WEEK: ChurchWeekStep[] = [
     title: "We connect",
     highlights: [
       "Planning Center or Elvanto",
-      "update your site each week",
+      "update your site regularly",
     ],
     icon: "git-network-outline",
-    body: "We connect our system to your Planning Center or Elvanto account so we can keep on top of exactly what's going on in the life of your church, automatically create new content and update your site each week.",
+    body: "We connect our system to your Planning Center or Elvanto account so we can keep on top of exactly what's going on in the life of your church, automatically create new content and update your site regularly.",
     image: churchPic("connect"),
   },
   {
     title: "We check in",
-    highlights: ["quarterly check in meetings", "serve you better"],
+    highlights: ["check in meetings twice a year", "serve you better"],
     icon: "chatbubbles-outline",
-    body: "We continue to have quarterly check in meetings to find out how things are going, and where we can serve you better.",
+    body: "We continue to have check in meetings twice a year to find out how things are going, and where we can serve you better.",
     image: churchPic("checkin"),
   },
 ];
@@ -1297,7 +1297,7 @@ export const BOARD_QA: BoardQuestion[] = [
   {
     question: "How will we know it's working?",
     answer:
-      "You'll get a short quarterly report with 'plan-a-visit' sign-ups (if you're on our website), sermon listens, email opens and feedback on how your socials are tracking. We'll go through it together each quarter. It's also worth asking newcomers how they found you, which is often the most useful number of all.",
+      "You'll get a short report every six months with 'plan-a-visit' sign-ups (if you're on our website), sermon listens, email opens and feedback on how your socials are tracking. We'll go through it together at our catch-up. It's also worth asking newcomers how they found you, which is often the most useful number of all.",
   },
   {
     question: "What are we signing up to?",
@@ -1310,9 +1310,9 @@ export const BOARD_QA: BoardQuestion[] = [
       "You do. Anything we think could be potentially dicey waits for your pastor's yes.",
   },
   {
-    question: "Why not use volunteers, or hire someone?",
+    question: "Why not use volunteers?",
     answer:
-      "The more the merrier! We'd love to work alongside your existing team of legends. A two-day-a-week comms coordinator is roughly $30K a year with super, and it's pretty rare to find one person who can shoot, edit, design and look after a website.",
+      "Maybe! Lots of churches try. The hard part is doing it reliably, often enough and well, every week, on top of everything else. We'd love to work alongside your volunteers using the same templates, and share a few pointers on shoot days if they're keen.",
   },
   {
     question: "What about kids and privacy?",
@@ -1417,14 +1417,14 @@ export const CHURCH_SURVEY: SurveySection[] = [
         helper: "All prices + GST.",
         type: "grid",
         rows: [
-          "Photo + video shoots, 2 a year ($1,700/yr)",
+          "Photo + video shoots, 2 a year ($1,400/yr)",
           "A new website ($1,500 one-off)",
-          "Keeping your website current each week ($3,600/yr)",
+          "Keeping your website current, updated regularly ($2,760/yr)",
           "Social posts, 1 a week ($1,000/yr)",
           "Weekly notice slides ($720/yr)",
           "Weekly sermon podcast/video upload ($480/yr)",
-          "Weekly email ($1,800/yr)",
-          "Quarterly strategy and feedback meetings (included in the $840/yr base)",
+          "Weekly email draft ($900/yr)",
+          "Strategy/feedback meetings twice a year (included in the $550/yr base)",
         ],
         options: [
           "We'd pay for this",
@@ -1523,18 +1523,16 @@ export const CHURCH_FAQ: FAQQuestion[] = [
   },
   {
     section: "church",
-    question:
-      "Some of our people already do this! What happens to them?",
-    // Isaac to confirm: pointers on shoot days
+    question: "Can't we just do this ourselves with volunteers?",
     answer:
-      "Hopefully they keep going! We'd love to work alongside them using the same templates, and we're happy to share a few pointers on shoot days if they're keen.",
+      "Maybe! Lots of churches try. The hard part is doing it reliably, often enough and well, every week, on top of everything else. We'd love to work alongside your volunteers using the same templates, and share a few pointers on shoot days if they're keen.",
   },
   {
     section: "church",
     question: "How much of our week will this take?",
     // Isaac to confirm: ~15 min a week, check against Kings
     answer:
-      "We organise a 30-minute strategy and feedback meeting each quarter, and other than that we hope you'll spend less than 10 minutes a week thinking about us (so you can focus on the pastoral stuff)!",
+      "We organise a 30-minute strategy & feedback meeting twice a year, and other than that we hope you'll spend less than 10 minutes a week thinking about us (so you can focus on the pastoral stuff)!",
   },
   {
     section: "church",
