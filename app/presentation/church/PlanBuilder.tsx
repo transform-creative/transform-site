@@ -216,14 +216,14 @@ export const PlanBuilder = forwardRef<
         }}
       >
         <div
-          className="col middle gap-5 pt-20 pb-20 textCenter"
+          className="col middle gap-5 pt-20 pb-20 center"
           style={{ background: "#11111122" }}
         >
-          <h2 style={{ color: "var(--accent)" }}>
-            What would great comms cost you?
+          <h2 style={{ color: "var(--accent)", textAlign: "center" }}>
+            What would <strong className="bold">great comms</strong> cost you?
           </h2>
-          <p className="muted">
-            For comparison, a two-day-a-week comms coordinator is
+          <p className="muted" style={{textAlign: 'center'}}>
+            For comparison, a <strong className="bold">two-day-a-week comms coordinator</strong> is
             about $30K a year.*
           </p>
         </div>
