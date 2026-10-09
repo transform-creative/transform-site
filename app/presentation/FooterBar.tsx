@@ -19,23 +19,24 @@ export function FooterBar({}: FooterBarProps) {
             <Link
               key={link.to}
               to={link.to}
-              className="btn-look link-plain"
+              className="btn-look link-plain txt"
             >
               {link.footerLabel}
             </Link>
           ))}
-          <Link to="/contact" className="btn-look link-plain">
+          <Link to="/contact" className="btn-look txt link-plain">
             Contact
           </Link>
         </nav>
-        <address className="col middle center gap-5 mt-10">
-          <a
+        <address className="col p-20 mb-10 boxed middle center gap-5 mt-10">
+        
+          <p className="m0 mb-5"><b style={{fontWeight: 600, color: "var(--txt)"}}>{CONTACT.location}</b></p>
+            <a
             className="link-plain"
             href={`mailto:${CONTACT.email}`}
           >
             {CONTACT.email}
           </a>
-          <p className="m0">{CONTACT.location}</p>
         </address>
         <div>
           <p>© {new Date().getFullYear()} Transform Creative</p>

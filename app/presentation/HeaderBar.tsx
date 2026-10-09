@@ -146,7 +146,7 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
     <div className={`${inShrink ? "col" : 'row middle'}`} style={{zIndex: 30, width: inShrink ? "300px" : "100%"}}>
       {inShrink && <div style={{ height: 50 }} />}
       {/* Real links (not buttons) so crawlers can follow the nav */}
-      {NAV_LINKS.map((link, i) => (
+      {NAV_LINKS.filter((link) => !link.footerOnly).map((link, i) => (
         <Fragment key={link.to}>
           <Link
             to={link.to}

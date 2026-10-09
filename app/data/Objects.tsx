@@ -6,6 +6,7 @@ import type {
   ChurchService,
   ChurchWeekStep,
   Project,
+  SurveySection,
 } from "./CommonTypes";
 import type {
   FAQQuestion,
@@ -568,17 +569,28 @@ export const FOUNDER_PHOTO =
   "https://egixfwkawhrysjzycbcv.supabase.co/storage/v1/object/public/storage_images/public_photos/isaac_drury.jpg";
 
 /** Main site nav, shared by the header and footer */
-export const NAV_LINKS: { to: string; label: string; footerLabel: string }[] =
-  [
-    { to: "/", label: "Home", footerLabel: "Home" },
-    { to: "/portfolio", label: "Portfolio", footerLabel: "Portfolio" },
-    { to: "/media", label: "Video", footerLabel: "Nonprofit video" },
-    {
-      to: "/development",
-      label: "Websites",
-      footerLabel: "Nonprofit websites",
-    },
-  ];
+// footerOnly links stay crawlable from the footer but are left out of the header
+export const NAV_LINKS: {
+  to: string;
+  label: string;
+  footerLabel: string;
+  footerOnly?: boolean;
+}[] = [
+  { to: "/", label: "Home", footerLabel: "Home" },
+  { to: "/media", label: "Video", footerLabel: "Nonprofit video" },
+  {
+    to: "/development",
+    label: "Website",
+    footerLabel: "Nonprofit websites",
+  },
+  { to: "/church", label: "Churches", footerLabel: "Church comms" },
+  {
+    to: "/portfolio",
+    label: "Portfolio",
+    footerLabel: "Portfolio",
+    footerOnly: true,
+  },
+];
 
 export const CONTACT = {
   email: "hello@transformcreative.com.au",
@@ -1318,6 +1330,186 @@ export const CHURCH_CAPACITY_LINE =
  *  (sermon slides, Alpha Marriage promos, print designs). */
 export const CHURCH_EXAMPLE_PROJECT_IDS = [12, 6, 18];
 
+/** Survey sent to churches after they've looked at /church
+ *  (/church-comms-survey, linked from the /church?survey= banner) */
+export const CHURCH_SURVEY_ID = "church-comms-survey";
+
+export const CHURCH_SURVEY: SurveySection[] = [
+  {
+    id: "church",
+    title: "Your church",
+    icon: "home-outline",
+    questions: [
+      {
+        id: "currentChannels",
+        title:
+          "How well does each of these show what your church is actually like right now?",
+        type: "grid",
+        rows: ["Website", "Facebook and Instagram"],
+        options: [
+          "Spot on",
+          "Pretty good",
+          "A bit out of date",
+          "Not really",
+          "We don't have one",
+        ],
+      },
+      {
+        id: "serviceTimes",
+        title:
+          "If your service times changed next week, who would update the website?",
+        type: "single",
+        options: [
+          "I would",
+          "Another staff member",
+          "A volunteer",
+          "Someone outside the church (e.g. a web developer)",
+          "Not sure who'd do it",
+        ],
+        other: "Other (please say)",
+      },
+      {
+        id: "whyHard",
+        title:
+          "Lots of churches find it hard to keep their website and socials current. Why do you reckon that is?",
+        type: "multi",
+        max: 3,
+        shuffle: true,
+        options: [
+          "No one has the time",
+          "No one has the skills",
+          "No one really owns it",
+          'Not sure what "good" looks like',
+          "Other ministry comes first",
+          "The person who did it moved on",
+          "Members don't use the website, so no one notices",
+          "Polished comms can feel a bit like marketing",
+        ],
+        other: "Other (please say)",
+      },
+      {
+        id: "spend",
+        title:
+          "Roughly what does your church spend on comms each year?",
+        helper:
+          "Think website, subscriptions like Canva, printing and any paid hours. A guess is fine.",
+        type: "single",
+        options: [
+          "Under $1,000",
+          "$1,000–$3,000",
+          "$3,000–$6,000",
+          "$6,000–$10,000",
+          "Over $10,000",
+          "No idea",
+        ],
+      },
+    ],
+  },
+  {
+    id: "plan",
+    title: "The plan",
+    icon: "pricetags-outline",
+    questions: [
+      {
+        id: "planParts",
+        title:
+          "Here's each part of the plan with its price. How would each one land for your church?",
+        helper: "All prices + GST.",
+        type: "grid",
+        rows: [
+          "Photo + video shoots, 2 a year ($1,700/yr)",
+          "A new website ($1,500 one-off)",
+          "Keeping your website current each week ($3,600/yr)",
+          "Social posts, 1 a week ($1,000/yr)",
+          "Weekly notice slides ($720/yr)",
+          "Weekly sermon podcast/video upload ($480/yr)",
+          "Weekly email ($1,800/yr)",
+          "Quarterly strategy and feedback meetings (included in the $840/yr base)",
+        ],
+        options: [
+          "We'd pay for this",
+          "Nice, but not at that price",
+          "We wouldn't use it",
+          "We've already got this covered",
+        ],
+      },
+      {
+        id: "blockers",
+        title: "What would most likely stop your church saying yes?",
+        type: "multi",
+        max: 2,
+        options: [
+          "Cost",
+          "Our volunteers already do this",
+          "It might not look or sound like us",
+          "Our elders or board wouldn't go for it",
+          "Our budget's already set for this year",
+          "Kids and privacy",
+          "Signing up for 12 months",
+          "Another supplier to manage",
+          "It's just not a priority right now",
+        ],
+        other: "Other (please say)",
+      },
+      {
+        id: "eldersQuestion",
+        title:
+          "If you brought this to your elders, what's the first question they'd ask?",
+        type: "short",
+      },
+    ],
+  },
+  {
+    id: "page",
+    title: "The page",
+    icon: "document-text-outline",
+    questions: [
+      {
+        id: "pageConfusing",
+        title:
+          "Was anything on the page confusing, off-putting or a bit salesy?",
+        type: "paragraph",
+        optional: true,
+      },
+      {
+        id: "pageMissing",
+        title:
+          "Is there anything comms-related your church would find useful that's missing from the page?",
+        type: "paragraph",
+        optional: true,
+      },
+    ],
+  },
+  {
+    id: "last",
+    title: "Last two",
+    icon: "chatbubbles-outline",
+    questions: [
+      {
+        id: "fit",
+        title: "Which of these is closest to true for your church?",
+        type: "single",
+        options: [
+          "We'd be keen to chat about this in the next few months",
+          "Interested, but not this year",
+          "I can see it working for other churches, just not ours",
+          "Not for us",
+        ],
+      },
+      {
+        id: "followUp",
+        title: "Happy for me to follow up?",
+        type: "single",
+        options: [
+          "Yes, happy to grab a coffee and chat",
+          "No thanks, just helping out",
+        ],
+        followUpOptions: ["Yes, happy to grab a coffee and chat"],
+      },
+    ],
+  },
+];
+
 export const CHURCH_FAQ_SECTIONS: FAQSection[] = [
   { id: "church", title: "Common" },
 ];
@@ -1342,7 +1534,7 @@ export const CHURCH_FAQ: FAQQuestion[] = [
     question: "How much of our week will this take?",
     // Isaac to confirm: ~15 min a week, check against Kings
     answer:
-      "We organise a 30-minute strategy catch-up each quarter, and other than that we hope you'll spend less than 10 minutes a week thinking about us (so you can focus on the pastoral stuff)!",
+      "We organise a 30-minute strategy and feedback meeting each quarter, and other than that we hope you'll spend less than 10 minutes a week thinking about us (so you can focus on the pastoral stuff)!",
   },
   {
     section: "church",

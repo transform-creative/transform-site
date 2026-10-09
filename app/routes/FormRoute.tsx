@@ -1,4 +1,8 @@
-import { useOutletContext, useParams } from "react-router";
+import {
+  useLocation,
+  useOutletContext,
+  useParams,
+} from "react-router";
 import { Icon } from "~/presentation/elements/Icon";
 import { LabelInput } from "~/presentation/elements/LabelInput/LabelInput";
 import { useState } from "react";
@@ -8,7 +12,8 @@ import { createResponse } from "~/database/Create";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import { buildMeta } from "~/business/seoBL";
 import "../app-v2.css";
-import { CONTACT } from "~/data/Objects";
+import { CHURCH_SURVEY_ID, CONTACT } from "~/data/Objects";
+import { CommsSurvey } from "~/presentation/church/CommsSurvey";
 
 export function meta() {
   return buildMeta({
@@ -20,7 +25,10 @@ export function meta() {
 }
 
 export default function FormRoute() {
-  const formId = useParams().id;
+  const params = useParams();
+  const { pathname } = useLocation();
+  // /forms/:id, or a form mounted at its own path (e.g. /church-comms-survey)
+  const formId = params.id ?? pathname.split("/").filter(Boolean)[0];
   const context: SharedContextProps = useOutletContext();
 
   const [formFor, setFormFor] = useState<string>("child");
@@ -67,6 +75,8 @@ export default function FormRoute() {
       setSubmitting(false);
     }
   }
+
+  if (formId === CHURCH_SURVEY_ID) return <CommsSurvey />;
 
   if (formId === "ys-extra-sign-up")
     return (

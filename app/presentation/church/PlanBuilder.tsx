@@ -471,8 +471,8 @@ export const PlanBuilder = forwardRef<
         {fmt(
           CHURCH_PLAN.base.price * CHURCH_PLAN.termMonths,
         )}{" "}
-        per year fee which covers quarterly strategy
-        meetings and behind-the-scenes admin costs.
+        per year fee which covers quarterly strategy and
+        feedback meetings and behind-the-scenes admin costs.
       </p>
     </div>
   );

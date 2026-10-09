@@ -113,3 +113,37 @@ export interface BoardQuestion {
   question: string;
   answer: string;
 }
+
+/** One question of a stepped survey (e.g. /church-comms-survey) */
+export interface SurveyQuestion {
+  id: string;
+  title: string;
+  helper?: string;
+  /**
+   * grid: one answer per row · single: pick one · multi: pick up to `max`
+   * short: one-line text · paragraph: long text
+   */
+  type: "grid" | "single" | "multi" | "short" | "paragraph";
+  options?: string[];
+  /** grid only */
+  rows?: string[];
+  /** multi only */
+  max?: number;
+  /** Shuffle options per respondent (the "other" option stays last) */
+  shuffle?: boolean;
+  /** Label of a trailing "Other" option that asks for a few words */
+  other?: string;
+  optional?: boolean;
+  /** Options that mean the respondent wants a follow-up */
+  followUpOptions?: string[];
+}
+
+export interface SurveySection {
+  id: string;
+  title: string;
+  icon: IoniconName;
+  questions: SurveyQuestion[];
+}
+
+/** A grid answer is keyed by row; multi answers are a list */
+export type SurveyAnswer = string | string[] | Record<string, string>;

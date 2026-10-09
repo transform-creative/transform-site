@@ -33,6 +33,8 @@ export const CHURCH_ACTION = {
   /** "Email me this plan" submitted */
   PLAN_PDF_REQUEST: "plan.pdf_request",
   BOOK_CHAT_CLICK: "book_chat.click",
+  /** Clicked the ?survey= banner through to /church-comms-survey */
+  SURVEY_OPEN: "survey.open",
 } as const;
 
 export type ChurchAction =
@@ -47,6 +49,7 @@ export const CHURCH_ACTION_LABELS: Record<string, string> = {
   [CHURCH_ACTION.BOARD_POPUP_OPEN]: "Opened board questions",
   [CHURCH_ACTION.PLAN_PDF_REQUEST]: "Requested plan PDF",
   [CHURCH_ACTION.BOOK_CHAT_CLICK]: "Clicked book a chat",
+  [CHURCH_ACTION.SURVEY_OPEN]: "Opened the survey",
 };
 
 /**

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useOutletContext } from "react-router";
+import { useOutletContext, useSearchParams } from "react-router";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import "../app-v2.css";
@@ -13,6 +13,7 @@ import {
   CHURCH_HERO_VIDEO,
   CHURCH_JOBS,
   CHURCH_SERVICES,
+  CHURCH_SURVEY_ID,
   CHURCH_WEEK,
   FOUNDER_PHOTO,
   PROJECTS,
@@ -124,8 +125,28 @@ export default function ChurchRoute() {
   // Measure both so the hero can start flush under the bar, not the wrapper.
   const [navBarHeight, setNavBarHeight] = useState(120);
   const [navGap, setNavGap] = useState(0);
+  const [searchParams] = useSearchParams();
+  // Set after mount, not during render: the prerendered page has no
+  // query string, so rendering the banner straight away would mismatch.
+  const [surveyInvite, setSurveyInvite] = useState<{
+    name: string;
+    url: string;
+  }>();
 
   const price = priceOf(plan);
+
+  // /church?survey=<name>&church=<church> shows the survey banner
+  useEffect(() => {
+    const name = searchParams.get("survey")?.trim();
+    if (!name) return;
+    const query = new URLSearchParams({ name });
+    const church = searchParams.get("church")?.trim();
+    if (church) query.set("church", church);
+    setSurveyInvite({
+      name,
+      url: `/${CHURCH_SURVEY_ID}?${query.toString()}`,
+    });
+  }, [searchParams]);
 
   useLayoutEffect(() => {
     const wrapper = document.getElementById("header-menu");
@@ -212,12 +233,39 @@ export default function ChurchRoute() {
         }}
       />
 
+      {/* Starts just under the visible nav bar, then sticks to the top of
+          the screen on scroll. Takes the hero's place under the header
+          wrapper, so it pulls up by the same gap. */}
+      {surveyInvite && (
+        <a
+          href={surveyInvite.url}
+          target="_blank"
+          rel="noopener"
+          className="sticky-bar accent row middle center gap-10 p-10 w-100 border-box no-underline fade-md"
+          style={{ marginTop: -navGap }}
+          onClick={() => logChurchActivity(CHURCH_ACTION.SURVEY_OPEN)}
+        >
+          <p className="textCenter">
+            Thanks for taking a look {surveyInvite.name}.{" "}
+            <strong
+              style={{ fontWeight: 600, textDecoration: "underline" }}
+            >
+              Click here
+            </strong>{" "}
+            to help me out big time by answering a few questions after
+            you've had a look.
+          </p>
+          <Icon name="open-outline" size={18} color="var(--bkg)" />
+        </a>
+      )}
+
       {/* 1. Hero: video filling the screen from the bottom of the navbar
           bar down, with an outline frame inset over it */}
       <section
         className="relative clip w-100 on-media"
         style={{
-          marginTop: -navGap,
+          // With the survey banner above, only cancel the column's 20px gap
+          marginTop: surveyInvite ? -20 : -navGap,
           height: `calc(100svh - ${navBarHeight}px)`,
         }}
       >

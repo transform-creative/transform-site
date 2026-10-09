@@ -1070,6 +1070,13 @@ h5.center {
   color: var(--accent);
 }
 
+/* Links on an accent background keep the container's text colour — the
+   accent hover/link colour would match the background and vanish */
+:is(.accent, .boxedAccent) a:not([role="button"]):is(:hover, .current, .link) {
+  color: inherit;
+  opacity: 0.7;
+}
+
 address {
   font-style: normal;
 }
@@ -1739,9 +1746,13 @@ a[role="button"].fill-white:hover {
   color: var(--bkg);
 }
 
-.accent .text-button:hover {
+:is(.accent, .boxedAccent) .text-button:hover {
   color: var(--bkg);
   opacity: 0.7;
+}
+/* Children too — the global `button:hover *` would turn them accent */
+:is(.accent, .boxedAccent) .text-button:hover * {
+  color: inherit;
 }
 
 .disabled-row {
@@ -1757,6 +1768,42 @@ a[role="button"].fill-white:hover {
   bottom: 0;
   z-index: 90;
   transition: opacity 0.3s;
+}
+
+/* Bar that scrolls up with the page, then sticks to the top of the screen
+   above the header (100), so the header's wrapper can't swallow its clicks */
+.sticky-bar {
+  position: sticky;
+  top: 0;
+  z-index: 105;
+}
+
+/* Selectable answer row (radio / checkbox style); .active = chosen */
+button.choice {
+  background: var(--bkg);
+  box-shadow: 0 0 0 1px inset var(--accent-lg);
+  font-size: 1.1rem;
+  text-align: start;
+}
+button.choice.active,
+button.choice.active:hover,
+button.choice.active:hover * {
+  background: var(--accent);
+  color: var(--bkg);
+}
+
+/* Fieldset that groups controls without the browser's frame */
+.plain-fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+/* Multi-line text box tall enough for a few sentences */
+.textarea-md {
+  min-height: 120px;
+  resize: vertical;
 }
 
 /* Phone-shaped frame for small UI mock-ups */

@@ -49,7 +49,7 @@ export const CHURCH_PLAN = {
   base: {
     label: "Always included",
     price: 70,
-    note: "Quarterly invite plan + 30-min call, start-up setup (Spotify, Apple Podcasts, Google Business Profile), quarterly report",
+    note: "Quarterly invite plan + 30-min strategy and feedback meeting, start-up setup (Spotify, Apple Podcasts, Google Business Profile), quarterly report",
   },
   groups: [
     {
@@ -70,7 +70,7 @@ export const CHURCH_PLAN = {
       control: "stepper",
       min: 2,
       max: 6,
-      default: 4,
+      default: 2,
       price: 0,
       tiered: { start: 850, step: 100 },
       hours: 0,

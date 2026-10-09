@@ -72,7 +72,7 @@ const BOARD_TITLE = "Taking this to your board?";
 const BOARD_SUBTITLE = "Here's what your treasurer and elders might ask.";
 
 /** The plan's first line item (CHURCH_PLAN.base) is relabelled in the PDF */
-const BASE_LABEL = "Strategy + baseline costs";
+const BASE_LABEL = "Strategy and feedback meetings + baseline costs";
 
 /** The website build is a one-off cost, shown under the setup line instead */
 const WEBSITE_BUILD_ID = "websiteBuild";
@@ -87,7 +87,7 @@ const SETUP_PLAN = [
   "We connect to your Planning Center or Elvanto, so your content and site stay current each week.",
   "We train your existing volunteers to fill any week-to-week gaps.",
   "We set up Spotify, Apple Podcasts and your Google Business Profile.",
-  "We check in each quarter with a short report and a 30-min call.",
+  "We check in each quarter with a short report and a 30-min strategy and feedback meeting.",
 ];
 
 /** Keep in sync with BOARD_TIME_BACK in app/data/Objects.tsx */
