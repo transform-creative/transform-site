@@ -39,6 +39,7 @@ import { IssueCard } from "./IssueCard";
 import { IssueModal } from "./IssueModal";
 import { ResponseViewer } from "./ResponseViewer";
 import { Radar } from "../radar/Radar";
+import { BlogAdmin } from "../blog/BlogAdmin";
 import type { IoniconName } from "~/data/Ionicons";
 import "../../app-v2.css";
 
@@ -66,14 +67,18 @@ const TAB_META: { key: TabKey; label: string }[] = [
   { key: "not_started", label: "Not started" },
 ];
 
-/** The admin side-nav's sections. Radar is Transform Creative only. */
-type PortalView = "radar" | "tickets" | "responses";
+/** The admin side-nav's sections. Radar and Blog are Transform Creative only. */
+type PortalView = "radar" | "tickets" | "responses" | "blog";
 
 const NAV_META: { key: PortalView; label: string; icon: IoniconName }[] = [
   { key: "radar", label: "Radar", icon: "radio-outline" },
   { key: "tickets", label: "Tickets", icon: "albums-outline" },
   { key: "responses", label: "Responses", icon: "document-text-outline" },
+  { key: "blog", label: "Blog", icon: "newspaper-outline" },
 ];
+
+/** Side-nav sections only the Transform Creative agency board gets */
+const TRANSFORM_ONLY_VIEWS: PortalView[] = ["radar", "blog"];
 
 /** Split the open issues into the three tab buckets by derived status. */
 function groupIssues(
@@ -157,7 +162,9 @@ export function ClientPortal({
   // The admin side-nav's active section (clients only ever see tickets).
   const [view, setView] = useState<PortalView>("tickets");
   const navItems = NAV_META.filter(
-    (n) => n.key !== "radar" || business?.id === TRANSFORM_BUSINESS_ID,
+    (n) =>
+      !TRANSFORM_ONLY_VIEWS.includes(n.key) ||
+      business?.id === TRANSFORM_BUSINESS_ID,
   );
   const mounted = useRef(true);
 
@@ -462,6 +469,10 @@ export function ClientPortal({
       ) : isAdmin && view === "responses" ? (
         <div className="flex-1 min-w-0 w-100">
           <ResponseViewer businessId={business!.id} />
+        </div>
+      ) : isAdmin && view === "blog" ? (
+        <div className="flex-1 min-w-0 w-100">
+          <BlogAdmin businessId={business!.id} />
         </div>
       ) : (
       <div className={`col gap-20 ${isAdmin ? "flex-1 min-w-0 w-100" : "w-75"}`}>

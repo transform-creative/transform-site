@@ -35,6 +35,15 @@ export interface SeoOptions {
   twitterDescription?: string;
   /** Private/auth-gated pages: emit robots noindex and skip social tags. */
   noIndex?: boolean;
+  /** og:type — "article" adds the article:* tags below */
+  type?: "website" | "article";
+  /** ISO dates for article:published_time / article:modified_time */
+  publishedTime?: string | null;
+  modifiedTime?: string | null;
+  /** One article:tag each (e.g. a post's keywords) */
+  tags?: string[];
+  /** schema.org payload rendered into <head> as JSON-LD */
+  jsonLd?: Record<string, unknown>;
 }
 
 /*******************************************
@@ -54,6 +63,11 @@ export function buildMeta({
   shareDescription = description,
   twitterDescription,
   noIndex,
+  type = "website",
+  publishedTime,
+  modifiedTime,
+  tags = [],
+  jsonLd,
 }: SeoOptions): MetaDescriptor[] {
   if (noIndex) {
     return [
@@ -80,7 +94,18 @@ export function buildMeta({
         ]
       : []),
     ...(imageAlt ? [{ property: "og:image:alt", content: imageAlt }] : []),
-    { property: "og:type", content: "website" },
+    { property: "og:type", content: type },
+    ...(type === "article"
+      ? [
+          ...(publishedTime
+            ? [{ property: "article:published_time", content: publishedTime }]
+            : []),
+          ...(modifiedTime
+            ? [{ property: "article:modified_time", content: modifiedTime }]
+            : []),
+          ...tags.map((tag) => ({ property: "article:tag", content: tag })),
+        ]
+      : []),
     { property: "og:site_name", content: "Transform Creative" },
     { property: "og:locale", content: "en_AU" },
     { property: "og:url", content: absolute(path) },
@@ -93,6 +118,7 @@ export function buildMeta({
     },
     { name: "twitter:image", content: ogImage },
     ...(imageAlt ? [{ name: "twitter:image:alt", content: imageAlt }] : []),
+    ...(jsonLd ? [{ "script:ld+json": jsonLd }] : []),
   ];
 }
 

@@ -1,4 +1,5 @@
 import type { Config } from "@react-router/dev/config";
+import { loadEnv } from "vite";
 
 /**
  * Prerender only for production builds.
@@ -10,6 +11,31 @@ import type { Config } from "@react-router/dev/config";
  * SPA mode and keeps behaving exactly as before.
  */
 const isProductionBuild = process.env.NODE_ENV !== "development";
+
+/**
+ * Slugs of every published blog post, so each gets its own static HTML page.
+ * Read straight from Supabase's REST API (this config isn't bundled by Vite,
+ * so the app's supabase client and `import.meta.env` aren't available here).
+ * RLS only returns published posts to the anon key.
+ *
+ * A failed fetch fails the build rather than quietly shipping a site with
+ * every post missing — Vercel keeps serving the previous deployment.
+ */
+async function publishedArticleSlugs(): Promise<string[]> {
+  const env = loadEnv("production", process.cwd(), "");
+  const url = env.VITE_SUPABASE_URL;
+  const key = env.VITE_SUPABASE_ANON_KEY;
+  if (!url || !key)
+    throw new Error("VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set");
+
+  const res = await fetch(`${url}/rest/v1/articles?select=slug`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}` },
+  });
+  if (!res.ok)
+    throw new Error(`Could not list blog posts to prerender: ${res.status}`);
+  const rows = (await res.json()) as { slug: string }[];
+  return rows.map((r) => r.slug);
+}
 
 export default {
   ssr: false,
@@ -30,6 +56,7 @@ export default {
     ? async () => {
         const { PROJECTS } = await import("./app/data/Objects");
         const { projectSlug } = await import("./app/business/commonBL");
+        const articleSlugs = await publishedArticleSlugs();
         return [
           "/",
           "/home",
@@ -38,9 +65,12 @@ export default {
           "/development",
           "/media",
           "/church",
+          "/blog",
           "/sitemap.xml",
           // One indexable page per project (the popup's twin)
           ...PROJECTS.map((p) => `/portfolio/${projectSlug(p, PROJECTS)}`),
+          // One static page per published blog post
+          ...articleSlugs.map((slug) => `/blog/${slug}`),
         ];
       }
     : undefined,

@@ -8,7 +8,12 @@
 
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
-import type { Issue, OrgOwner } from "~/data/CustomTypes";
+import type {
+  Article,
+  ArticleUpdate,
+  Issue,
+  OrgOwner,
+} from "~/data/CustomTypes";
 import type { TablesInsert, TablesUpdate } from "./supabase";
 
 /*************************
@@ -30,6 +35,29 @@ export async function updateIssue(
 
   if (error) {
     await logError(error, ["updateIssue", "Update"]);
+    throw error;
+  }
+
+  return data;
+}
+
+/*************************
+ * Save changes to a blog post (content, SEO fields, publish / unpublish via
+ * `published_at`). A duplicate slug fails with Postgres code 23505.
+ */
+export async function updateArticle(
+  articleId: number,
+  patch: ArticleUpdate
+): Promise<Article> {
+  const { data, error } = await supabase
+    .from("articles")
+    .update(patch)
+    .eq("id", articleId)
+    .select()
+    .single();
+
+  if (error) {
+    await logError(error, ["updateArticle", "Update"]);
     throw error;
   }
 

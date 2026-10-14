@@ -66,6 +66,31 @@ export type IssueStatus =
  */
 export type ClientIssue = Issue & { issue_comments: IssueComment[] };
 
+/**
+ * A blog post (/blog/:slug). A draft while `published_at` is null. `body` is
+ * sanitised Quill HTML; the SEO fields feed the meta tags (see `blogBL`).
+ */
+export type Article = Database["public"]["Tables"]["articles"]["Row"];
+export type ArticleInsert = Database["public"]["Tables"]["articles"]["Insert"];
+export type ArticleUpdate = Database["public"]["Tables"]["articles"]["Update"];
+/** The columns a listing card needs (skips the heavy `body`) */
+export type ArticleSummary = Pick<
+  Article,
+  | "id"
+  | "slug"
+  | "title"
+  | "excerpt"
+  | "cover_image"
+  | "cover_image_alt"
+  | "published_at"
+  | "updated_at"
+>;
+
+/** What the /blog route loads: the listing, or one post plus a few others */
+export type BlogPageData =
+  | { kind: "index"; articles: ArticleSummary[] }
+  | { kind: "article"; article: Article | null; more: ArticleSummary[] };
+
 /** One charity in one monthly ACNC snapshot (the `orgs` table, loaded by the ACNC radar job) */
 export type Org = Database["public"]["Tables"]["orgs"]["Row"];
 /** Latest-month fit org + what changed since last month (the `org_radar` view) */

@@ -1,11 +1,13 @@
 import { PROJECTS } from "~/data/Objects";
 import { projectSlug } from "~/business/commonBL";
 import { SITE_URL } from "~/business/seoBL";
+import { getPublishedArticles } from "~/database/Read";
 
 /*
  * /sitemap.xml — a resource route prerendered to a static file at build time
- * (see react-router.config.ts), so every /portfolio/:slug page is listed
- * without hand-maintaining the XML. Bump a page's lastmod when it changes.
+ * (see react-router.config.ts), so every /portfolio/:slug page and published
+ * /blog/:slug post is listed without hand-maintaining the XML. Bump a page's
+ * lastmod when it changes; blog posts use their own updated_at.
  */
 
 const PAGES: { path: string; lastmod: string; priority: string }[] = [
@@ -17,11 +19,24 @@ const PAGES: { path: string; lastmod: string; priority: string }[] = [
   { path: "/contact", lastmod: "2026-07-30", priority: "0.7" },
 ];
 
-export function loader() {
+export async function loader() {
+  const articles = await getPublishedArticles();
+  // The blog index changes whenever a post does
+  const blogLastmod = articles
+    .map((a) => a.updated_at)
+    .sort()
+    .at(-1)
+    ?.slice(0, 10);
+
   const urls = [
     ...PAGES.map(
       (p) =>
         `  <url>\n    <loc>${SITE_URL}${p.path}</loc>\n    <lastmod>${p.lastmod}</lastmod>\n    <priority>${p.priority}</priority>\n  </url>`,
+    ),
+    `  <url>\n    <loc>${SITE_URL}/blog</loc>\n${blogLastmod ? `    <lastmod>${blogLastmod}</lastmod>\n` : ""}    <priority>0.8</priority>\n  </url>`,
+    ...articles.map(
+      (a) =>
+        `  <url>\n    <loc>${SITE_URL}/blog/${a.slug}</loc>\n    <lastmod>${a.updated_at.slice(0, 10)}</lastmod>\n    <priority>0.7</priority>\n  </url>`,
     ),
     ...PROJECTS.map(
       (p) =>

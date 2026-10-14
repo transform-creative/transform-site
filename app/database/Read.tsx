@@ -1,6 +1,9 @@
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
 import type {
+  Article,
+  ArticleSummary,
+  BlogPageData,
   Business,
   BusinessRole,
   ClientIssue,
@@ -11,6 +14,96 @@ import type {
   OrgOwner,
   Profile,
 } from "~/data/CustomTypes";
+
+const ARTICLE_SUMMARY_COLUMNS =
+  "id, slug, title, excerpt, cover_image, cover_image_alt, published_at, updated_at";
+
+/*************************
+ * Read published blog posts, newest first (RLS hides drafts and posts
+ * scheduled for later). Runs at build time for prerendering, and in the browser.
+ * @param limit Cap the list (e.g. "more articles" under a post)
+ */
+export async function getPublishedArticles(
+  limit?: number
+): Promise<ArticleSummary[]> {
+  let query = supabase
+    .from("articles")
+    .select(ARTICLE_SUMMARY_COLUMNS)
+    .not("published_at", "is", null)
+    .lte("published_at", new Date().toISOString())
+    .order("published_at", { ascending: false });
+  if (limit) query = query.limit(limit);
+
+  const { data, error } = await query;
+
+  if (error) {
+    await logError(error, ["getPublishedArticles", "Read"]);
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+/*************************
+ * Read one published blog post by its slug. Null when there's no such live post.
+ */
+export async function getPublishedArticleBySlug(
+  slug: string
+): Promise<Article | null> {
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .eq("slug", slug)
+    .not("published_at", "is", null)
+    .lte("published_at", new Date().toISOString())
+    .maybeSingle();
+
+  if (error) {
+    await logError(error, ["getPublishedArticleBySlug", "Read"]);
+    throw error;
+  }
+
+  return data;
+}
+
+/*************************
+ * Everything a /blog page needs: the listing (no slug), or one published post
+ * plus up to three other recent posts to link to.
+ */
+export async function getBlogPage(slug?: string): Promise<BlogPageData> {
+  if (!slug) return { kind: "index", articles: await getPublishedArticles() };
+
+  const [article, latest] = await Promise.all([
+    getPublishedArticleBySlug(slug),
+    getPublishedArticles(4),
+  ]);
+  return {
+    kind: "article",
+    article,
+    more: latest.filter((a) => a.slug !== slug).slice(0, 3),
+  };
+}
+
+/*************************
+ * Read every blog post of a business (drafts included) for the admin Blog tab,
+ * most recently edited first. RLS limits drafts to that business's admins.
+ */
+export async function getBusinessArticles(
+  businessId: number
+): Promise<Article[]> {
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .eq("business_id", businessId)
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    await logError(error, ["getBusinessArticles", "Read"]);
+    throw error;
+  }
+
+  return data ?? [];
+}
 
 /*************************
  * Read every form / survey response submitted to a business, newest first.

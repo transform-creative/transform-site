@@ -10,10 +10,109 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "12.2.3"
   }
   public: {
     Tables: {
+      articles: {
+        Row: {
+          author_id: string | null
+          body: string
+          business_id: number
+          cover_image: string | null
+          cover_image_alt: string | null
+          created_at: string
+          excerpt: string | null
+          id: number
+          keywords: string[]
+          published_at: string | null
+          seo_title: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          body?: string
+          business_id?: number
+          cover_image?: string | null
+          cover_image_alt?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: never
+          keywords?: string[]
+          published_at?: string | null
+          seo_title?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          business_id?: number
+          cover_image?: string | null
+          cover_image_alt?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: never
+          keywords?: string[]
+          published_at?: string | null
+          seo_title?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          event_type: string
+          id: string
+          ip_address: string | null
+          is_read: boolean | null
+          metadata: Json | null
+          severity: string | null
+          timestamp: string
+          user_id: string | null
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          is_read?: boolean | null
+          metadata?: Json | null
+          severity?: string | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          is_read?: boolean | null
+          metadata?: Json | null
+          severity?: string | null
+          timestamp?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bulk_imports: {
         Row: {
           created_at: string

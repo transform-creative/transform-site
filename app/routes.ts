@@ -10,6 +10,14 @@ export default [
   route("/portfolio", "routes/MediaRoute.tsx"),
   route("/portfolio/:slug", "routes/ProjectRoute.tsx"),
   route("/sitemap.xml", "routes/SitemapRoute.ts"),
+  // One module for the listing and each post (see BlogRoute for why). Builds
+  // use the twin with a build-time loader; dev (pure SPA) can't have one.
+  route(
+    "/blog/:slug?",
+    process.env.NODE_ENV === "development"
+      ? "routes/BlogRoute.tsx"
+      : "routes/BlogRoute.prerender.tsx",
+  ),
   route("/contact", "routes/ContactRoute.tsx"),
   route("/development", "routes/DevelopmentRoute.tsx"),
   route("/media", "routes/MediaServicesRoute.tsx"),

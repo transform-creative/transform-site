@@ -14,6 +14,21 @@ import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
 
 /*************************
+ * Permanently delete a blog post (admin Blog tab).
+ */
+export async function deleteArticle(articleId: number): Promise<void> {
+  const { error } = await supabase
+    .from("articles")
+    .delete()
+    .eq("id", articleId);
+
+  if (error) {
+    await logError(error, ["deleteArticle", "Delete"]);
+    throw error;
+  }
+}
+
+/*************************
  * Clear an org's manual Jenny / Phil tag, putting it back on the automatic segment.
  */
 export async function deleteOrgOwner(abn: string): Promise<void> {

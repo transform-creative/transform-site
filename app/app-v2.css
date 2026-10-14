@@ -1723,6 +1723,10 @@ button.chip.active:hover * {
   align-self: flex-end;
 }
 
+.self-start {
+  align-self: flex-start;
+}
+
 /* Solid white fill with accent text, e.g. a secondary button on a hero */
 .fill-white,
 a[role="button"].fill-white,
@@ -1847,4 +1851,140 @@ button.choice.active:hover * {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+}
+
+/* Comfortable reading column for long-form text */
+.max-w-720 {
+  width: 100%;
+  max-width: 720px;
+}
+
+/* Wider column for headings that sit above a reading column */
+.max-w-1000 {
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* List without bullets (e.g. a row of tags) */
+.list-none {
+  list-style: none;
+}
+
+.object-cover {
+  object-fit: cover;
+}
+
+/************************************
+********* Rich text (prose) *********
+*************************************/
+/* Long-form HTML from the Quill editor (blog posts) */
+.prose h2 {
+  font-size: 28pt;
+  margin: 40px 0 10px;
+}
+.prose h3 {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 30px 0 5px;
+}
+.prose p,
+.prose li {
+  font-size: 20px;
+  line-height: 1.7;
+}
+.prose p {
+  margin-bottom: 20px;
+}
+.prose a {
+  color: var(--accent);
+  font-size: inherit;
+  text-decoration: underline;
+}
+.prose img,
+.prose iframe {
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+}
+.prose iframe {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: none;
+}
+.prose blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 20px 0;
+  padding-left: 20px;
+}
+.prose .ql-align-center {
+  text-align: center;
+}
+.prose .ql-align-right {
+  text-align: right;
+}
+
+/* Taller writing area for a Quill editor */
+.editor-tall .ql-editor {
+  min-height: 420px;
+  font-size: 18px;
+}
+
+/* Quill toolbar button labelled with text instead of an icon */
+.ql-toolbar button.ql-text-tool {
+  width: auto;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+/* Snow's display rule would otherwise beat the hidden attribute */
+.ql-toolbar button[hidden] {
+  display: none !important;
+}
+
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+.prose td {
+  border: 1px solid #19191940;
+  padding: 14px 20px;
+  font-size: 18px;
+  line-height: 1.5;
+  vertical-align: top;
+}
+/* Quill tables have no <th>, so the first row is styled as the header */
+.prose tr:first-child td {
+  background: var(--accent);
+  color: var(--bkg);
+  font-weight: 600;
+  border-color: var(--accent);
+}
+.prose tr:nth-child(even) td {
+  background: #4369400f;
+}
+
+/* Google search result preview */
+.color-link {
+  color: #1a0dab;
+}
+.color-url {
+  color: #188038;
+}
+
+.color-danger {
+  color: var(--dangerColor);
+}
+
+/* White surface for previews that mimic another product (e.g. Google) */
+.fill-white-card {
+  background: #fff;
+  border-radius: var(--borderRadius);
+  padding: 15px;
+}
+
+@media (max-width: 1200px) {
+  .prose h2 {
+    font-size: 22pt;
+  }
 }

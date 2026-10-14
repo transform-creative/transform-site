@@ -8,7 +8,17 @@
 
 import { supabase } from "./SupabaseClient";
 import { logError } from "./Auth";
-import type { Issue, IssueComment, OrgDecision } from "~/data/CustomTypes";
+import type {
+  Article,
+  ArticleInsert,
+  Issue,
+  IssueComment,
+  OrgDecision,
+} from "~/data/CustomTypes";
+import {
+  ARTICLE_IMAGE_BUCKET,
+  ARTICLE_IMAGE_FOLDER,
+} from "~/business/blogBL";
 import type { Tables, TablesInsert } from "./supabase";
 
 /*************************
@@ -70,6 +80,46 @@ export async function createResponse(
   }
 
   return true;
+}
+
+/*************************
+ * Create a blog post (draft or published) from the admin Blog tab.
+ * A duplicate slug fails with Postgres code 23505.
+ */
+export async function createArticle(article: ArticleInsert): Promise<Article> {
+  const { data, error } = await supabase
+    .from("articles")
+    .insert(article)
+    .select()
+    .single();
+
+  if (error) {
+    await logError(error, ["createArticle", "Create"]);
+    throw error;
+  }
+
+  return data;
+}
+
+/*************************
+ * Upload a blog image (cover or inline) to the public `transform` bucket under
+ * articles/ and return its public URL. RLS limits uploads to agency admins.
+ */
+export async function uploadArticleImage(file: File): Promise<string> {
+  const safeName = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, "-");
+  const path = `${ARTICLE_IMAGE_FOLDER}/${Date.now()}-${safeName}`;
+
+  const { error } = await supabase.storage
+    .from(ARTICLE_IMAGE_BUCKET)
+    .upload(path, file, { cacheControl: "31536000", contentType: file.type });
+
+  if (error) {
+    await logError(error, ["uploadArticleImage", "Create"]);
+    throw error;
+  }
+
+  return supabase.storage.from(ARTICLE_IMAGE_BUCKET).getPublicUrl(path).data
+    .publicUrl;
 }
 
 /*************************

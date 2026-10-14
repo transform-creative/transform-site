@@ -72,7 +72,8 @@ app/
 | `/home` | LandingPage | Duplicate of `/` |
 | `/portfolio` | Portfolio | Project listing with type filters, plus a crawlable "All projects" link list |
 | `/portfolio/:slug` | ProjectRoute | Indexable twin of the project popup (slug from `projectSlug()` in `commonBL`); every project is prerendered |
-| `/sitemap.xml` | SitemapRoute | Resource route prerendered to a static file; lists pages + every project |
+| `/sitemap.xml` | SitemapRoute | Resource route prerendered to a static file; lists pages + every project + every published blog post |
+| `/blog`, `/blog/:slug` | BlogRoute | Blog listing + posts from the `articles` table. One module (`/blog/:slug?`) — see Blog below |
 | `/contact` | ContactTab | Email CTA |
 | `/development` | DevelopmentRoute | Software/development showcase |
 | `/auth` | Authentication | Supabase OTP sign-in |
@@ -94,6 +95,17 @@ The `/client/:id` route is a private dashboard for clients (see `app/presentatio
 - **Issue severity** (drives the card colour swatch): `low | moderate | severe | critical | future` → see `severityColor()` in `commonBL`.
 - **Issue status is derived, not stored** — there is no status column. `deriveIssueStatus()` in `commonBL` infers it from timestamps: `approved` (`approved_at` set) → `awaiting_approval` (`updated_at` set) → `in_progress` (`started_at` set) → `not_started`.
 - **DB access is split by CRUD operation** in `app/database/`: `Read.tsx`, `Create.tsx`, `Update.tsx`, `Delete.tsx`. Wired: reads (`getOrgIssues` + `getOrgMembers` for the shared client board, `getClientIssues` as the fallback when a client has no org, `getProfile`, `getUserMembership`, `getBusinessById`, `getBusinessClients`, `getBusinessIssues`, `getClientOrgBusinessId`), inserts (`createIssue`, `createIssueComment`), and `updateIssue` — `IssueModal` uses these for "Log issue", comments, and approve/reject timestamp transitions. `ClientPortal` (client mode) loads `getOrgIssues`/`getOrgMembers` and labels each card with the colleague who posted it. `Delete.tsx` is still a scaffold.
+
+## Blog
+
+Posts live in the `articles` table (migration `20261014000000_articles.sql`) and are written in the admin portal's **Blog** tab (`app/presentation/blog/BlogAdmin.tsx` → `ArticleEditor.tsx`, Transform Creative admins only, like Radar). The body is Quill HTML (`presentation/elements/QuillEditor.tsx`, ported from the ping-pong-a-thon site) saved via `getSemanticHTML` and sanitised with DOMPurify (`sanitizeArticleHtml` in `business/blogBL.tsx`).
+
+- **Draft vs live**: `published_at` null = draft. RLS shows the public only posts with `published_at <= now()`; admins of `business_id` (default 129) read/write everything. Images upload to the public `transform` bucket under `articles/` (admins of 129 only).
+- **SEO fields** → page meta (`meta()` in `BlogRoute.tsx` via `buildMeta` in `seoBL`): `seo_title` (falls back to `title`), `excerpt` (meta description), `keywords` (meta keywords, `article:tag`, JSON-LD), `cover_image` + `cover_image_alt` (og/twitter image), plus `BlogPosting` JSON-LD from `articleSchema()`. `slug` is set by hand in the editor (defaults to the slugified title; DB check `^[a-z0-9]+(-[a-z0-9]+)*$`, unique).
+- **Prerendering**: `react-router.config.ts` lists every published slug (REST call with the anon key) so each post is a static HTML page with its full body and meta. The route has a build-time `loader` *and* a `clientLoader`. The `loader` lives in `BlogRoute.prerender.tsx`, a production-only twin that `routes.ts` swaps in when `NODE_ENV !== "development"`: dev runs as a plain SPA, which rejects `loader` exports. The `clientLoader` (in `BlogRoute.tsx`) covers dev, client navigation, and posts published since the last deploy (which the SPA fallback serves). `/blog` and `/blog/:slug` share one module because `ssr: false` rejects a `loader` on a route with no prerendered path, and `/blog` always exists.
+- **Rebuild on publish**: trigger `articles_trigger_rebuild` POSTs to a Vercel deploy hook stored in Vault as `vercel_deploy_hook` whenever a published post changes (no-op until that secret exists).
+- **Tables + markdown paste**: `QuillEditor`'s `tables` prop turns on Quill's built-in table module plus text toolbar buttons (row/column tools only show while the cursor is in a table). Pasted markdown is converted by `markdownPasteHtml` in `business/markdownBL.tsx` (kept separate so `marked` only ships with the admin editor). Quill tables have no `<th>`/`<thead>` and one line of text per cell, so markdown header rows become bold ordinary cells in the body.
+- **Don't import `quill` at module top level** — it needs `document`, and the server bundle used for prerendering loads every route module. `QuillEditor` imports it inside its effect.
 
 ## AI Auto-Fix Pipeline
 
@@ -146,8 +158,9 @@ https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/
 ```
 
 The **marketing/portfolio pages are entirely static** (from `Objects.tsx`). Dynamic
-database queries are used by the **Client Portal** only (issues, comments,
-memberships, businesses) — see that section and `app/database/`.
+database queries are used by the **Client Portal** (issues, comments,
+memberships, businesses) and the **Blog** (`articles`, read at build time for
+prerendering and in the browser) — see those sections and `app/database/`.
 
 ## Shared State (React Router Outlet Context)
 

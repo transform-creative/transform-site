@@ -590,6 +590,7 @@ export const NAV_LINKS: {
     footerLabel: "Portfolio",
     footerOnly: true,
   },
+  { to: "/blog", label: "Blog", footerLabel: "Blog", footerOnly: true },
 ];
 
 export const CONTACT = {
