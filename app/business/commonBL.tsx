@@ -28,6 +28,42 @@ export function projectImageAlt(project: Project): string {
 }
 
 /*******************************************
+ * A resized copy of an image in Supabase storage, through its render
+ * endpoint, which serves WebP to any browser that accepts it. Pick `width`
+ * for the largest size the image displays at. Anything that isn't a public
+ * storage URL (e.g. files in /public) comes back unchanged.
+ */
+export function optimisedImage(
+  url: string,
+  width: number,
+  quality = 70,
+): string {
+  const match = url.match(
+    /^(https:\/\/[a-z0-9]+\.supabase\.co)\/+storage\/v1\/object\/public\/([^?]+)$/,
+  );
+  // The render endpoint fails on GIFs (and would drop their animation)
+  if (!match || /\.gif$/i.test(match[2])) return url;
+  // resize=contain keeps the aspect ratio. The default (cover) keeps the
+  // original height and crops the width down to fit
+  return `${match[1]}/storage/v1/render/image/public/${match[2]}?width=${width}&quality=${quality}&resize=contain`;
+}
+
+/*******************************************
+ * `srcSet` of optimisedImage copies at each width, so the browser picks one
+ * for the screen. Undefined for images that can't be resized.
+ */
+export function optimisedSrcSet(
+  url: string,
+  widths: number[],
+  quality = 70,
+): string | undefined {
+  if (optimisedImage(url, 1) === url) return undefined;
+  return widths
+    .map((w) => `${optimisedImage(url, w, quality)} ${w}w`)
+    .join(", ");
+}
+
+/*******************************************
  * URL slug for a project's indexable page (/portfolio/:slug), from its name.
  * Projects sharing a name (e.g. The Middle Sister Project's video and design
  * entries) are told apart by type — the first in PROJECTS keeps the bare slug.

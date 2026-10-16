@@ -1,5 +1,8 @@
 import type { Config } from "@react-router/dev/config";
 import { loadEnv } from "vite";
+import { existsSync } from "node:fs";
+import { rename, rm } from "node:fs/promises";
+import { join } from "node:path";
 
 /**
  * Prerender only for production builds.
@@ -67,6 +70,8 @@ export default {
           "/church",
           "/blog",
           "/sitemap.xml",
+          // The "*" route; buildEnd moves it to 404.html
+          "/404",
           // One indexable page per project (the popup's twin)
           ...PROJECTS.map((p) => `/portfolio/${projectSlug(p, PROJECTS)}`),
           // One static page per published blog post
@@ -74,4 +79,18 @@ export default {
         ];
       }
     : undefined,
+  /**
+   * Vercel serves 404.html, with a 404 status, for any URL that isn't a file
+   * and isn't rewritten (vercel.json only rewrites the auth-only routes).
+   * Prerendering can only write <path>/index.html, so move /404's page there.
+   * Removing the folder also stops /404 itself answering with a 200.
+   */
+  async buildEnd({ reactRouterConfig }) {
+    if (!isProductionBuild) return;
+    const client = join(reactRouterConfig.buildDirectory, "client");
+    const page = join(client, "404", "index.html");
+    if (!existsSync(page)) throw new Error(`Expected a prerendered ${page}`);
+    await rename(page, join(client, "404.html"));
+    await rm(join(client, "404"), { recursive: true, force: true });
+  },
 } satisfies Config;

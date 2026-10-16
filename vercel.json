@@ -4,19 +4,158 @@
       "source": "/chat",
       "destination": "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2neXINmRa2l8cPxCMY8-FrrTt30-Tpwfj7-zqktFODuuJO9Z_wsSfv2wcNkiFvipiOl58trJuc",
       "permanent": false
+    },
+    {
+      "source": "/portfolio/ping-pong-a-thon-website",
+      "destination": "/portfolio/live-leaderboard-fundraising-platform",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/churches-of-christ-who-we-are",
+      "destination": "/portfolio/who-we-are-reigniting-the-mission",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/crossover-website",
+      "destination": "/portfolio/netflix-style-resource-library-website",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/cricket-volunteer-experience",
+      "destination": "/portfolio/a-day-volunteering-at-the-cricket",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/breaking-free-program",
+      "destination": "/portfolio/breaking-free-prison-advocacy-appeal",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/bcsant-merger",
+      "destination": "/portfolio/two-states-one-movement-the-merger-video",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/eoy-celebration",
+      "destination": "/portfolio/end-of-year-celebration-film",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/wright-street-program",
+      "destination": "/portfolio/wright-street-womens-shelter-appeal",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/baptism-week-2025",
+      "destination": "/portfolio/baptism-week-2025-invitation",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/national-baptism-week",
+      "destination": "/portfolio/what-it-means-to-be-baptised",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/crossover-about-us",
+      "destination": "/portfolio/easter-appeal-infomercial",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/rbc-easter-service-promo",
+      "destination": "/portfolio/easter-spoken-word-film",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/kbc-alpha-marriage-promos",
+      "destination": "/portfolio/alpha-marriage-couch-interviews",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/healthy-collective-ticketing-app",
+      "destination": "/portfolio/issue-tracking-ticketing-app",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/kings-ping-pong-a-thon-promo",
+      "destination": "/portfolio/youth-ping-pong-a-thon-fundraiser-promo",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/rbc-alpha-promo",
+      "destination": "/portfolio/alpha-welcome-video",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/dbs-promo",
+      "destination": "/portfolio/discovery-bible-study-promo",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/sonder-strategic-plan-launch",
+      "destination": "/portfolio/launching-a-2030-vision",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/nunga-action-plan",
+      "destination": "/portfolio/nunga-action-plan-launch",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/your-story-series",
+      "destination": "/portfolio/your-story-discipleship-training-series",
+      "permanent": true
     }
   ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/__spa-fallback.html" }
+    {
+      "source": "/auth",
+      "destination": "/__spa-fallback.html"
+    },
+    {
+      "source": "/client",
+      "destination": "/__spa-fallback.html"
+    },
+    {
+      "source": "/client/:path*",
+      "destination": "/__spa-fallback.html"
+    },
+    {
+      "source": "/forms/:path*",
+      "destination": "/__spa-fallback.html"
+    },
+    {
+      "source": "/church-comms-survey",
+      "destination": "/__spa-fallback.html"
+    },
+    {
+      "source": "/radar",
+      "destination": "/__spa-fallback.html"
+    },
+    {
+      "source": "/blog/:path*",
+      "destination": "/__spa-fallback.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
     }
   ]

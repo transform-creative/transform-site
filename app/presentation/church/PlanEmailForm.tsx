@@ -13,7 +13,6 @@ import {
   priceOf,
   type ChurchPlan,
 } from "~/business/churchPlanBL";
-import { createResponse } from "~/database/Create";
 import { LabelInput } from "~/presentation/elements/LabelInput/LabelInput";
 import { SlideOutModal } from "~/presentation/elements/SlideOutModal";
 import { Icon } from "~/presentation/elements/Icon";
@@ -78,6 +77,8 @@ export function PlanEmailForm({ active, plan, source, onClose }: Props) {
 
     setSubmitting(true);
     try {
+      // On demand, so supabase-js isn't in /church's initial bundle
+      const { createResponse } = await import("~/database/Create");
       await createResponse({
         business_id: 129,
         metadata: {

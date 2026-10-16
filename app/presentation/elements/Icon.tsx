@@ -1,6 +1,6 @@
 import type { SharedContextProps } from "~/data/CommonTypes";
 import { useOutletContext } from "react-router";
-import IonIcon from "@reacticons/ionicons";
+import IonIcon from "./IonIcon";
 import { IoniconName } from "~/data/Ionicons";
 import { CSSProperties } from "react";
 

@@ -8,7 +8,7 @@ import {
   logError,
   supabaseSignIn,
 } from "~/database/Auth";
-import IonIcon from "@reacticons/ionicons";
+import IonIcon from "../elements/IonIcon";
 import { BeatLoader } from "react-spinners";
 import { AuthApiError } from "@supabase/supabase-js";
 import { LabelInput } from "../elements/LabelInput/LabelInput";

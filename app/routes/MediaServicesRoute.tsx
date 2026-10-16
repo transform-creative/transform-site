@@ -11,7 +11,12 @@ import {
   MEDIA_HOW_WE_WORK,
   PROJECTS,
 } from "~/data/Objects";
-import { buildMeta, canonical, SITE_URL } from "~/business/seoBL";
+import {
+  buildMeta,
+  canonical,
+  SHARE_CARD,
+  SITE_URL,
+} from "~/business/seoBL";
 import { AnimatedDots } from "~/presentation/elements/AnimatedDots";
 import { SplashCursor } from "~/presentation/elements/SplashCursor";
 import { GradualBlur } from "~/presentation/elements/GradualBlur";
@@ -20,6 +25,8 @@ import { VideoPlayer } from "~/presentation/elements/VideoPlayer";
 import { ProjectCarousel } from "~/presentation/elements/ProjectCarousel";
 import WorkedWith from "~/presentation/landing/WorkedWith";
 import { ContactTab } from "~/presentation/landing/ContactTab";
+import { FiaBadge } from "~/presentation/elements/FiaBadge";
+import { optimisedImage } from "~/business/commonBL";
 
 const TRANSFORM_STORAGE =
   "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform";
@@ -35,8 +42,7 @@ export function meta() {
     title: TITLE,
     description: DESCRIPTION,
     path: "/media",
-    keywords:
-      "nonprofit video production Adelaide, charity video production Australia, Christian video production Adelaide, fundraising appeal video, church video production South Australia, not for profit videographer Adelaide, social media videos for charities",
+    image: SHARE_CARD.video,
     twitterDescription:
       "Adelaide video production for charities and Christian organisations — appeal videos, social clips and training series.",
   });
@@ -215,6 +221,8 @@ export default function MediaServicesRoute() {
         </div>
       </header>
 
+      <FiaBadge />
+
       <div className="horizontal-line w-100" style={{ margin: "60px 0 20px 0" }} />
 
       {/* 2. Worked with */}
@@ -301,7 +309,7 @@ export default function MediaServicesRoute() {
           {/* Capped on mobile, where w-45 goes full width and the 4:5 photo gets huge */}
           <div className={`w-45 ${context.inShrink ? "max-w-260" : ""}`}>
             <img
-              src={FOUNDER_PHOTO}
+              src={optimisedImage(FOUNDER_PHOTO, 600)}
               alt="Isaac Drury, video producer and founder of Transform Creative, Adelaide"
               loading="lazy"
               className="media-4-5 media-cover r-16 w-100"

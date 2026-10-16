@@ -9,13 +9,13 @@
     "typecheck": "react-router typegen && tsc",
     "email": "npm --prefix ./supabase/functions/_shared/emails run dev",
     "check:functions": "npx -y deno@2 task --cwd supabase/functions/dispatch-issue check && npx -y deno@2 task --cwd supabase/functions/email-handler check && npx -y deno@2 task --cwd supabase/functions/insert-logs check",
-    "deploy": "supabase functions deploy --project-ref hzfjmmakqwsmucxorhlb --no-verify-jwt"
+    "deploy": "supabase functions deploy --project-ref hzfjmmakqwsmucxorhlb --no-verify-jwt",
+    "icons": "node setup/icons/generate.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@react-router/node": "^8.3.0",
     "@react-router/serve": "^8.3.0",
-    "@reacticons/ionicons": "^7.1.0",
     "@supabase/supabase-js": "^2.101.1",
     "@vercel/analytics": "^2.0.1",
     "dompurify": "^3.4.17",
@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@react-router/dev": "^8.3.0",
+    "@reacticons/ionicons": "^7.1.0",
     "@tailwindcss/vite": "^4.1.4",
     "@types/node": "^24.0.15",
     "@types/react": "^19.1.2",

@@ -4,9 +4,17 @@ import {
   route,
 } from "@react-router/dev/routes";
 
+const isDev = process.env.NODE_ENV === "development";
+
+// Builds use the twin with a build-time loader (latest blog posts); dev
+// (pure SPA) can't have one. "/home" is the same page under its own id.
+const LANDING = isDev
+  ? "routes/LandingRoute.tsx"
+  : "routes/LandingRoute.prerender.tsx";
+
 export default [
-  index("routes/LandingRoute.tsx"),
-  route("/home", "routes/HomeRoute.tsx"),
+  index(LANDING),
+  route("/home", LANDING, { id: "home" }),
   route("/portfolio", "routes/MediaRoute.tsx"),
   route("/portfolio/:slug", "routes/ProjectRoute.tsx"),
   route("/sitemap.xml", "routes/SitemapRoute.ts"),
@@ -14,7 +22,7 @@ export default [
   // use the twin with a build-time loader; dev (pure SPA) can't have one.
   route(
     "/blog/:slug?",
-    process.env.NODE_ENV === "development"
+    isDev
       ? "routes/BlogRoute.tsx"
       : "routes/BlogRoute.prerender.tsx",
   ),
@@ -31,5 +39,6 @@ export default [
     id: "church-comms-survey",
   }),
   route("/radar", "routes/RadarRoute.tsx"),
-  route("", "routes/ErrorBoundary.tsx"),
+  // Unknown URLs. Prerendered to 404.html — see NotFoundRoute
+  route("*", "routes/NotFoundRoute.tsx"),
 ] satisfies RouteConfig;

@@ -15,9 +15,11 @@ import {
   boldPhrases,
   scrollToId,
   useAutoCycle,
+  optimisedImage,
 } from "~/business/commonBL";
 import { Icon } from "~/presentation/elements/Icon";
 import "../../app-v2.css";
+import { FiaBadge } from "../elements/FiaBadge";
 
 interface Props {
   services: ChurchService[];
@@ -76,6 +78,8 @@ export const ServiceTabs = forwardRef<ServiceTabsHandle, Props>(
       id={SECTION_ID}
       className="col middle  gap-20 w-75 shrink-p-10 border-box mt-20 mb-20 pt-20 pb-20"
     >
+            <FiaBadge />
+
       <h2 className="textCenter mb-20" style={{ letterSpacing: -1.5 }}>
         We help churches like yours by...
       </h2>
@@ -119,7 +123,8 @@ export const ServiceTabs = forwardRef<ServiceTabsHandle, Props>(
           <div data-tab-content>
             {service.image ? (
               <img
-                src={service.image}
+                src={optimisedImage(service.image, 960)}
+                loading="lazy"
                 alt=""
                 className="media-16-9 media-cover r-default w-100"
               />

@@ -22,7 +22,7 @@ import { ContactTab } from "~/presentation/landing/ContactTab";
  * - The build-time `loader` lives in BlogRoute.prerender.tsx, which routes.ts
  *   uses for production builds only. It runs for every published post (listed
  *   in react-router.config.ts), so crawlers get the full article HTML plus its
- *   title, description, keywords, share image and JSON-LD. It can't live here:
+ *   title, description, tags, share image and JSON-LD. It can't live here:
  *   dev runs as a plain SPA (no prerender), and SPA mode rejects `loader`.
  * - `clientLoader` runs in the browser: always in dev, and in production for
  *   client-side navigation and posts published since the last deploy (served
@@ -58,8 +58,6 @@ export function meta({
         description:
           "Practical ideas on video, websites and digital comms for Australian charities, churches and not-for-profits, from Adelaide's Transform Creative.",
         path: "/blog",
-        keywords:
-          "nonprofit marketing blog, charity video, nonprofit website, church communications, Adelaide",
       }),
       { tagName: "link", ...canonical("/blog") },
     ];
@@ -82,7 +80,6 @@ export function meta({
       title: articleMetaTitle(article),
       description: articleDescription(article),
       path,
-      keywords: article.keywords.join(", ") || undefined,
       image: article.cover_image ?? undefined,
       // Uploads come in any size, so don't claim 1200x630
       imageWidth: 0,
@@ -108,7 +105,7 @@ export default function BlogRoute() {
       <>
         <BlogIndex articles={loaderData.articles} />
         <div className="horizontal-line mediumFade mt-20" />
-        <div className="w-100 col middle">
+        <div className="w-100 col middle mt-20">
           <ContactTab />
         </div>
       </>

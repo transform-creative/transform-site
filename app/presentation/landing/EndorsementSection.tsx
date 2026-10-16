@@ -6,6 +6,7 @@ import { Carousel } from "../elements/Carousel";
 import { EndorsementCard } from "../elements/EndorsementCard";
 import WorkedWith from "./WorkedWith";
 import "../../app-v2.css";
+import { FiaBadge } from "../elements/FiaBadge";
 
 interface Props {
   /** Headline above the logos. Pass JSX to highlight words with <b>. */
@@ -19,7 +20,9 @@ interface Props {
 const DEFAULT_HEADER = (
   <>
     We're the{" "}
-    <b style={{ fontWeight: 600, color: "var(--accent)" }}>creative engine</b>{" "}
+    <b style={{ fontWeight: 600, color: "var(--accent)" }}>
+      creative engine
+    </b>{" "}
     empowering Australia’s{" "}
     <b style={{ fontWeight: 600, color: "var(--accent)" }}>
       most innovative non-profits.
@@ -41,20 +44,28 @@ export function EndorsementSection({
   const context: SharedContextProps = useOutletContext();
 
   const endorsed = PROJECTS.filter(
-    (p) => p.endorsement && (!types?.length || types.includes(p.type)),
+    (p) =>
+      p.endorsement && (!types?.length || types.includes(p.type)),
   );
 
   return (
     <div className="col middle m-20 pt-20">
+        <div className="row middle center mb-20">
+          <FiaBadge />
+        </div>
       <div className="boxed outline-accent w-75">
+      
+
         <div className="center p-20">
-          <h4 style={{ color: "var(--txt)" }} className="textCenter w-100">
+          <h4
+            style={{ color: "var(--txt)" }}
+            className="textCenter w-100"
+          >
             {header}
           </h4>
         </div>
         {showLogos && <WorkedWith />}
         {/* What our clients love */}
-      
       </div>
     </div>
   );

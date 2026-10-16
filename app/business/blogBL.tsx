@@ -266,7 +266,15 @@ export function articleSchema(article: Article) {
       keywords: article.keywords.join(", "),
     }),
     inLanguage: "en-AU",
-    author: { "@type": "Organization", name: "Transform Creative", url: SITE_URL },
+    // author_name is copied from the author's profile by a DB trigger;
+    // posts with no author credit the business
+    author: article.author_name
+      ? {
+          "@type": "Person",
+          name: article.author_name,
+          worksFor: { "@type": "Organization", name: "Transform Creative", url: SITE_URL },
+        }
+      : { "@type": "Organization", name: "Transform Creative", url: SITE_URL },
     publisher: {
       "@type": "Organization",
       name: "Transform Creative",

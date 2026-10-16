@@ -1,7 +1,7 @@
 import { Link, useOutletContext } from "react-router";
 import type { Project, SharedContextProps } from "~/data/CommonTypes";
 import { PROJECTS } from "~/data/Objects";
-import { projectImageAlt } from "~/business/commonBL";
+import { projectImageAlt, optimisedImage } from "~/business/commonBL";
 import { Icon } from "../elements/Icon";
 import { EndorsementCard } from "../elements/EndorsementCard";
 import "../../app-v2.css";
@@ -55,7 +55,7 @@ export function ProjectGallery({ project }: ProjectProps) {
         <div key={idx}>
           <img
             style={{ width: "100%", aspectRatio: "16 / 9" }}
-            src={img}
+            src={optimisedImage(img, 1280)}
             alt={projectImageAlt(project)}
             loading="lazy"
           />

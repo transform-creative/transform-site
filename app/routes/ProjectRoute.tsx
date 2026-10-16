@@ -34,6 +34,13 @@ function projectHeading(name: string, org?: string): string {
     : name;
 }
 
+/** Google shows ~60 characters, so the brand only goes on when it fits */
+function projectTitle(name: string, org?: string): string {
+  const heading = projectHeading(name, org);
+  const branded = `${heading} | Transform Creative`;
+  return branded.length <= 60 ? branded : heading;
+}
+
 /** First paragraph, cut on a word boundary to fit a meta description */
 function shortDescription(text: string, max = 155): string {
   if (text.length <= max) return text;
@@ -55,7 +62,7 @@ export function meta({ params }: Route.MetaArgs) {
   const path = `/portfolio/${params.slug}`;
   return [
     ...buildMeta({
-      title: `${projectHeading(project.name, project.organisation)} | ${label} | Transform Creative`,
+      title: projectTitle(project.name, project.organisation),
       description: shortDescription(project.description[0] ?? label),
       path,
       image: project.images[0],

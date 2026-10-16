@@ -8,8 +8,6 @@ export function meta() {
     description:
       "Browse our work with South Australian and Australian nonprofits — video production, custom websites, and software that builds trust and drives impact.",
     path: "/portfolio",
-    keywords:
-      "nonprofit video production portfolio, charity website examples South Australia, NFP digital content Adelaide, video production portfolio Adelaide",
     twitterDescription:
       "Browse our work with South Australian and Australian nonprofits — video production, custom websites, and software that builds trust.",
   });

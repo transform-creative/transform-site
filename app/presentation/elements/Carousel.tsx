@@ -578,6 +578,9 @@ export function Carousel({
             return (
               <div
                 key={i}
+                // Loop clones repeat real items: hide them from screen readers
+                // and crawlers so each item is only announced/indexed once
+                aria-hidden={isClone || undefined}
                 ref={(el) => { if (!isClone) itemRefs.current[logicalIndex] = el; }}
                 onClick={() => { if (!isClone) { stoppedRef.current = true; onClick && onClick(child); } }}
                 style={{

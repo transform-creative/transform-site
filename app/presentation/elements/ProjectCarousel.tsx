@@ -2,10 +2,31 @@ import { useEffect, useState } from "react";
 import { useOutletContext, useSearchParams } from "react-router";
 import ReactPlayer from "react-player";
 import type { Project, SharedContextProps } from "~/data/CommonTypes";
-import { projectImageAlt, projectToIcon } from "~/business/commonBL";
+import {
+  optimisedImage,
+  optimisedSrcSet,
+  projectImageAlt,
+  projectToIcon,
+} from "~/business/commonBL";
 import { Carousel } from "./Carousel";
 import { Icon } from "./Icon";
 import { ProjectInfoPopup } from "../landing/ProjectInfoPopup";
+
+/*******************************************
+ * Image props for a card. Lazy, so the off-screen cards (most of the track)
+ * wait until they scroll in. `sizes` follows the card widths in CSS terms
+ * rather than via inShrink, which is false in the prerendered HTML — phones
+ * would otherwise fetch the desktop size first.
+ */
+function cardImage(url: string) {
+  return {
+    src: optimisedImage(url, 1280),
+    srcSet: optimisedSrcSet(url, [720, 1280]),
+    sizes: "(max-width: 1199px) 356px, 1244px",
+    loading: "lazy" as const,
+    decoding: "async" as const,
+  };
+}
 
 export interface ProjectCarouselProps {
   projects: Project[];
@@ -107,7 +128,7 @@ export function ProjectCarousel({
                     }}
                   >
                     <img
-                      src={project.images[0]}
+                      {...cardImage(project.images[0])}
                       alt={projectImageAlt(project)}
                       style={{
                         position: "absolute",
@@ -193,7 +214,7 @@ export function ProjectCarousel({
                       height: "auto",
                       filter: hovered ? "contrast(0.8)" : "none",
                     }}
-                    src={project.images[0]}
+                    {...cardImage(project.images[0])}
                     alt={`image of ${project.name} - a piece of digital content created by transform creative australia`}
                   />
                 </>

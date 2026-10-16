@@ -11,13 +11,17 @@ import { getPublishedArticles } from "~/database/Read";
  */
 
 const PAGES: { path: string; lastmod: string; priority: string }[] = [
-  { path: "/", lastmod: "2026-07-30", priority: "1.0" },
-  { path: "/development", lastmod: "2026-10-08", priority: "0.9" },
+  { path: "/", lastmod: "2026-10-16", priority: "1.0" },
+  { path: "/development", lastmod: "2026-10-16", priority: "0.9" },
   { path: "/media", lastmod: "2026-09-30", priority: "0.9" },
-  { path: "/church", lastmod: "2026-10-08", priority: "0.9" },
-  { path: "/portfolio", lastmod: "2026-10-08", priority: "0.8" },
-  { path: "/contact", lastmod: "2026-07-30", priority: "0.7" },
+  { path: "/church", lastmod: "2026-10-16", priority: "0.9" },
+  { path: "/portfolio", lastmod: "2026-10-16", priority: "0.8" },
+  { path: "/contact", lastmod: "2026-10-16", priority: "0.7" },
 ];
+
+/** Every /portfolio/:slug page is built from PROJECTS in Objects.tsx — bump
+ *  this when a project's copy, media or name changes */
+const PROJECTS_LASTMOD = "2026-10-16";
 
 export async function loader() {
   const articles = await getPublishedArticles();
@@ -40,7 +44,7 @@ export async function loader() {
     ),
     ...PROJECTS.map(
       (p) =>
-        `  <url>\n    <loc>${SITE_URL}/portfolio/${projectSlug(p, PROJECTS)}</loc>\n    <priority>0.6</priority>\n  </url>`,
+        `  <url>\n    <loc>${SITE_URL}/portfolio/${projectSlug(p, PROJECTS)}</loc>\n    <lastmod>${PROJECTS_LASTMOD}</lastmod>\n    <priority>0.6</priority>\n  </url>`,
     ),
   ];
 

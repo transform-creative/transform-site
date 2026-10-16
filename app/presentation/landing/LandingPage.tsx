@@ -20,8 +20,15 @@ import { GradualBlur } from "../elements/GradualBlur";
 import { SplashCursor } from "../elements/SplashCursor";
 import { DEFAULT_POSTER } from "../elements/VideoPlayer";
 import "../../app-v2.css";
+import { optimisedImage } from "~/business/commonBL";
+import type { ArticleSummary } from "~/data/CustomTypes";
+import { FiaBadge } from "../elements/FiaBadge";
+import { LatestArticles } from "../blog/LatestArticles";
 
-export interface LandingPageProps {}
+export interface LandingPageProps {
+  /** Newest blog posts, from the route's loader */
+  latestArticles: ArticleSummary[];
+}
 
 interface FeatureCardProps {
   id: string;
@@ -119,7 +126,7 @@ function FeatureCard({
  * LandingPage component
  * @todo Create description
  */
-export function LandingPage({}: LandingPageProps) {
+export function LandingPage({ latestArticles }: LandingPageProps) {
   const context: SharedContextProps = useOutletContext();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -241,15 +248,25 @@ export function LandingPage({}: LandingPageProps) {
               cursorCharacter="|"
               color="green"
               textColors={["var(--accent)"]}
-              as="h1"
+              as="div"
             />
+
+            {/* The real h1, styled as a subheader under the slogan. The
+                typewriter above starts empty, so as the h1 it rendered as
+                a lone "|" for crawlers. */}
+            <h1 className="textCenter text-lg  w-75 m3" style={{color: "var(--txt)"}}>
+              Websites, fundraising platforms and video for Australian
+              not-for-profits
+            </h1>
           </div>
         </div>
         <div className="col middle center">
+          
           <div
-            className=" w100 mt-20 col middle center lateFade"
+            className=" w100 col middle center lateFade"
             style={{ opacity: 0 }}
           >
+
             <ProjectCarousel projects={PROJECTS} />
           </div>
         </div>
@@ -311,7 +328,7 @@ export function LandingPage({}: LandingPageProps) {
             }`}
           >
             <img
-              src={CHURCH_HERO_POSTER ?? DEFAULT_POSTER}
+              src={optimisedImage(CHURCH_HERO_POSTER ?? DEFAULT_POSTER, 800)}
               alt=""
               loading="lazy"
               className="layer-fill media-cover blur-8"
@@ -347,12 +364,16 @@ export function LandingPage({}: LandingPageProps) {
 
       <EndorsementSection />
 
-        <div className="p-20">
+        <div className="pt-20 pl-20 pr-20">
             <ContactTab
               showHeader={false}
               buttonText="Get in touch"
             />
           </div>
+<div className="horizontal-line" style={{marginBottom: 80}}/>
+      <div className="col middle mb-20 pb-20">
+        <LatestArticles articles={latestArticles} />
+      </div>
 
       {/* Edge blurs. Both sit under the header, footer and popups
           (zIndex 10), so only page content is softened.

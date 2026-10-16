@@ -7,7 +7,6 @@ import EditMenu from "./elements/EditMenu";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { SharedContextProps } from "~/data/CommonTypes";
-import { supabaseSignOut } from "~/database/Auth";
 import { scrollToId } from "~/business/commonBL";
 import "../app-v2.css"
 
@@ -132,6 +131,8 @@ function MenuOptions({ inShrink, onClose, context }: MenuOptionsProps) {
   const isSignedIn = !!user;
 
   async function handleSignOut() {
+    // Loaded on demand so supabase-js stays out of public pages' bundles
+    const { supabaseSignOut } = await import("~/database/Auth");
     const result = await supabaseSignOut();
     if (result !== true) {
       context.popAlert("Could not sign out", "Please try again", true);

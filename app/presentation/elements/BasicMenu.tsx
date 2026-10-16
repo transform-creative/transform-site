@@ -1,4 +1,4 @@
-import IonIcon from "@reacticons/ionicons";
+import IonIcon from "./IonIcon";
 
 import gsap from "gsap";
 import { Transition } from "react-transition-group";

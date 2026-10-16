@@ -1,4 +1,4 @@
-import IonIcon from "@reacticons/ionicons";
+import IonIcon from "./IonIcon";
 import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import type { ActivatableElement } from "~/data/CommonTypes";
@@ -77,7 +77,7 @@ export function ContextModal({
    * @param forceClose
    */
   function updateIsActive(
-    e: React.MouseEvent<HTMLDivElement>,
+    e: React.MouseEvent<HTMLElement>,
     forceClose = false
   ) {
     if (

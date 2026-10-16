@@ -1,4 +1,4 @@
-import IonIcon from "@reacticons/ionicons";
+import IonIcon from "./IonIcon";
 import type { IoniconName } from "~/data/Ionicons";
 
 interface ErrorLabelProps {

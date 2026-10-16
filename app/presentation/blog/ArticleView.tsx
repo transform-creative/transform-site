@@ -10,7 +10,9 @@ export interface ArticleViewProps {
   article: Pick<
     Article,
     "title" | "body" | "cover_image" | "cover_image_alt" | "published_at" | "keywords"
-  >;
+  > &
+    // Absent in the editor preview
+    Partial<Pick<Article, "author_name">>;
   /** Other posts to link to underneath (internal links help SEO) */
   more?: ArticleSummary[];
   /** Editor preview: no back link or "more" section */
@@ -41,6 +43,8 @@ export function ArticleView({ article, more = [], preview }: ArticleViewProps) {
           {article.title || "Untitled"}
         </h1>
         <p className="muted textCenter">
+          {/* Matches the BlogPosting author in the JSON-LD */}
+          {article.author_name && `By ${article.author_name} · `}
           {article.published_at ? (
             <time dateTime={article.published_at}>
               {formatArticleDate(article.published_at)}

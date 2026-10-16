@@ -3,7 +3,11 @@ import { useOutletContext } from "react-router";
 import ReactPlayer from "react-player";
 import type { SharedContextProps } from "~/data/CommonTypes";
 import { Icon } from "~/presentation/elements/Icon";
+import { optimisedImage } from "~/business/commonBL";
 import "../../app-v2.css";
+
+/** Width posters are resized to — players are at most ~75vw wide */
+export const POSTER_WIDTH = 1280;
 
 export interface VideoPlayerProps {
   /** Direct media URL. Must keep a plain `.mp4`/`.webm`/… ending — see note below. */
@@ -108,7 +112,8 @@ export function VideoPlayer({
     // `poster` is not among them, so it has to be set on the element. The
     // native attribute is also the safest home for it: unlike an <img>, a
     // poster that 404s renders nothing at all rather than a broken image.
-    if (poster) video.poster = poster;
+    // Resized WebP; keep the width in step with any preload of the same poster
+    if (poster) video.poster = optimisedImage(poster, POSTER_WIDTH);
 
     const succeed = () => setLoadState("ready");
     const fail = () => setLoadState("failed");

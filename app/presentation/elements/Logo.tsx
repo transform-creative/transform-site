@@ -122,8 +122,11 @@ export function Logo({ size = 100 }: LogoProps) {
           >
             Transform
           </div>
-          <h2
+          {/* Not a heading either, for the same reason — it was an h2 on
+              every page. Block-level so it still sits under "Transform". */}
+          <span
             id="logo-sub"
+            className="heading-look block"
             style={{
               opacity: 0,
               fontSize: `${Math.round(size / 2)}pt`,
@@ -131,7 +134,7 @@ export function Logo({ size = 100 }: LogoProps) {
             }}
           >
             Creative
-          </h2>
+          </span>
         </div>
       </div>
     </div>

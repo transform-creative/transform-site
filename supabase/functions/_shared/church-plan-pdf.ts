@@ -57,6 +57,13 @@ const CHURCH_CHAT_URL = "transformcreative.com.au/chat";
 const LOGO_URL =
   "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/TC_LOGO_WHITE.png";
 
+/** FIA membership badge (navy on transparent, padding baked in) and our FIA
+ *  directory listing. Keep in sync with FIA in app/data/Objects.tsx */
+const FIA_LOGO_URL =
+  "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/images/fia_logo.png";
+const FIA_DIRECTORY_URL =
+  "https://www.fia.org.au/s/fia-supplier-member-directory/company?id=0TUMo0000002BDtOAM";
+
 /** Photo behind the title, styled like the /church hero (dark scrim, light
  *  inset frame, white text) */
 const HERO_IMAGE_URL =
@@ -253,10 +260,11 @@ export async function generateChurchPlanPdf(
       return null;
     }
   }
-  const [logo, hero, setupImage] = await Promise.all([
+  const [logo, hero, setupImage, fiaBadge] = await Promise.all([
     fetchImage(LOGO_URL, "png"),
     fetchImage(HERO_IMAGE_URL, "jpg"),
     fetchImage(SETUP_IMAGE_URL, "jpg"),
+    fetchImage(FIA_LOGO_URL, "png"),
   ]);
 
   // Mutable page state — inner functions close over these
@@ -658,6 +666,26 @@ export async function generateChurchPlanPdf(
   // Printed copies can't be clicked, so spell out a short link too
   txt(CHURCH_CHAT_URL, ML + pad, y - 55, SZ_P, fontBold, C_ACCENT);
   addLink(ML, y - chatH, CW, chatH, CHURCH_BOOKING_URL);
+  y -= chatH;
+
+  // ── FIA membership badge, linking to our directory listing ──────────────
+
+  if (fiaBadge) {
+    const badgeH = 64; // includes the PNG's own padding (~20% each side)
+    const badgeW = (fiaBadge.width / fiaBadge.height) * badgeH;
+    ensureSpace(badgeH + 12);
+    y -= 12;
+    // Pulled left by the PNG's padding so the artwork lines up with the margin
+    const badgeX = ML - badgeW * 0.08;
+    page.drawImage(fiaBadge, {
+      x: badgeX,
+      y: y - badgeH,
+      width: badgeW,
+      height: badgeH,
+    });
+    addLink(badgeX, y - badgeH, badgeW, badgeH, FIA_DIRECTORY_URL);
+    y -= badgeH;
+  }
 
   return await pdfDoc.save();
 }

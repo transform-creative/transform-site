@@ -28,8 +28,8 @@ export const PROJECTS: Project[] = [
   {
     id: 20,
     type: "software",
-    organisation: "Ping-pong A thon",
-    name: "Ping-pong-a-thon website",
+    organisation: "Ping-pong-a-thon",
+    name: "Live-leaderboard fundraising platform",
     description: [
       "Ping Pong-a-thon run table tennis events around Australia which raise money to help prevent slavery around the world. We built the platform that runs the whole thing — from sign-ups through to the dollars landing where they should.",
       "Their previous system was trying to bootstrap a generic platform into this complex platform, so we made them something shaped around the way their campaign actually runs.",
@@ -76,7 +76,7 @@ export const PROJECTS: Project[] = [
     id: 8,
     type: "media",
     organisation: "Churches of Christ SA",
-    name: "Churches of Christ - Who We Are",
+    name: "Who We Are: reigniting the mission",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Churches-of-christ.mp4",
     description: [
@@ -94,7 +94,7 @@ export const PROJECTS: Project[] = [
   {
     id: 19,
     type: "software",
-    name: "Crossover website",
+    name: "Netflix-style resource library website",
     organisation: "Crossover",
     description: [
       "A modern, responsive and more secure website for Crossover Australia.",
@@ -123,7 +123,7 @@ export const PROJECTS: Project[] = [
   {
     id: 106,
     organisation: "Red Frogs",
-    name: "Cricket volunteer experience",
+    name: "A day volunteering at the cricket",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Red_frogs_volunteers-V1.mp4",
     images: [
@@ -142,7 +142,7 @@ export const PROJECTS: Project[] = [
   {
     id: 102,
     organisation: "BaptistCare",
-    name: "Breaking Free Program",
+    name: "Breaking Free prison advocacy appeal",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Breaking_Free.mp4",
     images: [
@@ -181,7 +181,7 @@ export const PROJECTS: Project[] = [
     id: 7,
     type: "media",
     organisation: "BCSANT",
-    name: "BCSANT Merger",
+    name: "Two states, one movement: the merger video",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/BCSANT%20merger%20-%20Draft%203.mp4",
     description: [
@@ -198,7 +198,7 @@ export const PROJECTS: Project[] = [
   {
     id: 107,
     organisation: "Sonder",
-    name: "EOY Celebration",
+    name: "End-of-year celebration film",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Sonder_EOY.mp4",
     images: [
@@ -216,7 +216,7 @@ export const PROJECTS: Project[] = [
   {
     id: 108,
     organisation: "BaptistCare",
-    name: "Wright Street Program",
+    name: "Wright Street women's shelter appeal",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Wright%20Street%20-%20subs.mp4",
     images: [
@@ -235,7 +235,7 @@ export const PROJECTS: Project[] = [
   {
     id: 101,
     organisation: "Crossover",
-    name: "Baptism Week 2025",
+    name: "Baptism Week 2025 invitation",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Baptism%20Week%202025_3.mp4",
     images: [
@@ -293,7 +293,7 @@ export const PROJECTS: Project[] = [
     id: 9,
     type: "media",
     organisation: "Crossover",
-    name: "Crossover - About us",
+    name: "Easter appeal infomercial",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Infomercial-subs3.mp4",
     description: [
@@ -315,7 +315,7 @@ export const PROJECTS: Project[] = [
     id: 4,
     type: "media",
     organisation: "Rostrevor Baptist Church",
-    name: "RBC Easter Service promo",
+    name: "Easter spoken-word film",
     link: "https://www.rbc.org.au/wordpress/",
 
     video:
@@ -334,7 +334,7 @@ export const PROJECTS: Project[] = [
     id: 6,
     type: "media",
     organisation: "King's Baptist",
-    name: "KBC Alpha Marriage promos",
+    name: "Alpha Marriage couch interviews",
     link: "https://kingsbaptist.org.au/",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Nigel%20+%20Mandy.mp4",
@@ -353,7 +353,7 @@ export const PROJECTS: Project[] = [
     id: 11,
     type: "software",
     organisation: "TWC Healthy Collective",
-    name: "Healthy Collective ticketing app",
+    name: "Issue-tracking ticketing app",
     description: [
       "The TWC Healthy Collective group hired us to build an application to help them keep better track of issues in their processes.",
       "The app features an easy to use ticket logdgement system, and allows admins to respond to user issues with ease.",
@@ -369,7 +369,7 @@ export const PROJECTS: Project[] = [
     id: 1,
     type: "media",
     organisation: "King's Baptist",
-    name: "King's Ping-pong-a-thon promo",
+    name: "Youth ping-pong-a-thon fundraiser promo",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/Pong%2025%20promo%202.mp4",
     images: [
@@ -385,7 +385,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 2,
-    name: "RBC Alpha promo",
+    name: "Alpha welcome video",
     type: "media",
     organisation: "Rostrevor Baptist Church",
     video:
@@ -405,7 +405,7 @@ export const PROJECTS: Project[] = [
     id: 10,
     type: "media",
     organisation: "Crossover",
-    name: "National Baptism Week",
+    name: "What it means to be baptised",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co//storage/v1/object/public/transform/National_baptism_week%20-%20Draft_3_subs.mp4",
     description: [
@@ -423,7 +423,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 1011,
-    name: "DBS Promo",
+    name: "Discovery Bible Study promo",
     type: "media",
     organisation: "The Global Harvest",
     video:
@@ -436,7 +436,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 1012,
-    name: "Sonder strategic plan launch",
+    name: "Launching a 2030 vision",
     type: "media",
     organisation: "Sonder",
     video:
@@ -451,9 +451,9 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 1013,
-    name: "Nunga Action Plan",
+    name: "Nunga Action Plan launch",
     type: "media",
-    organisation: "Baptist Care",
+    organisation: "BaptistCare",
     video:
       "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/nungal_action.mp4",
     link: "https://baptistcaresa.org.au/westcare-centre/baptistcare-in-sa-launches-nunga-action-plan/",
@@ -466,7 +466,7 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 1014,
-    name: "Your story series",
+    name: "Your Story discipleship training series",
     type: "media",
     organisation: "Access The Story",
     video:
@@ -602,6 +602,26 @@ export const CONTACT = {
     "https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2neXINmRa2l8cPxCMY8-FrrTt30-Tpwfj7-zqktFODuuJO9Z_wsSfv2wcNkiFvipiOl58trJuc",
 };
 
+/** Footer icons + the Organization schema's sameAs in root.tsx */
+export const SOCIAL_LINKS: { label: string; icon: IoniconName; href: string }[] = [
+  { label: "Facebook", icon: "logo-facebook", href: "https://www.facebook.com/TransformCreative/" },
+  { label: "Instagram", icon: "logo-instagram", href: "https://www.instagram.com/transform_creative_au/" },
+  { label: "LinkedIn", icon: "logo-linkedin", href: "https://www.linkedin.com/company/transform-creative-au" },
+];
+
+/** Fundraising Institute Australasia membership badge (FiaBadge). Also in
+ *  root.tsx's Organization JSON-LD (memberOf) and the church plan PDF
+ *  (supabase/functions/_shared/church-plan-pdf.ts keeps its own copy). */
+export const FIA = {
+  name: "Fundraising Institute Australasia",
+  /** Our listing in FIA's supplier member directory */
+  directoryUrl:
+    "https://www.fia.org.au/s/fia-supplier-member-directory/company?id=0TUMo0000002BDtOAM",
+  /** Navy on transparent, with padding baked into the PNG */
+  logo: "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/images/fia_logo.png",
+  alt: "Fundraising Institute Australasia professional member, code compliant",
+};
+
 export const WORKED_WITH_LOGOS: {
   name: string;
   image: string;
@@ -705,7 +725,7 @@ export const FEATURES: Feature[] = [
     category: "Decrease overheads",
     text: "Easily find 'proof-of-impact'",
     description: [
-      "Only 23% of organisations report having systems that let them understand the impact of their services",
+      "Only 23% of not-for-profits have systems that let them understand the impact of their services (Infoxchange, Digital Technology in the Not-for-Profit Sector Report 2024).",
       "Our custom site will generate better data and integrate directly into your existing systems & workflows.",
     ],
   },
@@ -786,7 +806,7 @@ export const FEATURES: Feature[] = [
     category: "Deliver great experiences",
     text: "Deliver real value", // unchanged — your original
     description: [
-      "Only 38% of orgs agree their website delivers value. We build what your campaign needs — peer-to-peer, event registration, custom donor journeys.",
+      "Only 38% of not-for-profits agree their website delivers value (Infoxchange, Digital Technology in the Not-for-Profit Sector Report 2024). We build what your campaign needs — peer-to-peer, event registration, custom donor journeys.",
       "If you're sick of your admin team telling you 'it's not possible with the current system', let's chat.",
     ],
   },
@@ -952,8 +972,8 @@ export const DEVELOPMENT_FAQ: FAQQuestion[] = [
     question: "Is a custom fundraising platform worth it for our charity?",
     // Rendered with pre-line, so the blank lines become paragraph breaks
     answer:
-      "It usually starts to make sense once your organisation raises around $500K or more a year through online donations (online giving, not total revenue).\n\n" +
-      "At that size, the \"cover our costs\" tips that platforms like Raisely and Funraisin prompt donors to add (usually around 4–5%) could be close to $20K a year. That's money which could be going towards your cause, not your platform, and it's roughly where owning your website and fundraising platform starts to stack up.\n\n" +
+      "It usually starts to make sense once your organisation raises around $600K or more a year through online donations (online giving, not total revenue).\n\n" +
+      "At that size, the \"cover our costs\" tips that platforms like Raisely and Funraisin prompt donors to add (usually around 4–5%) could be around $25K a year. That's money which could be going towards your cause, not your platform, and it's roughly where owning your website and fundraising platform starts to stack up.\n\n" +
       "If you're raising less than that online, a custom build probably won't pay for itself yet, and an off-the-shelf platform is likely the better fit for now. We're still happy to chat through where you're at.\n\n" +
       "Not sure where you sit? Pop your numbers into the savings calculator above, or book a free discovery call.",
     links: [{ label: "Book a free discovery call", href: CONTACT.bookingUrl }],

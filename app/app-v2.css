@@ -682,6 +682,11 @@ Padding
   line-height: 1.4;
 }
 
+.text-lg {
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
 .text-md {
   font-size: 1.1rem;
   line-height: 1.3;
@@ -864,6 +869,10 @@ h5.center {
   font-family: "Onest", sans-serif;
   font-weight: 200;
   line-height: 1.2;
+}
+
+.block {
+  display: block;
 }
 
 .wrap {
@@ -1370,6 +1379,12 @@ button.on-accent-button:hover * {
   /* Matches app.css, whose 35pt !important h1 rule wins on mobile */
   .text-h1 {
     font-size: 35pt;
+  }
+  /* Small label-style h1s (home, /development) sit above the big slogan.
+     h1.class outranks app.css's !important h1 rule, so they stay small. */
+  h1.text-lg,
+  h1.eyebrow {
+    font-size: 1.1rem !important;
   }
   .text-h2 {
     font-size: 25pt;

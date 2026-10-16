@@ -4,6 +4,7 @@ import {
   projectImageAlt,
   projectSlug,
   projectToIcon,
+  optimisedImage,
 } from "~/business/commonBL";
 import { useRef } from "react";
 import { Icon } from "../elements/Icon";
@@ -124,7 +125,7 @@ export function Portfolio({}: PortfolioProps) {
               {p.images[0] && (
                 <div className="media-16-9 r-default">
                   <img
-                    src={p.images[0]}
+                    src={optimisedImage(p.images[0], 960)}
                     alt={projectImageAlt(p)}
                     loading="lazy"
                     className="media-cover"

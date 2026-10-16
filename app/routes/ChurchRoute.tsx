@@ -25,9 +25,10 @@ import {
   type ChurchCtaSource,
 } from "~/data/Analytics";
 import { defaultPlan, priceOf } from "~/business/churchPlanBL";
-import { boldPhrases, scrollToId } from "~/business/commonBL";
+import { boldPhrases, scrollToId, optimisedImage } from "~/business/commonBL";
 import { buildMeta, canonical, SITE_URL } from "~/business/seoBL";
 import { Icon } from "~/presentation/elements/Icon";
+import { FiaBadge } from "~/presentation/elements/FiaBadge";
 import { DEFAULT_POSTER } from "~/presentation/elements/VideoPlayer";
 import {
   FrequentlyAskedQuestions,
@@ -57,7 +58,8 @@ export function meta() {
     title: TITLE,
     description: DESCRIPTION,
     path: "/church",
-    shareTitle: "Your church's local comms team",
+    // No separate shareTitle: og:title used to differ from <title>, so the
+    // page showed one title in search and another once shared/rendered
     shareDescription:
       "We shoot your Sundays, then keep your website, socials, slides and emails up to date every week. Price your plan in a minute.",
     image: "/og/church_comms_meta.jpg",
@@ -343,6 +345,7 @@ export default function ChurchRoute() {
         </div>
       </section>
 
+
       <div className="horizontal-line" />
 
       {/* 2. Three jobs */}
@@ -475,7 +478,7 @@ export default function ChurchRoute() {
                     screen, so they sat blank for a few seconds. Eager +
                     low priority fetches them with the page, after the hero. */}
                 <img
-                  src={step.image}
+                  src={optimisedImage(step.image, 800)}
                   alt=""
                   fetchPriority="low"
                   decoding="async"
@@ -549,7 +552,7 @@ export default function ChurchRoute() {
             className={`w-45 ${context.inShrink ? "max-w-260" : ""}`}
           >
             <img
-              src={FOUNDER_PHOTO}
+              src={optimisedImage(FOUNDER_PHOTO, 600)}
               alt="Isaac Drury, founder of Transform Creative"
               loading="lazy"
               className="media-4-5 media-cover r-16 w-100"
@@ -585,7 +588,7 @@ export default function ChurchRoute() {
           {examples.map((project) => (
             <div key={project.id} className="col gap-5">
               <img
-                src={project.images[0]}
+                src={optimisedImage(project.images[0], 960)}
                 alt={`${project.name}, ${project.organisation ?? "King's Baptist Church"}`}
                 loading="lazy"
                 className="media-16-9 media-cover r-default"

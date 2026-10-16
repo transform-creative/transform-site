@@ -25,7 +25,12 @@ import {
   FrequentlyAskedQuestions,
   faqJsonLd,
 } from "~/presentation/elements/FrequentlyAskedQuestions";
-import { buildMeta, canonical, SITE_URL } from "~/business/seoBL";
+import {
+  buildMeta,
+  canonical,
+  SHARE_CARD,
+  SITE_URL,
+} from "~/business/seoBL";
 import { SplashCursor } from "~/presentation/elements/SplashCursor";
 import { GradualBlur } from "~/presentation/elements/GradualBlur";
 
@@ -33,7 +38,12 @@ import { Icon } from "~/presentation/elements/Icon";
 import { Carousel } from "~/presentation/elements/Carousel";
 import { EndorsementCard } from "~/presentation/elements/EndorsementCard";
 import WorkedWith from "~/presentation/landing/WorkedWith";
-import { VideoPlayer } from "~/presentation/elements/VideoPlayer";
+import {
+  POSTER_WIDTH,
+  VideoPlayer,
+} from "~/presentation/elements/VideoPlayer";
+import { optimisedImage } from "~/business/commonBL";
+import { FiaBadge } from "~/presentation/elements/FiaBadge";
 
 const TRANSFORM_STORAGE =
   "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform";
@@ -53,7 +63,7 @@ const HERO_POSTER = `${TRANSFORM_STORAGE}/software-video-poster.jpg`;
    in the prerendered HTML — feature popout paragraphs after the first are
    not, so keep search terms out of those. */
 const TITLE =
-  "Not-for-profit Website Design & Development | Adelaide";
+  "Not-for-profit Websites & Fundraising Platforms | Adelaide";
 const DESCRIPTION =
   "Website design and development for Australian not-for-profits and charities, plus custom fundraising platforms as a Raisely alternative. Adelaide-based.";
 
@@ -62,8 +72,7 @@ export function meta() {
     title: TITLE,
     description: DESCRIPTION,
     path: "/development",
-    keywords:
-      "Not-for-profit website design, not for profit web development, charity website design, nonprofit web design agency, NFP website developer, nonprofit web design Adelaide, Raisely alternative Australia, custom fundraising platform",
+    image: SHARE_CARD.software,
     twitterDescription:
       "Website design and development for Australian not-for-profits and charities — custom sites and fundraising platforms, built in Adelaide.",
   });
@@ -74,7 +83,12 @@ export function meta() {
    puts it in that markup and lets the browser start fetching before hydration. */
 export const links = () => [
   canonical("/development"),
-  { rel: "preload", as: "image", href: HERO_POSTER },
+  // Same URL VideoPlayer sets, so the preload is reused
+  {
+    rel: "preload",
+    as: "image",
+    href: optimisedImage(HERO_POSTER, POSTER_WIDTH),
+  },
 ];
 
 const serviceSchema = {
@@ -221,23 +235,30 @@ export default function DevelopmentRoute() {
             <AnimatedDots autoPlayDelay={3000} />
 
             <div className="col middle gap-10 w-100">
-              {/* One h1: the eyebrow carries the search terms, the slogan
-                  reads exactly as before */}
-              <h1
-                className="textCenter w-100 mb-20"
+              {/* The h1 is the search-term line only, styled as a subheader
+                  under the slogan. With the slogan inside it too, crawlers
+                  read the two run together ("…AdelaideOwn your…"). text-h1
+                  on the wrapper keeps both at their old sizes: the
+                  eyebrow's 0.4em is relative to it. */}
+              <div
+                className="textCenter w-100 mb-20 text-h1"
                 style={{ color: "var(--txt)", letterSpacing: -1.5 }}
               >
-                <small className="eyebrow accent-text">
-                  Not-for-profit website design & development, Adelaide
-                </small>
-                Own your{" "}
-                <strong style={{ fontWeight: 600 }}>
-                  fundraising platform
-                </strong>
-                ,
-                <br />
-                Maximise your mission.
-              </h1>
+                <div className="heading-look">
+                  Own your{" "}
+                  <strong style={{ fontWeight: 600 }}>
+                    fundraising platform
+                  </strong>
+                  ,
+                  <br />
+                  Maximise your mission.
+                </div>
+
+                <h1 className="eyebrow accent-text textCenter mt-20">
+                  Not-for-profit websites & fundraising platforms,
+                  Adelaide
+                </h1>
+              </div>
               {/* <p
                 className="textCenter w-75 mt-10 mb-10"
                 style={{ color: "var(--txt)" }}
@@ -313,7 +334,7 @@ export default function DevelopmentRoute() {
         />
 
         <h2
-          className="textCenter accent m-10"
+          className="textCenter accent m-20"
           style={{ color: "var(--txt)", letterSpacing: -1.5 }}
         >
           Websites and fundraising platforms that help Aussie
@@ -321,6 +342,7 @@ export default function DevelopmentRoute() {
           <strong>increase donations</strong> and{" "}
           <strong>deliver great experiences</strong>.
         </h2>
+        <FiaBadge />
 
         <div
           className="horizontal-line  w-100"
@@ -335,11 +357,11 @@ export default function DevelopmentRoute() {
           </div>
         </div>
       </div>
-         <div
+      <div
         className="horizontal-line mediumFade mt-20 mb-20 ot02"
         style={{ top: 0 }}
       />
-        <div
+      <div
         className="col middle w-100"
         ref={examplesRef}
         style={{ overflow: "clip" }}
@@ -351,7 +373,8 @@ export default function DevelopmentRoute() {
           className="textCenter w-75"
           style={{ margin: "0px 0 40px 0", color: "var(--txt)" }}
         >
-          We've built websites with some of Australia's most innovative{" "}
+          We've built websites with some of Australia's most
+          innovative{" "}
           <b style={{ fontWeight: 600, color: "var(--accent)" }}>
             charities and nonprofits
           </b>{" "}
@@ -381,7 +404,6 @@ export default function DevelopmentRoute() {
         </div>
       </div>
 
-   
       <div
         className="horizontal-line mediumFade "
         style={{ top: -50, marginTop: 50, marginBottom: -20 }}
@@ -409,8 +431,6 @@ export default function DevelopmentRoute() {
         className="horizontal-line mediumFade "
         style={{ marginTop: 50, marginBottom: 0 }}
       />
-
-    
 
       <div className="w-100 col middle m-20">
         <HowItWorks />

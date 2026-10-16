@@ -20,7 +20,7 @@ The site is a portfolio/marketing website showcasing past projects and allowing 
 | Animations | GSAP v3 (via `@gsap/react`, SplitText plugin) |
 | Backend | Supabase (auth + database — see Client Portal) |
 | Hosting | Vercel |
-| Icons | Ionicons (`@reacticons/ionicons`) |
+| Icons | Ionicons, from a generated registry of only the icons used (`setup/icons/used-icons.txt` → `npm run icons`). `@reacticons/ionicons` is a devDependency the generator reads; never import it at runtime (856KB, untreeshakeable) |
 | Fonts | "SIFONN_PRO" (custom, /public/*.otf) + "Onest" (Google Fonts) |
 
 ## Project Structure
@@ -32,7 +32,7 @@ app/
 │   ├── CommonTypes.tsx   # Shared app types (e.g. SharedContextProps, AlertType)
 │   ├── CustomTypes.tsx   # DB-derived types/aliases (Issue, ClientIssue, Business, …)
 │   ├── Objects.tsx       # ALL static data: projects, contact info, client logos
-│   └── Ionicons.tsx      # Ionicon type definitions
+│   └── Ionicons.tsx      # IoniconName = keys of the generated icon registry
 ├── database/
 │   ├── SupabaseClient.tsx  # Supabase client init (typed createClient<Database>)
 │   ├── supabase.ts         # Generated DB schema types (source of truth)
@@ -51,13 +51,12 @@ app/
 │   ├── authentication/     # OTP sign-in form
 │   └── client/             # Client portal (ClientPortal, IssueCard, IssueModal)
 ├── routes/                 # Route-level page components
-│   ├── LandingRoute.tsx    # /
-│   ├── HomeRoute.tsx       # /home (same content as /)
+│   ├── LandingRoute.tsx    # / and /home (same module, own route id; .prerender twin adds the latest-posts loader)
 │   ├── MediaRoute.tsx      # /portfolio
 │   ├── ContactRoute.tsx    # /contact
 │   ├── DevelopmentRoute.tsx # /development
 │   ├── AuthenticationRoute.tsx # /auth
-│   ├── ErrorBoundary.tsx   # catch-all route
+│   ├── NotFoundRoute.tsx   # "*" catch-all, prerendered to 404.html (real 404 status on Vercel)
 │   └── ClientRoute.tsx     # /client/:id (clients & agency admins, auth-guarded)
 ├── root.tsx                # Root layout, session state, alert system, responsive tracking
 ├── routes.ts               # Route config
@@ -234,6 +233,10 @@ Both are set in `.env.local` and exposed via `import.meta.env.*`.
 4. **GSAP SplitText** is a paid plugin — it's already installed; use it freely
 5. **Responsive layout** uses the `inShrink` flag passed via context, not just Tailwind breakpoints
 6. The `/home` route exists as a duplicate of `/` — likely for navigation convenience
+7. **Adding a route**: either prerender it (`react-router.config.ts`) or add it to `vercel.json`'s `rewrites` (SPA shell). Anything that is neither gets Vercel's 404 page. If it needs sign-in/data, also add it to `APP_ROUTES` in `root.tsx`.
+8. **supabase-js is lazy-loaded.** `root.tsx` only imports the client on `APP_ROUTES` or when a session is stored. Public pages must not import `~/database/*` at module top level — `import()` it inside the handler instead (see `HeaderBar` sign-out, `PlanEmailForm`).
+9. **Renaming a project changes its `/portfolio/:slug` URL** — add a permanent redirect in `vercel.json` and bump `PROJECTS_LASTMOD` in `SitemapRoute.ts`.
+10. **Storage images**: wrap Supabase image URLs in `optimisedImage(url, width)` (`commonBL`) for resized WebP, and use `loading="lazy"` below the fold.
 
 ## Key rules
 - Never use spans - use appropriate relevant tags instead

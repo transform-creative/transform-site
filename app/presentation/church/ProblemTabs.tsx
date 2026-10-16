@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import type { ChurchJob, SharedContextProps } from "~/data/CommonTypes";
-import { boldPhrases, useAutoCycle } from "~/business/commonBL";
+import { boldPhrases, useAutoCycle, optimisedImage } from "~/business/commonBL";
 import { Icon } from "~/presentation/elements/Icon";
 import "../../app-v2.css";
 
@@ -101,7 +101,8 @@ export function ProblemTabs({ jobs, onHelp }: Props) {
           <div data-tab-content className="w-50">
             {job.jobImage ? (
               <img
-                src={job.jobImage}
+                src={optimisedImage(job.jobImage, 960)}
+                loading="lazy"
                 alt=""
                 className="media-16-9 media-cover r-default w-100"
               />

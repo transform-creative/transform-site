@@ -2,12 +2,17 @@ import type { LinkDescriptor, MetaDescriptor } from "react-router";
 
 export const SITE_URL = "https://www.transformcreative.com.au";
 
-/**
- * {{TODO: Isaac to supply public/og-image.jpg at 1200x630}}
- * Until then we fall back to the icon so link previews aren't broken —
- * swap this to "/og-image.jpg" once the real asset lands.
- */
-const DEFAULT_OG_IMAGE = "/transform-icon-color-donut.png";
+const SHARE_CARDS =
+  "https://hzfjmmakqwsmucxorhlb.supabase.co/storage/v1/object/public/transform/images";
+
+/** 1200x630 share cards (the size buildMeta declares by default) */
+export const SHARE_CARD = {
+  home: `${SHARE_CARDS}/home_card.jpg`,
+  software: `${SHARE_CARDS}/software_card.jpg`,
+  video: `${SHARE_CARDS}/video_card.jpg`,
+};
+
+const DEFAULT_OG_IMAGE = SHARE_CARD.home;
 
 /** Scrapers reject relative og:image / og:url, so everything is absolute.
  *  Already-absolute URLs (e.g. project images in Supabase storage) pass through. */
@@ -20,7 +25,6 @@ export interface SeoOptions {
   title: string;
   description: string;
   path: string;
-  keywords?: string;
   image?: string;
   /** Pixel size of `image`. Defaults to the 1200x630 share card size;
    *  pass 0 to omit the size tags when it isn't known. */
@@ -54,7 +58,6 @@ export function buildMeta({
   title,
   description,
   path,
-  keywords,
   image,
   imageWidth = 1200,
   imageHeight = 630,
@@ -82,7 +85,6 @@ export function buildMeta({
   return [
     { title },
     { name: "description", content: description },
-    ...(keywords ? [{ name: "keywords", content: keywords }] : []),
     // Open Graph
     { property: "og:title", content: shareTitle },
     { property: "og:description", content: shareDescription },

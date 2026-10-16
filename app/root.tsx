@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
   useNavigate,
 } from "react-router";
 import { Analytics } from "@vercel/analytics/react";
@@ -18,10 +19,10 @@ import {
 } from "./data/CommonTypes";
 import Alert from "./presentation/elements/Alert";
 import { useEffect, useState } from "react";
-import { supabase } from "./database/SupabaseClient";
-import { Session } from "@supabase/supabase-js";
+import type { Session } from "@supabase/supabase-js";
 import { HeaderBar } from "./presentation/HeaderBar";
 import { FooterBar } from "./presentation/FooterBar";
+import { SOCIAL_LINKS } from "./data/Objects";
 
 export const links: Route.LinksFunction = () => [
   {
@@ -59,6 +60,36 @@ export const meta: Route.MetaFunction = () => [
   },
 ]
 
+/** Routes that sign people in or read their data, so need supabase-js */
+const APP_ROUTES = [
+  "/auth",
+  "/client",
+  "/radar",
+  "/forms",
+  "/church-comms-survey",
+];
+
+/** Where supabase-js keeps the session: sb-<project ref>-auth-token */
+const AUTH_STORAGE_KEY = `sb-${
+  new URL(import.meta.env.VITE_SUPABASE_URL).hostname.split(".")[0]
+}-auth-token`;
+
+/*******************************************
+ * Whether this page needs the auth client. supabase-js is ~200KB, so public
+ * visitors who have never signed in never download it. Anyone with a stored
+ * session does, so the header can still show their portal link.
+ */
+function needsAuth(pathname: string): boolean {
+  if (APP_ROUTES.some((r) => pathname === r || pathname.startsWith(`${r}/`)))
+    return true;
+  if (typeof window === "undefined") return false; // prerender
+  try {
+    return localStorage.getItem(AUTH_STORAGE_KEY) !== null;
+  } catch {
+    return false; // storage blocked
+  }
+}
+
 export function HydrateFallback() {
 
   return (
@@ -82,10 +113,15 @@ const organizationSchema = {
   name: "Transform Creative",
   url: "https://www.transformcreative.com.au",
   logo: "https://www.transformcreative.com.au/transform-icon-color-donut.png",
-  sameAs: ['https://www.instagram.com/transform_creative_au/','https://www.linkedin.com/company/112600945' ],
+  sameAs: SOCIAL_LINKS.map((link) => link.href),
   description:
     "Adelaide creative agency specialising in websites, video production and software for Australian not-for-profits and charities.",
   areaServed: ["South Australia", "Australia"],
+  memberOf: {
+    "@type": "Organization",
+    name: "Fundraising Institute Australasia",
+    url: "https://www.fia.org.au",
+  },
   knowsAbout: [
     "Not-for-profit website design",
     "Video production",
@@ -159,20 +195,28 @@ export default function App() {
     active: false,
   });
 
+  // undefined = still resolving; auth-guarded routes wait for it
   const [session, setSession] = useState<Session | null>();
+  const [authStarted, setAuthStarted] = useState(false);
   // Starts false so prerendered HTML and the client's first render agree (no
   // hydration mismatch). The resize effect below corrects it on mount.
   const [inShrink, setInShrink] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  // Worked out during render, not in an effect: child effects run first, so
+  // an app route's auth guard would otherwise see a null session and
+  // redirect before the client had loaded.
+  const authActive = authStarted || needsAuth(pathname);
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (_event == "SIGNED_IN" || _event == "TOKEN_REFRESHED") {
-        //Perform sign in actions here
-      }
-      setSession(session);
+    if (!authActive || authStarted) return;
+    setAuthStarted(true);
+    import("./database/SupabaseClient").then(({ supabase }) => {
+      supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+      });
     });
-  }, []);
+  }, [authActive, authStarted]);
 
   /******************************
    * Check screen width
@@ -199,7 +243,7 @@ export default function App() {
   };
 const CONTEXT =  {
             popAlert: popAlert,
-            session,
+            session: authActive ? session : null,
             navigate,
             inShrink,
           } as SharedContextProps;
@@ -222,7 +266,7 @@ const CONTEXT =  {
         onClose={() => setAlert({ active: false })}
         state={alert.state}
       />
-      <FooterBar />
+      <FooterBar context={CONTEXT} />
     </div>
   );
 }
